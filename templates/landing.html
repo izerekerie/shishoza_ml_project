@@ -1,0 +1,271 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Umurinzi — Rwanda Forest Risk Intelligence</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#74a288",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-container": "#edeeed",
+                    "on-primary": "#ffffff",
+                    "surface-container-low": "#f2f4f3",
+                    "tertiary-container": "#073824",
+                    "outline": "#717973",
+                    "secondary": "#3a6750",
+                    "surface-bright": "#f8faf9",
+                    "primary": "#002113",
+                    "on-primary-container": "#74a288",
+                    "on-surface-variant": "#414943",
+                    "background": "#f8faf9",
+                    "primary-container": "#073824",
+                    "on-surface": "#191c1c",
+                    "outline-variant": "#c1c9c1",
+                    "on-secondary": "#ffffff",
+                    "secondary-container": "#bceecf",
+                    "on-secondary-container": "#406d55",
+                    "on-tertiary": "#ffffff",
+                    "surface": "#f8faf9"
+            },
+            "borderRadius": { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+            "spacing": { "gutter": "16px", "base": "8px", "container-margin": "24px", "section-gap": "64px", "panel-width-desktop": "360px" },
+            "fontFamily": {
+                    "title-md": ["Inter"], "body-sm": ["Inter"], "headline-lg": ["Inter"],
+                    "display-lg": ["Inter"], "label-caps": ["Inter"], "headline-lg-mobile": ["Inter"], "body-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "title-md": ["20px", {"lineHeight": "28px", "fontWeight": "500"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.3em", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+        .glass-card:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(7, 56, 36, 0.08); }
+        .lang-select { border: 0; background: transparent; font: inherit; color: #414943; cursor: pointer; outline: none; }
+    </style>
+</head>
+<body class="bg-background text-on-surface overflow-x-hidden bg-white">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/85 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm">
+<div class="flex justify-between items-center h-20 px-container-margin max-w-[1280px] mx-auto">
+<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Umurinzi</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-body-lg text-body-lg text-primary border-b-2 border-primary pb-1" href="/citizen" data-i18n="nav.citizen">Citizen</a>
+<a class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors" href="/manager" data-i18n="nav.manager">Manager</a>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-on-surface-variant">language</span>
+<select id="langSel" class="lang-select font-body-lg text-body-lg" aria-label="Language">
+<option value="en">English</option>
+<option value="rw">Kinyarwanda</option>
+<option value="fr">Français</option>
+</select>
+</div>
+<a href="/login" class="px-6 py-2 bg-primary-container text-on-tertiary font-bold rounded-full active:scale-95 transition-transform duration-150" data-i18n="nav.login">Login</a>
+</div>
+</div>
+</nav>
+<!-- Main Content Shell -->
+<main class="min-h-screen flex flex-col items-center justify-center pt-20">
+<!-- Hero Section -->
+<section class="relative w-full h-[52vh] flex flex-col items-center justify-center overflow-hidden">
+<div class="absolute inset-0 z-0"><div class="absolute inset-0 bg-gradient-to-b from-transparent to-background"></div></div>
+<div class="relative z-10 text-center px-gutter max-w-4xl">
+<h1 class="font-display-lg text-display-lg text-primary mb-4" data-i18n="hero.title">Umurinzi — Rwanda Forest Risk Intelligence</h1>
+<p class="font-title-md text-title-md text-on-surface-variant max-w-2xl mx-auto opacity-80" data-i18n="hero.sub">
+                    Satellite monitoring and parcel-level risk assessment to support sustainable forest management in Rwanda.
+                </p>
+</div>
+</section>
+<!-- Role cards -->
+<section class="w-full max-w-[1280px] px-container-margin -mt-24 mb-section-gap relative z-20">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<!-- Citizen Card -->
+<div class="glass-card p-10 rounded-lg shadow-lg flex flex-col justify-between group">
+<div>
+<div class="w-16 h-16 rounded-2xl bg-secondary-container flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-on-secondary-container text-4xl">landscape</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2" data-i18n="c.title">Citizen</h2>
+<p class="font-title-md text-title-md text-secondary mb-8" data-i18n="c.tag">Check the risk on my land.</p>
+<ul class="space-y-4 mb-10">
+<li class="flex items-center gap-4 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-lg text-body-lg" data-i18n="c.b1">Upload your land certificate for automatic parcel detection</span></li>
+<li class="flex items-center gap-4 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-lg text-body-lg" data-i18n="c.b2">See tree-cover and deforestation risk for your plot</span></li>
+<li class="flex items-center gap-4 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-lg text-body-lg" data-i18n="c.b3">Simulate a planned cut and view its impact</span></li>
+<li class="flex items-center gap-4 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-lg text-body-lg" data-i18n="c.b4">Get evidence-based conservation suggestions</span></li>
+</ul>
+</div>
+<a href="/citizen" class="w-full text-center py-5 bg-primary text-on-primary font-bold rounded-lg hover:shadow-xl transition-all duration-300 active:scale-[0.98]" data-i18n="c.cta">Enter Citizen Portal</a>
+</div>
+<!-- Forest Manager Card -->
+<div class="glass-card p-10 rounded-lg shadow-lg flex flex-col justify-between group overflow-hidden">
+<div>
+<div class="w-16 h-16 rounded-2xl bg-primary-container flex items-center justify-center mb-8 group-hover:scale-110 transition-transform duration-300">
+<span class="material-symbols-outlined text-on-tertiary-container text-4xl">monitoring</span>
+</div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2" data-i18n="m.title">Forest Manager</h2>
+<p class="font-title-md text-title-md text-secondary mb-8" data-i18n="m.tag">Oversee my district.</p>
+<ul class="space-y-4 mb-10">
+<li class="flex items-center gap-4 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-lg text-body-lg" data-i18n="m.b1">Interactive sector-wide risk map</span></li>
+<li class="flex items-center gap-4 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-lg text-body-lg" data-i18n="m.b2">High, medium and low risk levels</span></li>
+<li class="flex items-center gap-4 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-lg text-body-lg" data-i18n="m.b3">Click any sector for detailed analysis</span></li>
+<li class="flex items-center gap-4 text-on-surface-variant"><span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">check_circle</span><span class="font-body-lg text-body-lg" data-i18n="m.b4">District-level reporting and trends</span></li>
+</ul>
+</div>
+<a href="/login" class="w-full text-center py-5 bg-secondary text-on-secondary font-bold rounded-lg hover:shadow-xl transition-all duration-300 active:scale-[0.98]" data-i18n="m.cta">Access Manager Dashboard</a>
+</div>
+</div>
+</section>
+<!-- Honest info cards -->
+<section class="w-full max-w-[1280px] px-container-margin mb-section-gap grid grid-cols-1 md:grid-cols-3 gap-base">
+<div class="p-base bg-surface-container-low rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-3 mb-2"><span class="material-symbols-outlined text-secondary">public</span><h3 class="font-title-md text-title-md text-primary" data-i18n="i1.h">Open data</h3></div>
+<p class="font-body-sm text-body-sm text-on-surface-variant" data-i18n="i1.p">Built entirely on public satellite datasets — Sentinel-2, Sentinel-1, SRTM and Hansen Global Forest Change — so results are independent and reproducible.</p>
+</div>
+<div class="p-base bg-surface-container-low rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-3 mb-2"><span class="material-symbols-outlined text-secondary">satellite_alt</span><h3 class="font-title-md text-title-md text-primary" data-i18n="i2.h">Precision</h3></div>
+<p class="font-body-sm text-body-sm text-on-surface-variant" data-i18n="i2.p">Combines optical, radar and terrain satellite data in a machine-learning model to detect forest change and simulate the impact of a cut.</p>
+</div>
+<div class="p-base bg-surface-container-low rounded-lg border border-outline-variant/20">
+<div class="flex items-center gap-3 mb-2"><span class="material-symbols-outlined text-secondary">lock</span><h3 class="font-title-md text-title-md text-primary" data-i18n="i3.h">Privacy</h3></div>
+<p class="font-body-sm text-body-sm text-on-surface-variant" data-i18n="i3.p">Used anonymously. Land certificates are processed in memory only; owner names and IDs are never stored.</p>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-section-gap bg-surface-container-low border-t border-outline-variant/50">
+<div class="max-w-[1280px] mx-auto px-container-margin">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
+<div class="md:col-span-6 flex flex-col gap-4">
+<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Umurinzi</div>
+<p class="font-body-lg text-body-lg text-on-surface-variant max-w-xs" data-i18n="hero.sub">Satellite monitoring and parcel-level risk assessment to support sustainable forest management in Rwanda.</p>
+</div>
+<div class="md:col-span-3 flex flex-col gap-4">
+<div class="font-label-caps text-label-caps uppercase tracking-widest text-secondary" data-i18n="f.resources">RESOURCES</div>
+<div class="flex flex-col gap-3">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#" data-i18n="f.methodology">Methodology</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#" data-i18n="f.datasources">Data sources</a>
+</div>
+</div>
+<div class="md:col-span-3 flex flex-col gap-4">
+<div class="font-label-caps text-label-caps uppercase tracking-widest text-secondary" data-i18n="f.support">SUPPORT</div>
+<div class="flex flex-col gap-3">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#" data-i18n="f.contact">Contact</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#" data-i18n="f.guidelines">Guidelines</a>
+</div>
+</div>
+</div>
+<div class="pt-8 border-t border-outline-variant/40 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="font-body-sm text-body-sm text-on-surface-variant">© 2026 Umurinzi · African Leadership University · BSc Software Engineering</div>
+</div>
+</div>
+</footer>
+<script>
+const I18N = {
+  en: {
+    "nav.citizen":"Citizen","nav.manager":"Manager","nav.login":"Login",
+    "hero.title":"Umurinzi — Rwanda Forest Risk Intelligence",
+    "hero.sub":"Satellite monitoring and parcel-level risk assessment to support sustainable forest management in Rwanda.",
+    "c.title":"Citizen","c.tag":"Check the risk on my land.",
+    "c.b1":"Upload your land certificate for automatic parcel detection",
+    "c.b2":"See tree-cover and deforestation risk for your plot",
+    "c.b3":"Simulate a planned cut and view its impact",
+    "c.b4":"Get evidence-based conservation suggestions",
+    "c.cta":"Enter Citizen Portal",
+    "m.title":"Forest Manager","m.tag":"Oversee my district.",
+    "m.b1":"Interactive sector-wide risk map",
+    "m.b2":"High, medium and low risk levels",
+    "m.b3":"Click any sector for detailed analysis",
+    "m.b4":"District-level reporting and trends",
+    "m.cta":"Access Manager Dashboard",
+    "i1.h":"Open data","i1.p":"Built entirely on public satellite datasets — Sentinel-2, Sentinel-1, SRTM and Hansen Global Forest Change — so results are independent and reproducible.",
+    "i2.h":"Precision","i2.p":"Combines optical, radar and terrain satellite data in a machine-learning model to detect forest change and simulate the impact of a cut.",
+    "i3.h":"Privacy","i3.p":"Used anonymously. Land certificates are processed in memory only; owner names and IDs are never stored.",
+    "f.resources":"RESOURCES","f.methodology":"Methodology","f.datasources":"Data sources",
+    "f.support":"SUPPORT","f.contact":"Contact","f.guidelines":"Guidelines"
+  },
+  rw: {
+    "nav.citizen":"Umuturage","nav.manager":"Umuyobozi","nav.login":"Injira",
+    "hero.title":"Umurinzi — Ubwenge ku byago by'amashyamba mu Rwanda",
+    "hero.sub":"Gukurikirana hifashishijwe icyogajuru no gusuzuma ibyago ku rwego rw'isambu kugira ngo dushyigikire imicungire irambye y'amashyamba mu Rwanda.",
+    "c.title":"Umuturage","c.tag":"Reba ibyago ku butaka bwanjye.",
+    "c.b1":"Ohereza impamyabutaka kugira ngo isambu yawe imenyekane",
+    "c.b2":"Reba ibyago byo gutema no kubura kw'ibiti ku isambu yawe",
+    "c.b3":"Igerageze gutema maze urebe ingaruka zabyo",
+    "c.b4":"Akira inama zishingiye ku bimenyetso zo kubungabunga",
+    "c.cta":"Injira nk'Umuturage",
+    "m.title":"Umuyobozi w'amashyamba","m.tag":"Genzura akarere kanjye.",
+    "m.b1":"Ikarita y'ibyago ku mirenge yose",
+    "m.b2":"Urwego rw'ibyago: hejuru, hagati, hasi",
+    "m.b3":"Kanda umurenge wose urebe isesengura rirambuye",
+    "m.b4":"Raporo n'imigendekere by'akarere",
+    "m.cta":"Injira ku Imbonerahamwe",
+    "i1.h":"Amakuru afunguye","i1.p":"Yubatswe ku makuru rusange ya Sentinel-2, Sentinel-1, SRTM na Hansen Global Forest Change — bityo ibisubizo bigenga kandi bishobora kongera gukorwa.",
+    "i2.h":"Ukuri","i2.p":"Ihuza amakuru y'amabara, radar n'ubutaka mu cyitegererezo cy'ubwenge bw'ubukorano kugira ngo imenye impinduka mu mashyamba kandi yerekane ingaruka zo gutema.",
+    "i3.h":"Ibanga","i3.p":"Bikoreshwa mu ibanga. Impamyabutaka itunganyirizwa mu bwonko bwa mudasobwa gusa; amazina n'indangamuntu ntibibikwa.",
+    "f.resources":"IBIKORESHO","f.methodology":"Uburyo bwakoreshejwe","f.datasources":"Inkomoko y'amakuru",
+    "f.support":"UBUFASHA","f.contact":"Twandikire","f.guidelines":"Amabwiriza"
+  },
+  fr: {
+    "nav.citizen":"Citoyen","nav.manager":"Gestionnaire","nav.login":"Connexion",
+    "hero.title":"Umurinzi — Renseignement sur le risque forestier au Rwanda",
+    "hero.sub":"Surveillance satellitaire et évaluation des risques à l'échelle de la parcelle pour soutenir la gestion durable des forêts au Rwanda.",
+    "c.title":"Citoyen","c.tag":"Vérifier le risque sur ma terre.",
+    "c.b1":"Téléversez votre titre foncier pour la détection automatique de la parcelle",
+    "c.b2":"Consultez le couvert forestier et le risque de déforestation de votre parcelle",
+    "c.b3":"Simulez une coupe prévue et visualisez son impact",
+    "c.b4":"Recevez des suggestions de conservation fondées sur des preuves",
+    "c.cta":"Accéder au portail citoyen",
+    "m.title":"Gestionnaire forestier","m.tag":"Superviser mon district.",
+    "m.b1":"Carte interactive des risques par secteur",
+    "m.b2":"Niveaux de risque élevé, moyen et faible",
+    "m.b3":"Cliquez sur un secteur pour une analyse détaillée",
+    "m.b4":"Rapports et tendances au niveau du district",
+    "m.cta":"Accéder au tableau de bord",
+    "i1.h":"Données ouvertes","i1.p":"Construit entièrement sur des données satellitaires publiques — Sentinel-2, Sentinel-1, SRTM et Hansen Global Forest Change — pour des résultats indépendants et reproductibles.",
+    "i2.h":"Précision","i2.p":"Combine des données satellitaires optiques, radar et de terrain dans un modèle d'apprentissage automatique pour détecter les changements forestiers et simuler l'impact d'une coupe.",
+    "i3.h":"Confidentialité","i3.p":"Utilisé de façon anonyme. Les titres fonciers sont traités en mémoire uniquement ; les noms et identifiants ne sont jamais conservés.",
+    "f.resources":"RESSOURCES","f.methodology":"Méthodologie","f.datasources":"Sources de données",
+    "f.support":"ASSISTANCE","f.contact":"Contact","f.guidelines":"Directives"
+  }
+};
+function setLang(lang){
+  if(!I18N[lang]) lang="en";
+  document.documentElement.lang=lang;
+  document.querySelectorAll("[data-i18n]").forEach(function(el){
+    var v=I18N[lang][el.getAttribute("data-i18n")];
+    if(v!=null) el.textContent=v;
+  });
+  try{ localStorage.setItem("umurinzi_lang",lang); }catch(e){}
+  var sel=document.getElementById("langSel"); if(sel) sel.value=lang;
+}
+(function(){
+  var saved="en";
+  try{ saved=localStorage.getItem("umurinzi_lang")||"en"; }catch(e){}
+  setLang(saved);
+  var sel=document.getElementById("langSel");
+  if(sel) sel.addEventListener("change",function(e){ setLang(e.target.value); });
+})();
+</script>
+</body></html>

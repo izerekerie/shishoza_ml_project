@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.0/css/all.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_58496c54fea8e34b633247cbbc974bdc {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+                .leaflet-container { font-size: 1rem; }
+            </style>
+
+            <style>html, body {
+                width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            </style>
+
+            <style>#map {
+                position:absolute;
+                top:0;
+                bottom:0;
+                right:0;
+                left:0;
+                }
+            </style>
+
+            <script>
+                L_NO_TOUCH = false;
+                L_DISABLE_3D = false;
+            </script>
+
+        
+</head>
+<body>
+    
+    
+            <div class="folium-map" id="map_58496c54fea8e34b633247cbbc974bdc" ></div>
+        
+</body>
+<script>
+    
+    
+            var map_58496c54fea8e34b633247cbbc974bdc = L.map(
+                "map_58496c54fea8e34b633247cbbc974bdc",
+                {
+                    center: [-2.65, 29.12],
+                    crs: L.CRS.EPSG3857,
+                    ...{
+  "zoom": 11,
+  "zoomControl": true,
+  "preferCanvas": false,
+}
+
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_0a5845fc78eb1374786a38bd8ee00a53 = L.tileLayer(
+                "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+                {
+  "minZoom": 0,
+  "maxZoom": 18,
+  "maxNativeZoom": 18,
+  "noWrap": false,
+  "attribution": "Esri",
+  "subdomains": "abc",
+  "detectRetina": false,
+  "tms": false,
+  "opacity": 1,
+}
+
+            );
+        
+    
+            tile_layer_0a5845fc78eb1374786a38bd8ee00a53.addTo(map_58496c54fea8e34b633247cbbc974bdc);
+        
+    
+            var circle_marker_57094837c9fd6e101e25393518d88480 = L.circleMarker(
+                [-2.65, 29.12],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12, "stroke": true, "weight": 3}
+            ).addTo(map_58496c54fea8e34b633247cbbc974bdc);
+        
+    
+        var popup_378333fffb528c4a73fa5907a74ce99d = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_8637d5db9541a726f61ef4aa44f11abc = $(`<div id="html_8637d5db9541a726f61ef4aa44f11abc" style="width: 100.0%; height: 100.0%;"><b>HIGH RISK</b><br>Tree cover 2020: 93.6%<br>Tree cover 2024: 21.6%<br>Prob: 43.8%</div>`)[0];
+                popup_378333fffb528c4a73fa5907a74ce99d.setContent(html_8637d5db9541a726f61ef4aa44f11abc);
+            
+        
+
+        circle_marker_57094837c9fd6e101e25393518d88480.bindPopup(popup_378333fffb528c4a73fa5907a74ce99d)
+        ;
+
+        
+    
+    
+            circle_marker_57094837c9fd6e101e25393518d88480.bindTooltip(
+                `<div>
+                     Parcel A
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_88ec0d9efed0df2f00069908ba5f4906 = L.circleMarker(
+                [-2.72, 29.05],
+                {"bubblingMouseEvents": true, "color": "orange", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "orange", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12, "stroke": true, "weight": 3}
+            ).addTo(map_58496c54fea8e34b633247cbbc974bdc);
+        
+    
+        var popup_1a85720da7894106de0ddaa002307eba = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_cee1a38959765d554c23538faabea2de = $(`<div id="html_cee1a38959765d554c23538faabea2de" style="width: 100.0%; height: 100.0%;"><b>MEDIUM RISK</b><br>Tree cover 2020: 98.4%<br>Tree cover 2024: 96.0%<br>Prob: 35.8%</div>`)[0];
+                popup_1a85720da7894106de0ddaa002307eba.setContent(html_cee1a38959765d554c23538faabea2de);
+            
+        
+
+        circle_marker_88ec0d9efed0df2f00069908ba5f4906.bindPopup(popup_1a85720da7894106de0ddaa002307eba)
+        ;
+
+        
+    
+    
+            circle_marker_88ec0d9efed0df2f00069908ba5f4906.bindTooltip(
+                `<div>
+                     Parcel B
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+    
+            var circle_marker_b1e5ce68e238d9b7c6fbdfe3d233b426 = L.circleMarker(
+                [-2.58, 29.2],
+                {"bubblingMouseEvents": true, "color": "red", "dashArray": null, "dashOffset": null, "fill": true, "fillColor": "red", "fillOpacity": 0.7, "fillRule": "evenodd", "lineCap": "round", "lineJoin": "round", "opacity": 1.0, "radius": 12, "stroke": true, "weight": 3}
+            ).addTo(map_58496c54fea8e34b633247cbbc974bdc);
+        
+    
+        var popup_88a2f8f748df978c301d1f0836fcb386 = L.popup({
+  "maxWidth": 250,
+});
+
+        
+            
+                var html_eb8a811b8c7f8b6cb90783dc8a1b138f = $(`<div id="html_eb8a811b8c7f8b6cb90783dc8a1b138f" style="width: 100.0%; height: 100.0%;"><b>HIGH RISK</b><br>Tree cover 2020: 88.8%<br>Tree cover 2024: 62.4%<br>Prob: 52.7%</div>`)[0];
+                popup_88a2f8f748df978c301d1f0836fcb386.setContent(html_eb8a811b8c7f8b6cb90783dc8a1b138f);
+            
+        
+
+        circle_marker_b1e5ce68e238d9b7c6fbdfe3d233b426.bindPopup(popup_88a2f8f748df978c301d1f0836fcb386)
+        ;
+
+        
+    
+    
+            circle_marker_b1e5ce68e238d9b7c6fbdfe3d233b426.bindTooltip(
+                `<div>
+                     Parcel C
+                 </div>`,
+                {
+  "sticky": true,
+}
+            );
+        
+</script>
+</html>

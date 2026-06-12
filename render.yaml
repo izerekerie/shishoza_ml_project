@@ -1,0 +1,34 @@
+# ════════════════════════════════════════════════════════════════════
+#  Umurinzi — Render service blueprint
+#  Reading: https://render.com/docs/blueprint-spec
+#
+#  Quick deploy:
+#    1. Push this repo to GitHub.
+#    2. Go to https://render.com → New → Blueprint → connect the repo.
+#    3. Render reads this file and provisions everything.
+#
+#  Service tier choice for THIS workload (BSc demo):
+#    - "free" (512 MB RAM, spins down after 15 min idle): demos with cold starts
+#    - "starter" ($7/mo, 512 MB, always-on): NOT enough for our 600 MB boot
+#    - "standard" ($25/mo, 2 GB RAM): the recommended choice
+#
+#  The Docker-based deploy is preferred (matches the .Dockerfile exactly) but
+#  Render's native Python buildpack works too — see DEPLOYMENT.md.
+# ════════════════════════════════════════════════════════════════════
+
+services:
+  - type: web
+    name: umurinzi-web
+    runtime: docker                       # build from ./Dockerfile
+    plan: standard                        # 2 GB RAM — change to "free" for demos
+    region: frankfurt                     # closest Render region to Rwanda
+    branch: main
+    healthCheckPath: /api/me              # cheap endpoint that always returns 200
+    autoDeploy: true                      # rebuild on every push to main
+    envVars:
+      - key: SECRET_KEY                   # rotate from the BSc demo hardcode
+        generateValue: true               # Render auto-generates a secure value
+      - key: FLASK_ENV
+        value: production
+      - key: PYTHONUNBUFFERED
+        value: "1"

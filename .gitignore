@@ -1,0 +1,114 @@
+# ════════════════════════════════════════════════════════════════════
+#  Umurinzi — .gitignore
+#  Keeps the repository focused on the PROJECT DELIVERABLE only:
+#    - Flask app + scripts + notebooks
+#    - Training data + models + results
+#    - README.md + requirements.txt
+#  Everything else (dissertation drafts, planning notes, presentations,
+#  one-time utility scripts) is excluded.
+# ════════════════════════════════════════════════════════════════════
+
+# ── Environments & editor settings ──────────────────────────────────
+.venv/
+venv/
+env/
+.vscode/
+.claude/
+.idea/
+*.swp
+*.swo
+
+# ── Python build artifacts ─────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# ── OS junk ─────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ════════════════════════════════════════════════════════════════════
+#  Dissertation drafts & writing artifacts — NOT project deliverable
+# ════════════════════════════════════════════════════════════════════
+*.docx
+*.pptx
+*.pdf                              # except sample certificates (re-included below)
+!data/raw/external/*.pdf
+
+# ── Project-planning markdown (not the README) ──────────────────────
+SPEC.md
+DECISIONS.md
+DESIGN_PROMPTS.md
+PROGRESS.md
+PROGRESS_TRACKER.md
+RESEARCH_TODO.md
+
+# ════════════════════════════════════════════════════════════════════
+#  One-time / utility scripts — not part of the reproducible pipeline
+# ════════════════════════════════════════════════════════════════════
+scripts/restructure_project.py
+scripts/organize_deliverables.py
+scripts/apa7_format.py
+scripts/apply_proposal_fixes.py
+scripts/gen_diagram_descriptions.py
+scripts/revert8_and_ethics.py
+scripts/rewrite_descriptions.py
+
+# ── Derivative bundle (regenerable from results/) ──────────────────
+ml_deliverables/
+
+# ── Over-100MB binary (exceeds GitHub hard limit) ───────────────────
+# rf_D_tuned.pkl is the grid-search winner but NOT deployed (rf_D.pkl beats
+# it on inference cost vs marginal F1 gain). Search RESULTS are preserved in
+# results/hyperparameter_tuning/ — the .pkl itself is regenerable by running
+# scripts/hyperparameter_tune.py
+models/rf_D_tuned.pkl
+
+# ════════════════════════════════════════════════════════════════════
+#  Runtime / generated data — regenerable on demand
+# ════════════════════════════════════════════════════════════════════
+# SQLite DB — anyone cloning runs scripts/seed_users.py to rebuild
+data/database/treesight.db
+
+# Temporary upload working directory (citizens uploading cadastral PDFs)
+data/raw/external/_uploads/
+
+# Debug PNGs that the cadastral OCR pipeline may emit during dev
+data/raw/external/bug_*.png
+data/raw/external/cad_*.png
+data/raw/external/cad_*.txt
+data/raw/external/bugesera_*.png
+
+# Temporary task / log output
+/tmp/
+*.log
+treesight.log
+
+# ════════════════════════════════════════════════════════════════════
+#  Old-structure remnants (defensive — in case anyone re-creates them)
+# ════════════════════════════════════════════════════════════════════
+data/eda/                          # was the old EDA location → now results/eda/
+data/training_data.csv             # was the old raw location → now data/raw/
+data/training_data_clean.csv       # now data/processed/
+data/sectors_*.geojson             # now data/geo/
+data/nyungwe_*.tif                 # now data/geo/
+data/seed_*.sql                    # now data/database/
+data/sector_risk.json              # now results/application/
+data/experiment_results.csv        # now results/experiments/
+data/feature_importance.png        # now results/experiments/
+data/rq1_*.png                     # now results/experiments/
+data/rq1_*.md                      # now results/experiments/
+data/hp_tuning_*.csv               # now results/hyperparameter_tuning/
+data/hp_tuning_*.json              # now results/hyperparameter_tuning/
+data/hp_tuning_*.png               # now results/hyperparameter_tuning/
+data/confusion_matrix.png          # now results/metrics/
+data/results_*.png                 # now results/metrics/
+data/evaluation_audit.json         # now results/metrics/
+data/patch_size_*.png              # now results/patch_size_analysis/
+data/patch_size_*.csv              # now results/patch_size_analysis/
+data/data_check_*.png              # old prototype, deleted
+data/deforestation_map.png         # old prototype, deleted
+data/hyperparam_results.csv        # duplicate, deleted

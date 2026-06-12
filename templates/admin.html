@@ -1,0 +1,309 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<title>Umurinzi — Admin · User management</title>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = { darkMode:"class", theme:{ extend:{
+    "colors":{
+      "on-primary":"#ffffff","primary":"#002113","primary-container":"#073824","on-tertiary":"#ffffff",
+      "secondary":"#3a6750","on-secondary-container":"#406d55","secondary-container":"#bceecf",
+      "surface-container-low":"#f2f4f3","surface-container-highest":"#e1e3e2","on-surface":"#191c1c",
+      "on-surface-variant":"#414943","outline-variant":"#c1c9c1","background":"#f8faf9","error":"#dc2626"
+    },
+    "borderRadius":{ "DEFAULT":"0.5rem","lg":"1rem","full":"9999px" },
+    "spacing":{ "gutter":"16px","base":"8px","container-margin":"24px" },
+    "fontFamily":{ "headline-lg":["Inter"],"title-md":["Inter"],"label-caps":["Inter"],"body-sm":["Inter"] },
+    "fontSize":{
+      "headline-lg":["32px",{"lineHeight":"40px","fontWeight":"800"}],
+      "title-md":["20px",{"lineHeight":"28px","fontWeight":"500"}],
+      "label-caps":["12px",{"lineHeight":"16px","letterSpacing":"0.2em","fontWeight":"600"}],
+      "body-sm":["14px",{"lineHeight":"20px"}]
+    }
+  } } }
+</script>
+<style>
+  body { font-family:'Inter',sans-serif; background:#f8faf9; }
+  /* styling for JS-injected table content */
+  table { width:100%; border-collapse:collapse; font-size:13px; }
+  thead th { text-align:left; padding:10px 10px; background:#f2f4f3; color:#414943; font-weight:700;
+             font-size:11px; text-transform:uppercase; letter-spacing:0.06em; border-bottom:1px solid #e5e7eb; }
+  tbody td { padding:10px; border-bottom:1px solid #f1f5f4; vertical-align:middle; }
+  tbody tr:hover td { background:#f8faf9; }
+  td.email { font-family:ui-monospace,monospace; font-size:12px; color:#073824; }
+  td.actions { text-align:right; white-space:nowrap; }
+  .pill { display:inline-block; padding:2px 10px; border-radius:999px; font-size:11px; font-weight:700; }
+  .pill.admin { background:#dbeafe; color:#1e3a8a; }
+  .pill.manager { background:#bceecf; color:#073824; }
+  .pill.active { background:#dcfce7; color:#166534; }
+  .pill.inactive { background:#fee2e2; color:#991b1b; }
+  .iconbtn { background:#fff; border:1px solid #d1d5db; padding:4px 10px; border-radius:6px;
+             font-size:12px; font-weight:600; cursor:pointer; margin-left:4px; color:#414943; }
+  .iconbtn:hover { background:#f2f4f3; border-color:#073824; color:#073824; }
+  .err { color:#b91c1c; font-size:12px; margin-top:10px; display:none; }
+  #modal { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:none;
+           align-items:center; justify-content:center; padding:20px; z-index:100; }
+  #modal.open { display:flex; }
+</style>
+</head>
+<body class="h-screen overflow-hidden text-on-surface flex">
+<!-- Sidebar (same as manager) -->
+<aside class="fixed left-0 top-0 h-full w-[280px] bg-[#F8FAFC] flex flex-col p-gutter gap-base border-r border-[#E5E7EB] shadow-sm z-40">
+  <div class="mb-4">
+    <h1 class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Umurinzi</h1>
+    <p class="font-body-sm text-body-sm text-on-surface-variant opacity-70">Administration</p>
+  </div>
+  <nav class="flex flex-col gap-2 mb-auto">
+    <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/manager">
+      <span class="material-symbols-outlined">map</span><span class="font-title-md text-title-md">Risk Map</span></a>
+    <a class="flex items-center gap-3 p-3 bg-primary text-white rounded-lg font-bold transition-all hover:translate-x-1" href="/admin">
+      <span class="material-symbols-outlined">manage_accounts</span><span class="font-title-md text-title-md">User management</span></a>
+    <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/citizen">
+      <span class="material-symbols-outlined">person</span><span class="font-title-md text-title-md">Citizen view</span></a>
+    <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/apidocs/" target="_blank">
+      <span class="material-symbols-outlined">api</span><span class="font-title-md text-title-md">API docs</span></a>
+  </nav>
+  <div class="mt-8 pt-6 border-t border-outline-variant/20 flex flex-col gap-1">
+    <div class="px-2 text-sm font-bold text-on-surface" id="userLabel">loading…</div>
+    <a class="flex items-center gap-3 p-2 text-error hover:bg-surface-container-highest rounded-lg transition-all text-sm font-semibold cursor-pointer" id="logoutLink" href="#">
+      <span class="material-symbols-outlined text-base">logout</span><span>Sign out</span></a>
+  </div>
+  <div class="mt-auto pt-4 border-t border-[#E5E7EB]"><p class="text-[10px] text-on-surface-variant text-center opacity-60">© 2026 Umurinzi · ALU</p></div>
+</aside>
+
+<!-- Main -->
+<main class="ml-[280px] flex-1 h-full overflow-y-auto p-8">
+  <header class="mb-6">
+    <h2 class="text-2xl font-bold text-primary">User management</h2>
+    <p class="text-sm text-on-surface-variant mt-1">Create and manage forest-manager and admin accounts.</p>
+  </header>
+
+  <!-- Stat cards -->
+  <section class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="bg-white p-5 rounded-2xl border border-[#E5E7EB]" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);"><p class="text-xs text-on-surface-variant mb-1">Total users</p><p class="text-3xl font-bold text-primary" id="statTotal">—</p></div>
+    <div class="bg-white p-5 rounded-2xl border border-[#E5E7EB] border-l-4" style="border-left-color:#1e3a8a;box-shadow:0 4px 12px rgba(0,0,0,0.03);"><p class="text-xs text-on-surface-variant mb-1">Admins</p><p class="text-3xl font-bold" style="color:#1e3a8a" id="statAdmins">—</p></div>
+    <div class="bg-white p-5 rounded-2xl border border-[#E5E7EB] border-l-4" style="border-left-color:#073824;box-shadow:0 4px 12px rgba(0,0,0,0.03);"><p class="text-xs text-on-surface-variant mb-1">Forest managers</p><p class="text-3xl font-bold text-primary" id="statMgrs">—</p></div>
+    <div class="bg-white p-5 rounded-2xl border border-[#E5E7EB] border-l-4" style="border-left-color:#16a34a;box-shadow:0 4px 12px rgba(0,0,0,0.03);"><p class="text-xs text-on-surface-variant mb-1">Active</p><p class="text-3xl font-bold" style="color:#16a34a" id="statActive">—</p></div>
+  </section>
+
+  <!-- Users card -->
+  <section class="bg-white rounded-2xl border border-[#E5E7EB] p-6" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+    <div class="flex gap-3 items-center flex-wrap mb-4">
+      <input type="text" id="searchInp" placeholder="Search email, name, or district…" class="flex-1 min-w-[220px] px-4 py-2.5 rounded-lg border border-outline-variant/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary"/>
+      <select id="roleFilter" class="px-4 py-2.5 rounded-lg border border-outline-variant/60 text-sm">
+        <option value="">All roles</option>
+        <option value="admin">Admin only</option>
+        <option value="forest_manager">Forest manager only</option>
+      </select>
+      <button id="addBtn" class="flex items-center gap-1.5 bg-primary text-white px-5 py-2.5 rounded-lg text-sm font-bold hover:opacity-90 transition-all" style="background-color:#14532D;">
+        <span class="material-symbols-outlined text-[18px]">person_add</span> Add user</button>
+    </div>
+    <div class="overflow-x-auto">
+      <table id="usersTable">
+        <thead><tr>
+          <th>ID</th><th>Email</th><th>Name</th><th>Role</th><th>District</th><th>Lang</th><th>Last login</th><th>Status</th><th style="text-align:right">Actions</th>
+        </tr></thead>
+        <tbody id="usersBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<!-- Add/Edit modal -->
+<div id="modal">
+  <div class="bg-white p-6 rounded-2xl max-w-[460px] w-full" style="box-shadow:0 20px 40px rgba(0,0,0,0.25);">
+    <h3 id="modalTitle" class="text-lg font-bold text-primary mb-4">Add user</h3>
+    <form id="userForm" class="space-y-1">
+      <input type="hidden" id="formId"/>
+      <label for="formEmail" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">Email <span style="color:#dc2626">*</span></label>
+      <input id="formEmail" type="email" required autocomplete="off" class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary"/>
+      <label for="formName" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">Full name <span style="color:#dc2626">*</span></label>
+      <input id="formName" type="text" required class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary"/>
+      <label for="formRole" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">Role <span style="color:#dc2626">*</span></label>
+      <select id="formRole" required class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm">
+        <option value="forest_manager">Forest manager</option>
+        <option value="admin">Admin</option>
+      </select>
+      <label for="formScope" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">District scope (forest managers only)</label>
+      <select id="formScope" class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm">
+        <option value="">— none —</option>
+      </select>
+      <label for="formOrg" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">Organisation</label>
+      <input id="formOrg" type="text" placeholder="e.g. Rwanda Forestry Authority" class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary"/>
+      <label for="formLang" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">Preferred language</label>
+      <select id="formLang" class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm">
+        <option value="en">English</option><option value="rw">Kinyarwanda</option><option value="fr">Français</option>
+      </select>
+      <label for="formPwd" id="pwdLabel" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">Password <span style="color:#dc2626">*</span></label>
+      <input id="formPwd" type="password" placeholder="min 4 characters" class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary"/>
+      <p class="err" id="formErr"></p>
+      <div class="flex gap-2 justify-end mt-5">
+        <button type="button" id="cancelBtn" class="px-4 py-2 rounded-lg text-sm font-semibold border border-outline-variant/60 text-on-surface-variant hover:bg-surface-container-low">Cancel</button>
+        <button type="submit" id="saveBtn" class="px-5 py-2 rounded-lg text-sm font-bold text-white" style="background-color:#14532D;">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+let USERS = [];
+let DISTRICTS = [];
+
+(async () => {
+  const me = await fetch('/api/me').then(r => r.json());
+  if (!me.authenticated || me.user.role !== 'admin') { window.location.href = '/login'; return; }
+  document.getElementById('userLabel').textContent = me.user.full_name;
+  try {
+    const geo = await fetch('/static/sectors.geojson').then(r => r.json());
+    DISTRICTS = [...new Set(geo.features.map(f => f.properties.district))].sort();
+    const sel = document.getElementById('formScope');
+    DISTRICTS.forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; sel.appendChild(o); });
+  } catch (e) {}
+  await refresh();
+})();
+
+async function refresh() {
+  const r = await fetch('/api/users').then(r => r.json());
+  USERS = r.users || [];
+  renderStats(); renderTable();
+}
+
+function renderStats() {
+  document.getElementById('statTotal').textContent  = USERS.length;
+  document.getElementById('statAdmins').textContent = USERS.filter(u => u.role === 'admin').length;
+  document.getElementById('statMgrs').textContent   = USERS.filter(u => u.role === 'forest_manager').length;
+  document.getElementById('statActive').textContent = USERS.filter(u => u.is_active === 1).length;
+}
+
+function renderTable() {
+  const q = document.getElementById('searchInp').value.toLowerCase();
+  const rf = document.getElementById('roleFilter').value;
+  const tbody = document.getElementById('usersBody');
+  tbody.innerHTML = '';
+  USERS.filter(u => !rf || u.role === rf)
+    .filter(u => !q || (u.email + ' ' + u.full_name + ' ' + (u.district_scope || '')).toLowerCase().includes(q))
+    .forEach(u => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${u.user_id}</td>
+        <td class="email">${u.email}</td>
+        <td>${u.full_name}</td>
+        <td><span class="pill ${u.role === 'admin' ? 'admin' : 'manager'}">${u.role}</span></td>
+        <td>${u.district_scope || '<em style="color:#9ca3af">ALL</em>'}</td>
+        <td>${u.language}</td>
+        <td style="color:#6b7280">${u.last_login || '(never)'}</td>
+        <td><span class="pill ${u.is_active ? 'active' : 'inactive'}">${u.is_active ? 'active' : 'disabled'}</span></td>
+        <td class="actions">
+          <button class="iconbtn" data-action="edit" data-id="${u.user_id}">Edit</button>
+          <button class="iconbtn" data-action="reset" data-id="${u.user_id}">Reset</button>
+          ${u.is_active
+            ? `<button class="iconbtn" data-action="disable" data-id="${u.user_id}">Disable</button>`
+            : `<button class="iconbtn" data-action="enable"  data-id="${u.user_id}">Enable</button>`}
+        </td>`;
+      tbody.appendChild(tr);
+    });
+}
+
+document.getElementById('searchInp').addEventListener('input', renderTable);
+document.getElementById('roleFilter').addEventListener('change', renderTable);
+
+const modal = document.getElementById('modal');
+function openModal(user) {
+  document.getElementById('formErr').style.display = 'none';
+  if (user) {
+    document.getElementById('modalTitle').textContent = `Edit user #${user.user_id}`;
+    document.getElementById('formId').value = user.user_id;
+    document.getElementById('formEmail').value = user.email;
+    document.getElementById('formEmail').disabled = true;
+    document.getElementById('formName').value = user.full_name;
+    document.getElementById('formRole').value = user.role;
+    document.getElementById('formScope').value = user.district_scope || '';
+    document.getElementById('formOrg').value = user.organisation || '';
+    document.getElementById('formLang').value = user.language;
+    document.getElementById('formPwd').value = '';
+    document.getElementById('formPwd').required = false;
+    document.getElementById('pwdLabel').style.display = 'none';
+    document.getElementById('formPwd').style.display = 'none';
+  } else {
+    document.getElementById('modalTitle').textContent = 'Add user';
+    document.getElementById('formId').value = '';
+    document.getElementById('formEmail').value = '';
+    document.getElementById('formEmail').disabled = false;
+    document.getElementById('formName').value = '';
+    document.getElementById('formRole').value = 'forest_manager';
+    document.getElementById('formScope').value = '';
+    document.getElementById('formOrg').value = '';
+    document.getElementById('formLang').value = 'en';
+    document.getElementById('formPwd').value = '';
+    document.getElementById('formPwd').required = true;
+    document.getElementById('pwdLabel').style.display = 'block';
+    document.getElementById('formPwd').style.display = 'block';
+  }
+  modal.classList.add('open');
+}
+function closeModal() { modal.classList.remove('open'); }
+document.getElementById('addBtn').addEventListener('click', () => openModal(null));
+document.getElementById('cancelBtn').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+document.getElementById('usersBody').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-action]'); if (!btn) return;
+  const id = parseInt(btn.getAttribute('data-id'), 10);
+  const action = btn.getAttribute('data-action');
+  const user = USERS.find(u => u.user_id === id);
+  if (action === 'edit')    return openModal(user);
+  if (action === 'reset')   return resetPassword(user);
+  if (action === 'disable') return toggleActive(user, 0);
+  if (action === 'enable')  return toggleActive(user, 1);
+});
+
+async function resetPassword(user) {
+  const pwd = prompt(`New password for ${user.email}:`);
+  if (!pwd) return;
+  const r = await fetch(`/api/users/${user.user_id}/password`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: pwd}) });
+  const d = await r.json();
+  if (d.ok) alert('Password updated.'); else alert('Error: ' + (d.error || 'unknown'));
+}
+
+async function toggleActive(user, newState) {
+  const verb = newState ? 'enable' : 'disable';
+  if (!confirm(`Really ${verb} ${user.email}?`)) return;
+  const r = await fetch(`/api/users/${user.user_id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({is_active: newState}) });
+  const d = await r.json();
+  if (d.ok) refresh(); else alert('Error: ' + (d.error || 'unknown'));
+}
+
+document.getElementById('userForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const id = document.getElementById('formId').value;
+  const body = {
+    full_name: document.getElementById('formName').value.trim(),
+    role: document.getElementById('formRole').value,
+    district_scope: document.getElementById('formScope').value || null,
+    organisation: document.getElementById('formOrg').value.trim() || null,
+    language: document.getElementById('formLang').value,
+  };
+  const err = document.getElementById('formErr');
+  err.style.display = 'none';
+  try {
+    let r;
+    if (id) {
+      r = await fetch(`/api/users/${id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    } else {
+      body.email = document.getElementById('formEmail').value.trim().toLowerCase();
+      body.password = document.getElementById('formPwd').value;
+      r = await fetch('/api/users', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body) });
+    }
+    const d = await r.json();
+    if (d.ok) { closeModal(); refresh(); }
+    else { err.textContent = d.error || 'Save failed'; err.style.display = 'block'; }
+  } catch (e) { err.textContent = 'Network error: ' + e.message; err.style.display = 'block'; }
+});
+
+document.getElementById('logoutLink').addEventListener('click', async (e) => {
+  e.preventDefault(); await fetch('/api/logout', { method:'POST' }); window.location.href = '/login';
+});
+</script>
+</body></html>

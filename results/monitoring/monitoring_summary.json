@@ -1,0 +1,18 @@
+{
+  "total_predictions": 12,
+  "risk_distribution": {
+    "LOW": 8,
+    "HIGH": 2,
+    "MEDIUM": 2
+  },
+  "confidence_distribution": {
+    "HIGH": 4,
+    "LOW": 7,
+    "MEDIUM": 1
+  },
+  "out_of_zone_pct": 58.3,
+  "median_km_from_training": 84.9,
+  "drift_threshold_pct": 30.0,
+  "drift_detected": true,
+  "recommended_action": "RETRAIN_NATIONAL"
+}
