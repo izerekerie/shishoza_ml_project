@@ -1,0 +1,42 @@
+# Mirror .gitignore (don't bloat the Docker context)
+.venv/
+.git/
+.gitignore
+.vscode/
+.claude/
+.DS_Store
+
+# Dissertation drafts
+*.docx
+*.pptx
+SPEC.md
+DECISIONS.md
+DESIGN_PROMPTS.md
+PROGRESS.md
+PROGRESS_TRACKER.md
+RESEARCH_TODO.md
+
+# Utility scripts — not needed at runtime
+scripts/restructure_project.py
+scripts/organize_deliverables.py
+scripts/apa7_format.py
+scripts/apply_proposal_fixes.py
+scripts/gen_diagram_descriptions.py
+scripts/revert8_and_ethics.py
+scripts/rewrite_descriptions.py
+
+# Notebooks — not runtime; saves ~270 KB + node_modules-like overhead
+notebooks/
+
+# Build artifacts
+__pycache__/
+*.pyc
+*.log
+ml_deliverables/
+models/rf_D_tuned.pkl
+
+# Temporary uploads
+data/raw/external/_uploads/
+data/raw/external/bug_*.png
+data/raw/external/cad_*.png
+data/database/treesight.db

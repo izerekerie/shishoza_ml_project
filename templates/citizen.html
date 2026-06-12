@@ -1,0 +1,334 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<title>Umurinzi — Citizen Portal</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = { darkMode:"class", theme:{ extend:{
+    "colors":{
+      "primary":"#012d1d","primary-container":"#1b4332","on-primary":"#ffffff","on-primary-fixed-variant":"#274e3d",
+      "secondary":"#79564b","on-surface":"#071e27","on-surface-variant":"#414844","outline":"#717973",
+      "outline-variant":"#c1c8c2","surface":"#f3faff","surface-bright":"#f3faff","surface-container-lowest":"#ffffff",
+      "surface-container-low":"#e6f6ff","surface-container":"#dbf1fe","surface-container-high":"#d5ecf8",
+      "surface-variant":"#cfe6f2","surface-dim":"#c7dde9","background":"#f3faff","error":"#ba1a1a",
+      "error-container":"#ffdad6","primary-fixed":"#c1ecd4"
+    },
+    "borderRadius":{ "DEFAULT":"0.125rem","lg":"0.25rem","xl":"0.5rem","full":"0.75rem" },
+    "spacing":{ "container-margin":"24px","panel-width":"360px","gutter":"16px" },
+    "fontFamily":{ "label-sm":["Inter"],"title-lg":["Inter"],"data-mono":["Inter"],"headline-md":["Inter"],"label-md":["Inter"],"body-md":["Inter"] },
+    "fontSize":{
+      "label-sm":["12px",{"lineHeight":"16px","letterSpacing":"0.05em","fontWeight":"600"}],
+      "headline-md":["24px",{"lineHeight":"32px","fontWeight":"600"}],
+      "title-lg":["20px",{"lineHeight":"28px","fontWeight":"600"}],
+      "data-mono":["14px",{"lineHeight":"20px","fontWeight":"400"}],
+      "label-md":["14px",{"lineHeight":"20px","letterSpacing":"0.01em","fontWeight":"500"}],
+      "body-md":["16px",{"lineHeight":"24px","fontWeight":"400"}]
+    }
+  } } }
+</script>
+<style>
+  body { font-family:'Inter',sans-serif; }
+  .material-symbols-outlined { font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24; }
+  ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-thumb { background:#c1c8c2; border-radius:10px; }
+  .map-overlay-shadow { box-shadow:0 4px 12px rgba(15,23,42,0.12); }
+  #map { position:absolute; inset:0; z-index:0; }
+  .err { color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; padding:8px 10px; border-radius:6px; font-size:13px; }
+</style>
+</head>
+<body class="bg-background text-on-surface overflow-hidden h-screen flex flex-col" style="background-color:#f8fafc;">
+<!-- Top nav -->
+<header class="bg-surface-bright shadow-sm flex justify-between items-center h-16 px-container-margin w-full border-b border-outline-variant z-50 shrink-0">
+<div class="flex items-center gap-6">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">Umurinzi</h1>
+<nav class="hidden md:flex gap-4">
+<a class="text-primary border-b-2 border-primary font-bold font-label-md text-label-md px-1 py-1" href="/citizen">Citizen</a>
+<a class="text-on-surface-variant font-medium font-label-md text-label-md px-1 py-1 hover:text-primary transition-colors" href="/manager">Manager</a>
+</nav>
+</div>
+<a href="/" class="flex items-center gap-2 px-4 py-2 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors">
+<span class="material-symbols-outlined text-[18px]">west</span> Landing</a>
+</header>
+
+<main class="flex-1 flex overflow-hidden">
+<!-- Citizen portal panel -->
+<section class="w-panel-width h-full bg-surface overflow-y-auto border-r border-outline-variant shrink-0 z-40">
+<div class="p-container-margin space-y-6">
+<header>
+<h2 class="font-title-lg text-title-lg text-primary">Citizen Portal</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Land management &amp; risk monitoring</p>
+</header>
+
+<!-- Identify land -->
+<div class="bg-white p-5 rounded-xl border border-outline-variant/50 space-y-4" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">fmd_good</span>
+<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline">Identify Your Land</h3></div>
+<label class="border border-dashed border-outline-variant rounded-xl p-8 text-center cursor-pointer hover:bg-surface-container-low transition-all group bg-white flex flex-col items-center" for="file">
+<input class="hidden" id="file" type="file" accept=".pdf,.png,.jpg,.jpeg"/>
+<div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-3"><span class="material-symbols-outlined text-primary text-2xl">upload_file</span></div>
+<p class="font-label-md text-label-md font-medium text-on-surface">Upload Land Title</p>
+<p class="font-label-sm text-label-sm text-outline mt-1">PDF, PNG, or JPG · crop out your name first</p>
+</label>
+<p class="font-label-sm text-label-sm text-on-surface-variant" id="status"></p>
+<button id="go" disabled class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-label-md text-label-md font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed" style="background-color:#14532D;">Extract Location</button>
+<details class="group">
+<summary class="flex items-center justify-between font-label-sm text-label-sm text-primary cursor-pointer hover:underline list-none">
+<span>Manual coordinate entry</span><span class="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span></summary>
+<div class="mt-4 space-y-3">
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline">Easting</label><input id="manEasting" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="527187" type="number"></div>
+<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline">Northing</label><input id="manNorthing" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="4781470" type="number"></div>
+</div>
+<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline">Surface area m² (optional)</label><input id="manArea" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="383" type="number" step="0.1"></div>
+<button id="manSubmit" class="w-full bg-primary-container text-on-primary py-2.5 rounded-lg font-label-sm text-label-sm font-bold hover:opacity-90 transition-all">Use these coordinates</button>
+<p class="font-label-sm text-label-sm" id="manStatus"></p>
+</div>
+</details>
+</div>
+
+<!-- Land data inventory -->
+<div class="bg-white p-5 rounded-xl border border-outline-variant/50 space-y-4" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">inventory_2</span>
+<h3 class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">Land Data Inventory</h3></div>
+<div class="grid grid-cols-1 gap-px bg-outline-variant/20 rounded-lg overflow-hidden border border-outline-variant/20" id="inventory">
+<div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">UPI</span><span class="font-data-mono text-data-mono font-medium" id="v-upi">—</span></div>
+<div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">Surface Area</span><span class="font-data-mono text-data-mono font-medium" id="v-area">—</span></div>
+<div class="flex justify-between items-start p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">Location</span><span class="font-data-mono text-data-mono text-right font-medium" id="v-loc">—</span></div>
+<div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">Lat/Lng</span><span class="font-data-mono text-data-mono font-medium" id="v-latlng">—</span></div>
+</div>
+</div>
+
+<!-- Risk analysis (hidden until analysed) -->
+<div id="riskPanel" class="hidden p-5 rounded-xl border space-y-4" style="border-left:4px solid #DC2626; background-color:rgba(220,38,38,0.05);">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]" id="riskIconEl" style="color:#DC2626">analytics</span>
+<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline">Risk Analysis</h3></div>
+<span class="px-2.5 py-0.5 text-on-primary font-label-sm text-label-sm font-bold rounded-full" id="riskBadge" style="background:#DC2626;">—</span>
+</div>
+<div class="p-4 bg-white rounded-xl border border-outline-variant/30">
+<div class="flex justify-between items-end mb-2"><p class="font-label-sm text-label-sm text-outline">Deforestation Probability</p><p class="font-headline-md text-headline-md font-bold tabular-nums" id="defProb" style="color:#DC2626">—</p></div>
+<div class="w-full bg-outline-variant/20 h-1.5 rounded-full overflow-hidden"><div class="h-full" id="defProbBar" style="width:0%;background:#DC2626"></div></div>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1">Tree Cover</p><p class="font-title-lg text-title-lg text-primary tabular-nums font-bold" id="treeCover">—</p></div>
+<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1">NDVI 2020 → now</p><p class="font-title-lg text-title-lg tabular-nums font-bold" id="ndviTrend">—</p></div>
+</div>
+<p class="font-label-sm text-label-sm text-outline" id="confNote"></p>
+</div>
+
+<!-- Simulation -->
+<div id="simPanel" class="hidden bg-white p-5 rounded-xl border border-outline-variant/50 space-y-4" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">model_training</span>
+<h3 class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">Simulate a Cut</h3></div>
+<div class="space-y-3">
+<div class="flex justify-between items-center"><label class="font-label-sm text-label-sm text-on-surface-variant">Target cleared area</label><span class="font-data-mono text-data-mono font-bold text-primary tabular-nums" id="cutVal">0 ha</span></div>
+<input id="cutSlider" class="w-full h-1 bg-outline-variant rounded-lg appearance-none cursor-pointer" max="100" min="0" value="0" step="1" type="range" style="accent-color:#14532D;">
+</div>
+<button id="simulateBtn" class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2" style="background-color:#14532D;"><span class="material-symbols-outlined text-[18px]">play_circle</span> Run Simulation</button>
+<div id="simResult"></div>
+</div>
+
+<!-- Alternatives -->
+<div id="altPanel" class="hidden bg-white p-5 rounded-xl border border-outline-variant/50 space-y-4" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">alt_route</span>
+<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline">Why are you considering cutting?</h3></div>
+<div class="grid grid-cols-2 gap-2">
+<button data-reason="firewood" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all">Firewood</button>
+<button data-reason="timber" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all">Timber</button>
+<button data-reason="farming" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all">Farming</button>
+<button data-reason="income" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all">Income</button>
+</div>
+<div id="altCards"></div>
+</div>
+</div>
+</section>
+
+<!-- Map viewport (real Leaflet) -->
+<section class="flex-1 relative bg-surface-dim">
+<div id="map"></div>
+</section>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
+<script>
+const RISK_COLOUR = { HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a' };
+function rc(r){ return RISK_COLOUR[r] || '#6b7280'; }
+
+const fileEl = document.getElementById('file');
+const go = document.getElementById('go');
+const statusEl = document.getElementById('status');
+
+// ── Map ──
+// Rwanda bounding box so the map frames the country on load (not the whole world).
+const RW_BOUNDS = [[-2.84, 28.86], [-1.05, 30.90]];
+const map = L.map('map', { zoomControl:true });
+const googleHybrid = L.tileLayer('https://mt{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}',{subdomains:['0','1','2','3'],attribution:'© Google',maxZoom:21}).addTo(map);
+const esriSat = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:19});
+const osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:19});
+L.control.layers({'Satellite + labels':googleHybrid,'Satellite (Esri)':esriSat,'Street':osm}, null, {collapsed:true, position:'topright'}).addTo(map);
+map.fitBounds(RW_BOUNDS);
+// Leaflet renders the whole world if the container had no size at init (flex/absolute
+// layout). Recalculate size once layout settles, then re-frame Rwanda.
+function fixMapSize(){ map.invalidateSize(); if (!parcelPolygon && !marker) map.fitBounds(RW_BOUNDS); }
+setTimeout(fixMapSize, 250);
+window.addEventListener('load', fixMapSize);
+
+window.type = '';
+const drawnItems = new L.FeatureGroup().addTo(map);
+const drawControl = new L.Control.Draw({ position:'topleft',
+  draw:{ polygon:{allowIntersection:false,showArea:false,shapeOptions:{color:'#facc15',weight:3,fillOpacity:0.2}},
+         rectangle:{shapeOptions:{color:'#facc15',weight:3,fillOpacity:0.2}},
+         polyline:false,circle:false,marker:false,circlemarker:false },
+  edit:{ featureGroup:drawnItems, remove:true } });
+map.addControl(drawControl);
+map.on(L.Draw.Event.CREATED, e => {
+  drawnItems.clearLayers(); drawnItems.addLayer(e.layer);
+  const ll = e.layer.getLatLngs()[0] || e.layer.getLatLngs();
+  const sqm = L.GeometryUtil ? L.GeometryUtil.geodesicArea(ll) : null;
+  if (sqm) e.layer.bindPopup(`Drawn area: <strong>${sqm.toFixed(0)} m²</strong> (${(sqm/10000).toFixed(4)} ha)`).openPopup();
+});
+
+let marker=null, circle500=null, parcelPolygon=null, parcelMeta=null, lastAnalysis=null;
+function computeAreaM2(ll){ return (L.GeometryUtil && L.GeometryUtil.geodesicArea) ? L.GeometryUtil.geodesicArea(ll) : null; }
+
+// ── Upload ──
+let picked=null;
+fileEl.addEventListener('change', () => { if (fileEl.files.length){ picked=fileEl.files[0]; go.disabled=false; statusEl.textContent=`Ready: ${picked.name}`; } });
+go.addEventListener('click', async () => {
+  if (!picked) return;
+  go.disabled=true; go.textContent='Extracting…';
+  try {
+    const fd=new FormData(); fd.append('file', picked);
+    const data = await (await fetch('/api/extract',{method:'POST',body:fd})).json();
+    if (data.error){ statusEl.innerHTML=`<span class="err">${data.error}</span>`; }
+    else { render(data); }
+  } catch(e){ statusEl.innerHTML=`<span class="err">Network error: ${e.message}</span>`; }
+  finally { go.disabled=false; go.textContent='Extract Location'; }
+});
+
+// ── Manual coords ──
+const manSubmit=document.getElementById('manSubmit'), manStatus=document.getElementById('manStatus');
+manSubmit.addEventListener('click', async () => {
+  const easting=parseFloat(document.getElementById('manEasting').value);
+  const northing=parseFloat(document.getElementById('manNorthing').value);
+  const a=document.getElementById('manArea').value; const area_sqm=a?parseFloat(a):null;
+  if (isNaN(easting)||isNaN(northing)){ manStatus.textContent='Enter both Easting and Northing'; manStatus.style.color='#b91c1c'; return; }
+  manSubmit.disabled=true; manSubmit.textContent='Submitting…';
+  try {
+    const data = await (await fetch('/api/manual-coords',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({easting,northing,area_sqm})})).json();
+    if (data.error){ manStatus.textContent=data.error; manStatus.style.color='#b91c1c'; }
+    else { manStatus.textContent='Coordinates accepted'; manStatus.style.color='#16a34a'; render(data); }
+  } catch(e){ manStatus.textContent='Network error'; manStatus.style.color='#b91c1c'; }
+  finally { manSubmit.disabled=false; manSubmit.textContent='Use these coordinates'; }
+});
+
+// ── Render extracted location + auto-analyse ──
+function render(d){
+  parcelMeta=d;
+  document.getElementById('v-upi').textContent = d.upi || '—';
+  document.getElementById('v-area').textContent = d.surface_sqm ? `${d.surface_sqm} m²` : (d.extracted_area_m2 ? `${d.extracted_area_m2} m²` : '—');
+  document.getElementById('v-loc').innerHTML = [d.village,d.sector,d.district].filter(Boolean).join(', ') || '—';
+  document.getElementById('v-latlng').textContent = (d.lat&&d.lng) ? `${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}` : '—';
+  if (!d.polygon_wgs84 || !d.polygon_wgs84.length){
+    const det=document.querySelector('details'); if(det) det.open=true;
+    manStatus.textContent='OCR could not read the polygon — enter coordinates below.'; manStatus.style.color='#b91c1c';
+    if(d.easting) document.getElementById('manEasting').value=Math.round(d.easting);
+    if(d.northing) document.getElementById('manNorthing').value=Math.round(d.northing);
+    if(d.surface_sqm) document.getElementById('manArea').value=d.surface_sqm;
+  }
+  if (d.lat && d.lng){
+    if(marker) marker.remove(); if(circle500) circle500.remove(); drawnItems.clearLayers(); parcelPolygon=null;
+    marker=L.marker([d.lat,d.lng]).addTo(map).bindPopup(`<strong>${d.upi||'parcel'}</strong><br/>${d.sector||''}, ${d.district||''}`);
+    circle500=L.circle([d.lat,d.lng],{radius:500,color:'#22c55e',fillColor:'#22c55e',fillOpacity:0.1,weight:2,dashArray:'5,5'}).addTo(map);
+    if (d.polygon_wgs84 && d.polygon_wgs84.length>=4){
+      const ring=d.polygon_wgs84.map(([lng,lat])=>[lat,lng]).slice(0,-1);
+      parcelPolygon=L.polygon(ring,{color:'#facc15',weight:4,fillColor:'#facc15',fillOpacity:0.22});
+      drawnItems.addLayer(parcelPolygon); map.fitBounds(parcelPolygon.getBounds().pad(0.4));
+    } else { map.setView([d.lat,d.lng],18); }
+    marker.openPopup();
+    analyse();   // auto-run risk analysis once we have a location
+  }
+}
+
+// ── Analyse ──
+async function analyse(){
+  if (!parcelMeta || parcelMeta.lat==null) return;
+  let lat=parcelMeta.lat, lng=parcelMeta.lng;
+  let area_ha = parcelMeta.extracted_area_m2 ? parcelMeta.extracted_area_m2/10000 : (parcelMeta.surface_sqm ? parcelMeta.surface_sqm/10000 : null);
+  if (parcelPolygon){ const c=parcelPolygon.getBounds().getCenter(); lat=c.lat; lng=c.lng;
+    const m2=computeAreaM2(parcelPolygon.getLatLngs()[0]||parcelPolygon.getLatLngs()); if(m2) area_ha=m2/10000; }
+  try {
+    const r = await (await fetch('/api/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lng,area_ha})})).json();
+    renderRisk(r);
+  } catch(e){}
+}
+
+function renderRisk(r){
+  lastAnalysis=r;
+  const c=rc(r.risk_level);
+  const panel=document.getElementById('riskPanel');
+  panel.classList.remove('hidden');
+  panel.style.borderLeftColor=c; panel.style.backgroundColor=c+'0d';
+  document.getElementById('riskIconEl').style.color=c;
+  const badge=document.getElementById('riskBadge'); badge.textContent=r.risk_level+' RISK'; badge.style.background=c;
+  const dp=document.getElementById('defProb'); dp.textContent=(r.deforestation_prob*100).toFixed(1)+'%'; dp.style.color=c;
+  const bar=document.getElementById('defProbBar'); bar.style.width=(r.deforestation_prob*100).toFixed(1)+'%'; bar.style.background=c;
+  document.getElementById('treeCover').textContent=r.tree_cover_pct.toFixed(0)+'%';
+  document.getElementById('ndviTrend').textContent=`${r.ndvi_2020.toFixed(2)} → ${r.ndvi_current.toFixed(2)}`;
+  document.getElementById('confNote').textContent=`Confidence: ${r.confidence} — ${r.confidence_note}`;
+  if(circle500) circle500.setStyle({color:c,fillColor:c});
+  if(parcelPolygon) parcelPolygon.setStyle({color:c,fillColor:c});
+  // simulation
+  if (r.parcel_area_ha && r.parcel_area_ha>0){
+    document.getElementById('simPanel').classList.remove('hidden');
+    updateCut();
+  }
+  // alternatives
+  const alt=document.getElementById('altPanel');
+  if (r.risk_level==='HIGH'||r.risk_level==='MEDIUM') alt.classList.remove('hidden'); else alt.classList.add('hidden');
+}
+
+// ── Simulation ──
+const cutSlider=document.getElementById('cutSlider'), cutVal=document.getElementById('cutVal'), simResult=document.getElementById('simResult');
+function currentCutHa(){ return (lastAnalysis?.parcel_area_ha||0)*(cutSlider.value/100); }
+function updateCut(){ const ha=currentCutHa(); cutVal.textContent=`${ha.toFixed(4)} ha`; }
+cutSlider.addEventListener('input', updateCut);
+document.getElementById('simulateBtn').addEventListener('click', async () => {
+  if (!lastAnalysis) return; const cut=currentCutHa();
+  if (cut<=0){ simResult.innerHTML='<div class="err">Move the slider above 0 first</div>'; return; }
+  try {
+    const s = await (await fetch('/api/simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id,cut_area_ha:cut})})).json();
+    if (s.error){ simResult.innerHTML=`<div class="err">${s.error}</div>`; return; }
+    const jump = s.delta.risk_level_change>0?'Risk worsened':(s.delta.risk_level_change<0?'Risk improved':'Risk unchanged');
+    simResult.innerHTML = `
+      <div class="grid grid-cols-2 gap-4 mt-1">
+        <div class="space-y-1"><p class="font-label-sm text-label-sm text-outline text-center">Risk after cut</p>
+          <div class="h-12 flex items-center justify-center rounded border" style="background:${rc(s.after.risk_level)}1a;border-color:${rc(s.after.risk_level)}33"><span class="font-title-lg text-title-lg font-bold" style="color:${rc(s.after.risk_level)}">${s.after.risk_level}</span></div></div>
+        <div class="space-y-1"><p class="font-label-sm text-label-sm text-outline text-center">Tree cover after</p>
+          <div class="h-12 flex items-center justify-center bg-surface-container-low rounded border border-outline-variant/20"><span class="font-title-lg text-title-lg font-bold text-primary tabular-nums">${s.after.tree_cover_pct.toFixed(0)}%</span></div></div>
+      </div>
+      <p class="font-label-sm text-label-sm mt-3" style="color:${s.delta.risk_level_change>0?'#b91c1c':'#15803d'}">${jump} — tree cover ${s.before.tree_cover_pct.toFixed(0)}% → ${s.after.tree_cover_pct.toFixed(0)}%, 500 m deforested ${s.before.neighbourhood_500m_deforested_pct.toFixed(0)}% → ${s.after.neighbourhood_500m_deforested_pct.toFixed(0)}%</p>`;
+  } catch(e){ simResult.innerHTML=`<div class="err">${e.message}</div>`; }
+});
+
+// ── Alternatives ──
+document.querySelectorAll('#altPanel [data-reason]').forEach(btn => btn.addEventListener('click', async () => {
+  if (!lastAnalysis) return;
+  const altCards=document.getElementById('altCards');
+  altCards.innerHTML='<p class="font-label-sm text-label-sm text-outline mt-3">Loading suggestions…</p>';
+  try {
+    const data = await (await fetch('/api/alternatives',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id,reason:btn.getAttribute('data-reason'),language:'en'})})).json();
+    const sugg=data.suggestions||[];
+    altCards.innerHTML = sugg.length ? sugg.map(s => `
+      <div class="mt-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
+        <p class="font-label-sm text-label-sm text-on-surface mb-2">${s.suggestion_text}</p>
+        ${s.gov_program_url?`<a href="${s.gov_program_url}" target="_blank" class="font-label-sm text-label-sm font-bold text-primary hover:underline">Learn more →</a>`:''}
+      </div>`).join('') : '<p class="font-label-sm text-label-sm text-error mt-3">No suggestions for that reason.</p>';
+  } catch(e){ altCards.innerHTML=`<div class="err">${e.message}</div>`; }
+}));
+</script>
+</body></html>

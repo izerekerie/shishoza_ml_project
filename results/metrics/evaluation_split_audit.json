@@ -1,0 +1,87 @@
+{
+  "split_method": "stratified 80/20, random_state=42",
+  "train_size": 8000,
+  "test_size": 2000,
+  "train_class_distribution": {
+    "0": 4000,
+    "1": 4000
+  },
+  "test_class_distribution": {
+    "0": 1000,
+    "1": 1000
+  },
+  "label_leakage_pixels": 0,
+  "spatial_proximity_test_set": {
+    "median_m_to_nearest_train_pixel": 217.77647165424494,
+    "p25_m": 84.60928322874858,
+    "lt_60m_pct": 18.0,
+    "lt_100m_pct": 30.45,
+    "ge_1km_pct": 0.65
+  },
+  "metrics_held_out": {
+    "f1": 0.7935891209324915,
+    "precision": 0.7714825306893296,
+    "recall": 0.817,
+    "auc": 0.8660479999999999,
+    "confusion_matrix": [
+      [
+        758,
+        242
+      ],
+      [
+        183,
+        817
+      ]
+    ]
+  },
+  "patch_size_analysis": {
+    "method": "DBSCAN eps=35 m on deforested sample, 1 pixel = 0.09 ha",
+    "n_patches_found": 4420,
+    "median_patch_size_ha": 0.09,
+    "buckets": [
+      {
+        "bucket": "\u22640.1 ha (tiny)",
+        "lo_ha": 0.0,
+        "hi_ha": 0.1,
+        "n_test": 794,
+        "tp": 650,
+        "fn": 144,
+        "recall": 0.8186
+      },
+      {
+        "bucket": "0.1\u20130.2 ha (smallholder)",
+        "lo_ha": 0.1,
+        "hi_ha": 0.2,
+        "n_test": 147,
+        "tp": 118,
+        "fn": 29,
+        "recall": 0.8027
+      },
+      {
+        "bucket": "0.2\u20130.5 ha",
+        "lo_ha": 0.2,
+        "hi_ha": 0.5,
+        "n_test": 58,
+        "tp": 48,
+        "fn": 10,
+        "recall": 0.8276
+      },
+      {
+        "bucket": "0.5\u20131.0 ha",
+        "lo_ha": 0.5,
+        "hi_ha": 1.0,
+        "n_test": 1,
+        "tp": 1,
+        "fn": 0,
+        "recall": 1.0
+      },
+      {
+        "bucket": ">1.0 ha (large)",
+        "n_test": 0,
+        "tp": 0,
+        "fn": 0,
+        "recall": null
+      }
+    ]
+  }
+}

@@ -1,0 +1,261 @@
+<!DOCTYPE html><html class="light" lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Umurinzi Intelligence | Forest Manager Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = { darkMode:"class", theme:{ extend:{
+    "colors":{
+      "on-tertiary-container":"#74a288","surface-container-lowest":"#ffffff","surface-container":"#edeeed",
+      "on-primary":"#ffffff","surface-container-low":"#f2f4f3","tertiary-container":"#073824",
+      "status-live":"#2e5b44","surface-container-highest":"#e1e3e2","outline":"#717973",
+      "secondary":"#3a6750","surface-variant":"#e1e3e2","surface-bright":"#f8faf9","primary":"#002113",
+      "on-primary-container":"#74a288","on-surface-variant":"#414943","surface-container-high":"#e7e8e8",
+      "background":"#f8faf9","primary-container":"#073824","on-surface":"#191c1c","outline-variant":"#c1c9c1",
+      "on-secondary":"#ffffff","secondary-container":"#bceecf","surface":"#f8faf9","on-secondary-container":"#406d55",
+      "error":"#dc2626","error-container":"#ffdad6"
+    },
+    "borderRadius":{ "DEFAULT":"1rem","lg":"2rem","xl":"3rem","full":"9999px" },
+    "spacing":{ "gutter":"16px","base":"8px","container-margin":"24px","panel-width-desktop":"320px" },
+    "fontFamily":{ "title-md":["Inter"],"body-sm":["Inter"],"headline-lg":["Inter"],"label-caps":["Inter"] },
+    "fontSize":{
+      "title-md":["20px",{"lineHeight":"28px","fontWeight":"500"}],
+      "body-sm":["14px",{"lineHeight":"20px","fontWeight":"400"}],
+      "headline-lg":["32px",{"lineHeight":"40px","fontWeight":"600"}],
+      "label-caps":["12px",{"lineHeight":"16px","letterSpacing":"0.2em","fontWeight":"600"}]
+    }
+  } } }
+</script>
+<style>
+  body { font-family:'Inter',sans-serif; background:#f8faf9; }
+  .glass-card { background:rgba(255,255,255,0.85); backdrop-filter:blur(12px);
+                border:1px solid rgba(0,0,0,0.05); box-shadow:0 4px 6px -1px rgb(0 0 0 / 0.05); }
+  .ping-animate { animation:ping 1.5s cubic-bezier(0,0,0.2,1) infinite; }
+  @keyframes ping { 75%,100% { transform:scale(2); opacity:0; } }
+  .custom-scrollbar::-webkit-scrollbar { width:4px; }
+  .custom-scrollbar::-webkit-scrollbar-thumb { background:#e1e3e2; border-radius:10px; }
+  #map { position:absolute; inset:0; z-index:0; }
+  .leaflet-top.leaflet-left { top:70px; }
+</style>
+</head>
+<body class="flex h-screen overflow-hidden text-on-surface">
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-0 h-full w-[320px] bg-[#F8FAFC] flex flex-col p-gutter gap-base border-r border-[#E5E7EB] shadow-sm z-50">
+<div class="mb-4">
+<h1 class="font-headline-lg text-headline-lg font-black tracking-tighter text-[#14532D]">Umurinzi</h1>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-70">Forest Risk Control</p>
+</div>
+<nav class="flex flex-col gap-2 mb-auto">
+<a class="flex items-center gap-3 p-3 bg-[#14532D] text-white rounded-lg font-bold transition-all hover:translate-x-1" href="/manager">
+<span class="material-symbols-outlined">map</span><span class="font-title-md text-title-md">Risk Map</span></a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/citizen">
+<span class="material-symbols-outlined">person</span><span class="font-title-md text-title-md">Citizen view</span></a>
+<a id="adminLink" class="hidden items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/admin">
+<span class="material-symbols-outlined">manage_accounts</span><span class="font-title-md text-title-md">User management</span></a>
+<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/apidocs/" target="_blank">
+<span class="material-symbols-outlined">api</span><span class="font-title-md text-title-md">API docs</span></a>
+</nav>
+<div class="mt-8 pt-6 border-t border-outline-variant/20 flex flex-col gap-1">
+<div class="px-2 text-sm font-bold text-on-surface" id="userLabel">loading…</div>
+<div class="px-2 text-xs text-on-surface-variant mb-2" id="userRole"></div>
+<a class="flex items-center gap-3 p-2 text-error hover:bg-surface-container-highest rounded-lg transition-all text-sm font-semibold cursor-pointer" id="logoutLink" href="#">
+<span class="material-symbols-outlined text-base">logout</span><span>Sign out</span></a>
+</div>
+<div class="mt-auto pt-4 border-t border-[#E5E7EB]"><p class="text-[10px] text-on-surface-variant text-center opacity-60">© 2026 Umurinzi · ALU</p></div>
+</aside>
+
+<!-- Main: map + overlays -->
+<main class="ml-[320px] flex flex-1 h-full overflow-hidden relative">
+<div id="map"></div>
+
+<!-- Header -->
+<header class="absolute top-0 left-0 right-0 h-16 glass-card z-20 flex items-center justify-between px-gutter border-b border-outline-variant/20">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">location_on</span>
+<div class="flex flex-col">
+<span class="text-[10px] font-label-caps text-on-surface-variant">DISTRICT SCOPE</span>
+<span class="font-bold text-primary" id="scopeLabel">—</span>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded-full border border-outline-variant/20">
+<span class="w-2 h-2 rounded-full bg-status-live ping-animate"></span>
+<span class="text-xs font-bold">SECTOR RISK · RF-D</span>
+</div>
+</div>
+</header>
+
+<!-- Right data panels -->
+<div class="absolute right-0 top-0 h-full w-[400px] flex flex-col gap-gutter p-gutter overflow-y-auto custom-scrollbar pointer-events-none pt-20 z-10">
+<!-- Risk summary -->
+<section class="glass-card p-5 rounded-lg pointer-events-auto">
+<header class="flex justify-between items-center mb-4">
+<h2 class="font-label-caps text-label-caps text-on-surface-variant">RISK SUMMARY</h2>
+<span class="material-symbols-outlined text-on-surface-variant text-base">analytics</span>
+</header>
+<div class="grid grid-cols-2 gap-3">
+<div class="bg-surface-container-low p-4 rounded-lg border border-outline-variant/10"><p class="text-xs text-on-surface-variant mb-1">Total Sectors</p><p class="text-2xl font-bold text-primary" id="stat-total">—</p></div>
+<div class="bg-error-container/10 p-4 rounded-lg border border-error/20"><p class="text-xs text-error font-bold mb-1">HIGH RISK</p><p class="text-2xl font-bold text-error" id="stat-high">—</p></div>
+<div class="bg-orange-100/30 p-4 rounded-lg border border-orange-500/20"><p class="text-xs text-orange-600 font-bold mb-1">MEDIUM RISK</p><p class="text-2xl font-bold text-orange-700" id="stat-med">—</p></div>
+<div class="bg-secondary-container/10 p-4 rounded-lg border border-secondary/20"><p class="text-xs text-secondary font-bold mb-1">LOW RISK</p><p class="text-2xl font-bold text-secondary" id="stat-low">—</p></div>
+</div>
+</section>
+<!-- Sector detail -->
+<section class="glass-card p-5 rounded-lg pointer-events-auto" id="sectorDetail">
+<header class="flex justify-between items-center mb-4">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-on-surface-variant text-sm">touch_app</span><h2 class="font-label-caps text-label-caps text-on-surface-variant">SECTOR DETAIL</h2></div>
+</header>
+<p class="text-sm text-on-surface-variant">Click any coloured sector on the map to see its details.</p>
+</section>
+<!-- Top concerns -->
+<section class="glass-card p-5 rounded-lg pointer-events-auto flex-1 min-h-0 flex flex-col">
+<header class="flex justify-between items-center mb-4"><h2 class="font-label-caps text-label-caps text-on-surface-variant">TOP CONCERNS</h2><span class="text-[10px] text-on-surface-variant">SEVERITY SORT</span></header>
+<div class="space-y-2 overflow-y-auto pr-1 custom-scrollbar tabular-nums" id="topList"></div>
+</section>
+</div>
+
+<!-- Legend -->
+<div class="absolute bottom-6 right-6 bg-white p-4 rounded-lg z-10 border border-[#E5E7EB] shadow-sm pointer-events-none">
+<p class="font-label-caps text-label-caps mb-3">RISK ASSESSMENT LEGEND</p>
+<div class="flex flex-col gap-2 text-xs font-medium">
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-error"></span>HIGH RISK</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-orange-500"></span>MEDIUM RISK</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-secondary"></span>LOW RISK</div>
+<div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-outline-variant"></span>NOT-ASSESSED</div>
+</div>
+</div>
+
+<!-- Floating zoom tools -->
+<div class="absolute bottom-6 left-6 flex flex-col gap-2 z-10">
+<button id="zoomIn" class="w-12 h-12 glass-card rounded-full flex items-center justify-center text-primary hover:bg-primary-container hover:text-on-primary transition-all shadow-lg"><span class="material-symbols-outlined">add</span></button>
+<button id="zoomOut" class="w-12 h-12 glass-card rounded-full flex items-center justify-center text-primary hover:bg-primary-container hover:text-on-primary transition-all shadow-lg"><span class="material-symbols-outlined">remove</span></button>
+</div>
+</main>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+// ---- Auth + scope ----
+(async () => {
+  try {
+    const d = await (await fetch('/api/me')).json();
+    if (!d.authenticated) { window.location.href = '/login'; return; }
+    const u = d.user;
+    document.getElementById('userLabel').textContent = u.full_name;
+    document.getElementById('userRole').textContent = u.role === 'admin' ? 'Administrator' : 'Forest Manager';
+    document.getElementById('scopeLabel').textContent = u.district_scope || 'National (admin)';
+    if (u.role === 'admin') document.getElementById('adminLink').classList.remove('hidden');
+  } catch (e) {}
+})();
+document.getElementById('logoutLink').addEventListener('click', async (e) => {
+  e.preventDefault(); await fetch('/api/logout', { method:'POST' }); window.location.href = '/login';
+});
+
+const RISK_COLOUR = { HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a', UNKNOWN:'#9ca3af' };
+function dot(l){ return `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${RISK_COLOUR[l]||'#9ca3af'};margin-right:6px;vertical-align:middle;"></span>`; }
+const CONF_PCT = { HIGH:'100%', MEDIUM:'60%', LOW:'30%' };
+
+// ---- Real Leaflet map ----
+const RW_BOUNDS = [[-2.84, 28.86], [-1.05, 30.90]];
+const map = L.map('map', { zoomControl:false });
+L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  { attribution:'© Esri / Maxar', maxZoom:19 }).addTo(map);
+map.fitBounds(RW_BOUNDS);
+// Recalculate size once the flex/absolute layout settles, else Leaflet shows the world.
+setTimeout(() => map.invalidateSize(), 250);
+window.addEventListener('load', () => map.invalidateSize());
+document.getElementById('zoomIn').addEventListener('click', () => map.zoomIn());
+document.getElementById('zoomOut').addEventListener('click', () => map.zoomOut());
+
+let sectorLookup = {};
+const sectorLayers = {};
+
+(async () => {
+  const [boundaries, riskData] = await Promise.all([
+    fetch('/static/sectors.geojson').then(r => r.json()),
+    fetch('/api/sector-risk').then(r => r.json()),
+  ]);
+  for (const r of riskData.sectors) sectorLookup[r.sector_id] = r;
+
+  const s = riskData.summary;
+  document.getElementById('stat-total').textContent = s.total_sectors;
+  document.getElementById('stat-high').textContent  = s.high_risk_sectors;
+  document.getElementById('stat-med').textContent   = s.medium_risk_sectors;
+  document.getElementById('stat-low').textContent   = s.low_risk_sectors;
+
+  const top = riskData.sectors.filter(r => r.risk_level==='HIGH' || r.risk_level==='MEDIUM')
+    .sort((a,b) => b.deforested_pct - a.deforested_pct).slice(0,12);
+  document.getElementById('topList').innerHTML = top.map(r => `
+    <div class="p-3 bg-white hover:bg-surface-container-low rounded border border-[#E5E7EB] border-l-4 flex items-center justify-between cursor-pointer transition-all" style="border-left-color:${RISK_COLOUR[r.risk_level]}" data-sid="${r.sector_id}">
+      <div class="flex flex-col"><span class="text-xs font-bold">${r.sector}</span><span class="text-[10px] text-on-surface-variant">${r.district}</span></div>
+      <span class="text-xs font-bold" style="color:${RISK_COLOUR[r.risk_level]}">${r.deforested_pct.toFixed(0)}%</span>
+    </div>`).join('') || '<p class="text-xs text-on-surface-variant">No high/medium concern sectors in scope.</p>';
+  document.querySelectorAll('#topList [data-sid]').forEach(el => el.addEventListener('click', () => {
+    const layer = sectorLayers[el.getAttribute('data-sid')];
+    if (layer) { map.fitBounds(layer.getBounds()); layer.fire('click'); }
+  }));
+
+  const inScope = L.latLngBounds([]);
+  const geo = L.geoJSON(boundaries, {
+    filter: f => (riskData.scope?.district && riskData.scope.district !== 'ALL') ? f.properties.district === riskData.scope.district : true,
+    style: f => { const r = sectorLookup[f.properties.sector_id];
+      return { color:'#374151', weight:0.5, fillColor: RISK_COLOUR[r ? r.risk_level : 'UNKNOWN'], fillOpacity:0.55 }; },
+    onEachFeature: (f, layer) => {
+      sectorLayers[f.properties.sector_id] = layer;
+      inScope.extend(layer.getBounds());
+      layer.on({
+        mouseover: e => e.target.setStyle({ weight:2, color:'#111827' }),
+        mouseout:  e => geo.resetStyle(e.target),
+        click: () => renderSectorDetail(f.properties)
+      });
+    }
+  }).addTo(map);
+  if (inScope.isValid()) map.fitBounds(inScope.pad(0.1));
+})();
+
+async function renderSectorDetail(props) {
+  const sid = props.sector_id;
+  const r = sectorLookup[sid];
+  const el = document.getElementById('sectorDetail');
+  const level = (r && r.risk_level) ? r.risk_level : 'UNKNOWN';
+  el.innerHTML = `
+    <header class="flex justify-between items-center mb-4">
+      <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm" style="color:${RISK_COLOUR[level]}">warning</span>
+        <h2 class="font-label-caps text-label-caps text-on-surface-variant">SECTOR · ${props.sector}</h2></div>
+      <span class="text-[10px] text-white px-2 py-0.5 rounded-full font-bold" style="background:${RISK_COLOUR[level]}">${level}</span>
+    </header>
+    <div class="space-y-1">
+      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">District</span><span class="font-bold">${props.district}</span></div>
+      ${r && r.risk_level!=='UNKNOWN' ? `
+      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Historical Deforestation</span><span class="font-bold">${r.deforested_pct.toFixed(1)}%</span></div>
+      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Sample Size</span><span class="font-bold">${r.n_pixels} pixels</span></div>` : ''}
+      <div class="mt-4 p-4 bg-primary-container/5 rounded-lg border border-primary/10" id="liveBox">
+        <div class="flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-primary text-lg">biotech</span><span class="font-bold text-sm text-primary">Live Model Output</span></div>
+        <p class="text-xs text-on-surface-variant">Running model on sector centroid…</p>
+      </div>
+    </div>`;
+  try {
+    const live = await (await fetch('/api/analyse-sector', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sector_id: sid }) })).json();
+    const box = document.getElementById('liveBox');
+    if (live.error) { box.innerHTML = `<p class="text-xs text-error">${live.error}</p>`; return; }
+    box.innerHTML = `
+      <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-lg">biotech</span><span class="font-bold text-sm text-primary">Live Model Output</span></div>
+        <span class="text-xs font-bold" style="color:${RISK_COLOUR[live.risk_level]}">${dot(live.risk_level)}${live.risk_level}</span></div>
+      <div class="grid grid-cols-2 gap-y-2 text-xs">
+        <span class="text-on-surface-variant">Tree Cover Index</span><span class="text-right font-medium">${(live.tree_cover_pct/100).toFixed(2)}</span>
+        <span class="text-on-surface-variant">NDVI Reading</span><span class="text-right font-medium">${live.ndvi_current.toFixed(2)}</span>
+        <span class="text-on-surface-variant">NDVI 2020 → now</span><span class="text-right font-medium">${live.ndvi_2020.toFixed(2)} → ${live.ndvi_current.toFixed(2)}</span>
+        <span class="text-on-surface-variant">Resolution</span><span class="text-right font-medium">Sentinel-2 / S1 / SRTM</span>
+        <span class="text-on-surface-variant">System Rule</span><span class="text-right font-bold" style="color:${RISK_COLOUR[live.risk_level]}">${live.rule_fired}</span>
+      </div>
+      <div class="mt-4"><div class="flex justify-between text-[10px] font-bold mb-1"><span>MODEL CONFIDENCE</span><span class="text-primary">${live.confidence}</span></div>
+        <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden"><div class="h-full bg-primary" style="width:${CONF_PCT[live.confidence]||'50%'}"></div></div>
+        <p class="text-[10px] text-on-surface-variant mt-1">${live.confidence_note}</p></div>`;
+  } catch (e) {
+    const box = document.getElementById('liveBox'); if (box) box.innerHTML = `<p class="text-xs text-error">Network error: ${e.message}</p>`;
+  }
+}
+</script>
+</body></html>

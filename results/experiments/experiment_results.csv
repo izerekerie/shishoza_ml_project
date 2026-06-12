@@ -1,0 +1,5 @@
+,F1,Precision,Recall,AUC,Features,Train_sec
+A — Optical only (S2),0.6981,0.7161,0.681,0.7754,9.0,0.7
+B — Optical + Terrain,0.777,0.7571,0.798,0.8475,12.0,0.5
+C — Optical + Radar (S1),0.7355,0.7341,0.737,0.8171,14.0,0.6
+D — All combined (S2+S1+SRTM),0.7908,0.777,0.805,0.865,17.0,0.6
