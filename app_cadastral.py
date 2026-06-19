@@ -35,12 +35,12 @@ FEATURE_COLS = ['EVI_train', 'NBR_train', 'NDVI_change', 'NDVI_test', 'NDVI_trai
                 'VH_test', 'VH_train', 'VV_test', 'VV_train', 'aspect', 'elevation',
                 'slope']
 
-print("[boot] loading trained Random Forest model rf_D.pkl …")
-_MODEL = pickle.load(open(Path(__file__).parent / "models" / "rf_D.pkl", "rb"))
+print("[boot] loading trained Random Forest model rf_D_national.pkl …")
+_MODEL = pickle.load(open(Path(__file__).parent / "models" / "rf_D_national.pkl", "rb"))
 print(f"[boot]   model has {_MODEL.n_features_in_} features, classes={list(_MODEL.classes_)}")
 
 print("[boot] loading training data with geometry …")
-_train_raw = pd.read_csv(Path(__file__).parent / "data" / "raw" / "training_data.csv")
+_train_raw = pd.read_csv(Path(__file__).parent / "data" / "raw" / "training_data_national.csv")
 _geos = _train_raw['.geo'].apply(lambda s: json.loads(s)['coordinates'])
 _train_raw['lng'] = _geos.apply(lambda c: c[0])
 _train_raw['lat'] = _geos.apply(lambda c: c[1])
@@ -96,13 +96,14 @@ def find_nearest_pixels(lat: float, lng: float, k: int = 25):
 def analyse_parcel(lat: float, lng: float, area_ha: float = None) -> dict:
     """Run the full Umurinzi analysis for one parcel.
 
-    The model RUNS on any Rwanda location, but its prediction is only
-    well-calibrated inside the Nyungwe training domain. We therefore return a
-    `confidence` field based on distance from the nearest training pixel:
+    The model is trained on pixels sampled nationally (all five provinces), so
+    it is calibrated across Rwanda. We still return a `confidence` field based
+    on distance from the nearest training pixel, since prediction quality is
+    best close to a sample:
 
-        ≤ 5 km   → HIGH   (in-domain)
-        ≤ 50 km  → MEDIUM (near-domain, Western/Southern Rwanda)
-        > 50 km  → LOW    (out-of-domain — surface result only)
+        ≤ 5 km   → HIGH   (close to a national training sample)
+        ≤ 50 km  → MEDIUM (near a sample)
+        > 50 km  → LOW    (sparse sampling here — surface result only)
 
     The 3-rule classifier still fires for every query so citizens get a
     HIGH/MEDIUM/LOW result everywhere, but the dissertation and UI
@@ -138,14 +139,14 @@ def analyse_parcel(lat: float, lng: float, area_ha: float = None) -> dict:
     # Training-domain confidence based on KD-tree distance to nearest sample
     if nearest_km <= 5:
         confidence = 'HIGH'
-        confidence_note = 'In training domain (Nyungwe buffer zone)'
+        confidence_note = 'Close to a national training sample'
     elif nearest_km <= 50:
         confidence = 'MEDIUM'
-        confidence_note = f'Near training domain ({nearest_km:.0f} km from nearest sample)'
+        confidence_note = f'Near a training sample ({nearest_km:.0f} km away)'
     else:
         confidence = 'LOW'
-        confidence_note = (f'Outside training domain ({nearest_km:.0f} km from nearest '
-                           f'Nyungwe sample) — production deployment should query GEE live')
+        confidence_note = (f'Sparse sampling here ({nearest_km:.0f} km from nearest '
+                           f'sample) — production deployment should query GEE live')
 
     return {
         'risk_level':           risk_level,
