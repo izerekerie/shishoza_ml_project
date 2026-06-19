@@ -1,0 +1,23 @@
+{
+  "random_cv": {
+    "f1": 0.7877,
+    "f1_std": 0.0081,
+    "precision": 0.7779,
+    "recall": 0.7978
+  },
+  "spatial_block_cv": {
+    "method": "KMeans 10 blocks on lat/lng, GroupKFold 5-split, tuned RF",
+    "f1": 0.7332,
+    "f1_std": 0.0334,
+    "precision": 0.7471,
+    "recall": 0.723,
+    "per_fold_f1": [
+      0.7529,
+      0.6941,
+      0.7669,
+      0.6911,
+      0.7607
+    ]
+  },
+  "f1_drop_random_minus_spatial": 0.0546
+}
