@@ -1,0 +1,83 @@
+{
+  "dataset_sizes": {
+    "national": 23319,
+    "nyungwe": 10000
+  },
+  "four_experiments_5foldcv_200trees": [
+    {
+      "experiment": "A \u2014 Optical only",
+      "n_features": 9,
+      "nyungwe_f1": 0.6966,
+      "nyungwe_std": 0.0046,
+      "national_f1": 0.7545,
+      "national_std": 0.0038,
+      "delta": 0.058
+    },
+    {
+      "experiment": "B \u2014 Optical + Terrain",
+      "n_features": 12,
+      "nyungwe_f1": 0.7665,
+      "nyungwe_std": 0.0063,
+      "national_f1": 0.8208,
+      "national_std": 0.004,
+      "delta": 0.0543
+    },
+    {
+      "experiment": "C \u2014 Optical + Radar",
+      "n_features": 14,
+      "nyungwe_f1": 0.7293,
+      "nyungwe_std": 0.0087,
+      "national_f1": 0.7937,
+      "national_std": 0.0037,
+      "delta": 0.0644
+    },
+    {
+      "experiment": "D \u2014 All combined",
+      "n_features": 17,
+      "nyungwe_f1": 0.783,
+      "nyungwe_std": 0.007,
+      "national_f1": 0.8319,
+      "national_std": 0.0041,
+      "delta": 0.0489
+    }
+  ],
+  "national_spatial_block_cv": {
+    "method": "KMeans 10 blocks, GroupKFold-5, 800 trees",
+    "f1": 0.7534,
+    "f1_std": 0.0806,
+    "per_fold": [
+      0.8192,
+      0.6171,
+      0.7127,
+      0.8383,
+      0.7799
+    ]
+  },
+  "leave_one_province_out": {
+    "East/Iburasirazuba": {
+      "n_test": 3167,
+      "f1": 0.8049,
+      "recall": 0.8344
+    },
+    "Kigali City/Umujyi wa Kigali": {
+      "n_test": 2263,
+      "f1": 0.8503,
+      "recall": 0.8155
+    },
+    "North/Amajyaruguru": {
+      "n_test": 6000,
+      "f1": 0.8064,
+      "recall": 0.845
+    },
+    "South/Amajyepfo": {
+      "n_test": 5889,
+      "f1": 0.8058,
+      "recall": 0.7997
+    },
+    "West/Iburengerazuba": {
+      "n_test": 6000,
+      "f1": 0.7087,
+      "recall": 0.646
+    }
+  }
+}
