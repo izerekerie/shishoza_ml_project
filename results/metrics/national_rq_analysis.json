@@ -1,0 +1,114 @@
+{
+  "feature_importance": [
+    {
+      "feature": "elevation",
+      "importance": 0.1304
+    },
+    {
+      "feature": "NDVI_change",
+      "importance": 0.0965
+    },
+    {
+      "feature": "VH_VV_ratio",
+      "importance": 0.082
+    },
+    {
+      "feature": "SWIR_test",
+      "importance": 0.0652
+    },
+    {
+      "feature": "RED_train",
+      "importance": 0.0596
+    },
+    {
+      "feature": "VV_train",
+      "importance": 0.0581
+    },
+    {
+      "feature": "slope",
+      "importance": 0.0546
+    },
+    {
+      "feature": "SWIR_train",
+      "importance": 0.053
+    },
+    {
+      "feature": "NDVI_test",
+      "importance": 0.0523
+    },
+    {
+      "feature": "NBR_train",
+      "importance": 0.0514
+    },
+    {
+      "feature": "aspect",
+      "importance": 0.0489
+    },
+    {
+      "feature": "NDVI_train",
+      "importance": 0.0454
+    },
+    {
+      "feature": "NIR_train",
+      "importance": 0.0445
+    },
+    {
+      "feature": "VV_test",
+      "importance": 0.0422
+    },
+    {
+      "feature": "VH_train",
+      "importance": 0.0394
+    },
+    {
+      "feature": "EVI_train",
+      "importance": 0.0389
+    },
+    {
+      "feature": "VH_test",
+      "importance": 0.0375
+    }
+  ],
+  "by_source": {
+    "terrain": 0.2339,
+    "optical": 0.5069,
+    "radar": 0.2592
+  },
+  "patch_size": [
+    {
+      "bucket": "<=0.1 ha",
+      "n_patches": 2216,
+      "n_pixels": 2216,
+      "recall": 0.8317
+    },
+    {
+      "bucket": "0.1-0.2 ha",
+      "n_patches": 69,
+      "n_pixels": 138,
+      "recall": 0.8768
+    },
+    {
+      "bucket": "0.2-0.5 ha",
+      "n_patches": 14,
+      "n_pixels": 47,
+      "recall": 0.9149
+    },
+    {
+      "bucket": "0.5-1.0 ha",
+      "n_patches": 0,
+      "n_pixels": 0,
+      "recall": null
+    },
+    {
+      "bucket": ">1.0 ha",
+      "n_patches": 0,
+      "n_pixels": 0,
+      "recall": null
+    }
+  ],
+  "held_out_D": {
+    "f1": 0.8359,
+    "precision": 0.8359,
+    "recall": 0.8359
+  }
+}
