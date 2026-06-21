@@ -231,8 +231,9 @@ async function renderSectorDetail(props) {
       ${r && r.risk_level!=='UNKNOWN' ? `
       <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Forest lost 2020–24</span><span class="font-bold">${r.deforested_pct.toFixed(1)}% of forest</span></div>
       <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Forest assessed</span><span class="font-bold">${r.forest_ha ?? '—'} ha</span></div>` : ''}
-      <div class="mt-4 p-4 bg-primary-container/5 rounded-lg border border-primary/10" id="liveBox">
-        <div class="flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-primary text-lg">biotech</span><span class="font-bold text-sm text-primary">Live Model Output</span></div>
+      <p class="text-[11px] text-on-surface-variant mt-2" style="line-height:1.4;opacity:0.85;">Two complementary signals: <b>Forest lost</b> = what was actually cut 2020–24 (Hansen, historical). <b>Current condition</b> below = how the vegetation looks recently (model, 2023–24).</p>
+      <div class="mt-3 p-4 bg-primary-container/5 rounded-lg border border-primary/10" id="liveBox">
+        <div class="flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-primary text-lg">biotech</span><span class="font-bold text-sm text-primary">Current condition (model)</span></div>
         <p class="text-xs text-on-surface-variant">Running model on sector centroid…</p>
       </div>
     </div>`;
