@@ -167,7 +167,7 @@ def analyse_parcel(lat: float, lng: float, area_ha: float = None) -> dict:
 
 
 # Forest-manager / admin accounts live in the same SQLite DB as alternatives.
-_USERS_DB = Path(__file__).parent / "data" / "database" / "umurinzi.db"
+_USERS_DB = Path(__file__).parent / "data" / "database" / "treesight.db"
 
 
 def _users_conn():
@@ -565,7 +565,7 @@ _CUT_RECENT = {}   # analysis_id → last full analyse result (for simulate to l
 
 # ── Lookup the seeded ALTERNATIVES SQLite table ────────────────────────
 import sqlite3
-_DB_PATH = Path(__file__).parent / "data" / "database" / "umurinzi.db"
+_DB_PATH = Path(__file__).parent / "data" / "database" / "treesight.db"
 if not _DB_PATH.exists():
     print(f"[boot]   ⚠ {_DB_PATH} not found — alternatives endpoint will return empty")
 else:

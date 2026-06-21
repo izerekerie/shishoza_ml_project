@@ -284,6 +284,7 @@ def extract_polygon_from_pil_image(crop, workdir: Path) -> dict:
     import cv2
     import numpy as np
     import re
+    import math
     from PIL import Image
 
     try:
@@ -314,43 +315,49 @@ def extract_polygon_from_pil_image(crop, workdir: Path) -> dict:
         # bigger than text/label boxes (<5%). This works for both compact pages
         # (Rwamagana 1:212 scale, parcel ~53%) and wide pages (Bugesera 1:5000
         # scale, parcel ~15%).
-        all_quads = []
+        candidates = []
         for i, c in enumerate(contours):
             area = cv2.contourArea(c)
             if area < 1_000:
                 continue
-            approx = cv2.approxPolyDP(c, 0.022 * cv2.arcLength(c, True), True)
-            if 4 <= len(approx) <= 6:
+            # Lower epsilon (1.2% of perimeter, was 2.2%) keeps the real vertices
+            # of irregular parcels instead of collapsing every shape to a quad.
+            approx = cv2.approxPolyDP(c, 0.012 * cv2.arcLength(c, True), True)
+            # Accept any closed polygon with 4..20 vertices. Rwandan parcels are
+            # frequently 5-, 6-sided or L-shaped — the old 4-6 cap silently
+            # dropped them ("polygon just missing").
+            if 4 <= len(approx) <= 20:
                 parent = hierarchy[0][i][3] if hierarchy is not None else -1
-                all_quads.append((area, approx, parent, i))
+                candidates.append((area, approx, parent, i))
 
-        if not all_quads:
-            return {"error": "no quadrilateral candidates"}
+        if not candidates:
+            return {"error": "no polygon candidates"}
 
-        all_quads.sort(key=lambda x: -x[0])
-        outer_area = all_quads[0][0]
-        # Filter: a real parcel has parent (not outermost) AND occupies
-        # 5%-60% of the outer-frame area (excludes inner frames + tiny boxes)
+        candidates.sort(key=lambda x: -x[0])
+        outer_area = candidates[0][0]
+        # A real parcel is an INNER polygon (has a parent) occupying 3%-85% of
+        # the outer page frame: bigger than text/label boxes, smaller than
+        # nested inner frames. Widened from 5-60% so unusual scales/shapes
+        # survive the filter.
         parcel_candidates = [
-            (a, ap) for (a, ap, parent, _) in all_quads
-            if parent != -1 and (0.05 * outer_area) <= a <= (0.60 * outer_area)
+            (a, ap) for (a, ap, parent, _) in candidates
+            if parent != -1 and (0.03 * outer_area) <= a <= (0.85 * outer_area)
         ]
         if not parcel_candidates:
-            return {"error": "no parcel in 5-60% area band"}
-        parcel = parcel_candidates[0]    # largest within the band
+            return {"error": "no parcel in 3-85% area band"}
+        _, approx = parcel_candidates[0]    # largest within the band
 
-        _, approx = parcel
-        corners_px = [(int(p[0][0]), int(p[0][1])) for p in approx][:4]
+        corners_px = [(int(p[0][0]), int(p[0][1])) for p in approx]
         if len(corners_px) < 4:
             return {"error": "fewer than 4 corners"}
 
-        # Order clockwise from top-left for deterministic output
-        cx = sum(c[0] for c in corners_px) / 4
-        cy = sum(c[1] for c in corners_px) / 4
-        srt = sorted(corners_px,
-                     key=lambda c: (0 if c[1] < cy else 1, 0 if c[0] < cx else 1))
-        tl, tr, bl, br = srt
-        clockwise = [tl, tr, br, bl]
+        # Order all vertices clockwise around the centroid so the ring is a
+        # simple (non-self-intersecting) polygon regardless of vertex count.
+        # Works for quads AND irregular many-sided parcels — no rectangle
+        # assumption.
+        cx = sum(p[0] for p in corners_px) / len(corners_px)
+        cy = sum(p[1] for p in corners_px) / len(corners_px)
+        clockwise = sorted(corners_px, key=lambda p: math.atan2(p[1] - cy, p[0] - cx))
 
         # ── OCR with TSV bounding boxes (multi-PSM for robustness) ──
         p_cad = workdir / "_cad_tsv.png"; crop.save(p_cad)
