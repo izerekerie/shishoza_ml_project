@@ -1,0 +1,3295 @@
+{
+  "benchmark": "Hansen GFC v1.13 (UMD/Google, Science 2013)",
+  "hansen_asset": "UMD/hansen/global_forest_change_2025_v1_13",
+  "loss_window": "2020-2024 (full training window)",
+  "n_sectors_compared": 365,
+  "pearson_r": 0.32153549746259874,
+  "spearman_rho": 0.2897790149209549,
+  "per_sector": [
+    {
+      "sector_id": "2413",
+      "sector": "Simbi",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 100.0,
+      "hansen_pct": 55.725,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "5712",
+      "sector": "Rilima",
+      "district": "Bugesera",
+      "risk_level": "HIGH",
+      "deforested_pct": 100.0,
+      "hansen_pct": 35.252,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "1213",
+      "sector": "Remera",
+      "district": "Gasabo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 100.0,
+      "hansen_pct": 47.771,
+      "n_pixels": 89
+    },
+    {
+      "sector_id": "1207",
+      "sector": "Kacyiru",
+      "district": "Gasabo",
+      "risk_level": "HIGH",
+      "deforested_pct": 100.0,
+      "hansen_pct": 25.784,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "1108",
+      "sector": "Nyamirambo",
+      "district": "Nyarugenge",
+      "risk_level": "HIGH",
+      "deforested_pct": 100.0,
+      "hansen_pct": 9.214,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "5705",
+      "sector": "Mayange",
+      "district": "Bugesera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 99.541,
+      "hansen_pct": 59.476,
+      "n_pixels": 436
+    },
+    {
+      "sector_id": "5703",
+      "sector": "Kamabuye",
+      "district": "Bugesera",
+      "risk_level": "HIGH",
+      "deforested_pct": 98.611,
+      "hansen_pct": 31.006,
+      "n_pixels": 72
+    },
+    {
+      "sector_id": "4501",
+      "sector": "Bukure",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 98.214,
+      "hansen_pct": 39.16,
+      "n_pixels": 56
+    },
+    {
+      "sector_id": "4513",
+      "sector": "Nyamiyaga",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 97.945,
+      "hansen_pct": 43.954,
+      "n_pixels": 146
+    },
+    {
+      "sector_id": "4512",
+      "sector": "Mutete",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 97.163,
+      "hansen_pct": 41.812,
+      "n_pixels": 141
+    },
+    {
+      "sector_id": "4505",
+      "sector": "Giti",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 96.875,
+      "hansen_pct": 37.912,
+      "n_pixels": 32
+    },
+    {
+      "sector_id": "4508",
+      "sector": "Manyagiro",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 96.053,
+      "hansen_pct": 72.403,
+      "n_pixels": 76
+    },
+    {
+      "sector_id": "2407",
+      "sector": "Mbazi",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 96.0,
+      "hansen_pct": 40.072,
+      "n_pixels": 25
+    },
+    {
+      "sector_id": "2402",
+      "sector": "Huye",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 95.312,
+      "hansen_pct": 78.268,
+      "n_pixels": 128
+    },
+    {
+      "sector_id": "4506",
+      "sector": "Kageyo",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 94.872,
+      "hansen_pct": 33.072,
+      "n_pixels": 39
+    },
+    {
+      "sector_id": "4105",
+      "sector": "Cyinzuzi",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 94.444,
+      "hansen_pct": 46.733,
+      "n_pixels": 36
+    },
+    {
+      "sector_id": "1304",
+      "sector": "Kagarama",
+      "district": "Kicukiro",
+      "risk_level": "HIGH",
+      "deforested_pct": 94.444,
+      "hansen_pct": 8.414,
+      "n_pixels": 18
+    },
+    {
+      "sector_id": "4112",
+      "sector": "Ngoma",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 93.846,
+      "hansen_pct": 69.223,
+      "n_pixels": 65
+    },
+    {
+      "sector_id": "1204",
+      "sector": "Gisozi",
+      "district": "Gasabo",
+      "risk_level": "HIGH",
+      "deforested_pct": 93.75,
+      "hansen_pct": 4.609,
+      "n_pixels": 16
+    },
+    {
+      "sector_id": "2301",
+      "sector": "Busanze",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 93.6,
+      "hansen_pct": 69.428,
+      "n_pixels": 250
+    },
+    {
+      "sector_id": "4520",
+      "sector": "Rwamiko",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 93.333,
+      "hansen_pct": 21.963,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "4516",
+      "sector": "Rukomo",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 93.258,
+      "hansen_pct": 50.035,
+      "n_pixels": 267
+    },
+    {
+      "sector_id": "2401",
+      "sector": "Gishamvu",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 93.22,
+      "hansen_pct": 66.743,
+      "n_pixels": 59
+    },
+    {
+      "sector_id": "1209",
+      "sector": "Kimironko",
+      "district": "Gasabo",
+      "risk_level": "HIGH",
+      "deforested_pct": 91.667,
+      "hansen_pct": 4.287,
+      "n_pixels": 12
+    },
+    {
+      "sector_id": "5401",
+      "sector": "Gahini",
+      "district": "Kayonza",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 90.909,
+      "hansen_pct": 40.745,
+      "n_pixels": 44
+    },
+    {
+      "sector_id": "4108",
+      "sector": "Kisaro",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 90.909,
+      "hansen_pct": 39.442,
+      "n_pixels": 77
+    },
+    {
+      "sector_id": "4518",
+      "sector": "Rutare",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 90.909,
+      "hansen_pct": 36.393,
+      "n_pixels": 66
+    },
+    {
+      "sector_id": "4519",
+      "sector": "Ruvune",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 90.278,
+      "hansen_pct": 47.598,
+      "n_pixels": 288
+    },
+    {
+      "sector_id": "1302",
+      "sector": "Gatenga",
+      "district": "Kicukiro",
+      "risk_level": "HIGH",
+      "deforested_pct": 90.196,
+      "hansen_pct": 17.994,
+      "n_pixels": 51
+    },
+    {
+      "sector_id": "4502",
+      "sector": "Bwisige",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 90.116,
+      "hansen_pct": 52.916,
+      "n_pixels": 344
+    },
+    {
+      "sector_id": "5710",
+      "sector": "Nyamata",
+      "district": "Bugesera",
+      "risk_level": "HIGH",
+      "deforested_pct": 90.0,
+      "hansen_pct": 16.551,
+      "n_pixels": 10
+    },
+    {
+      "sector_id": "2506",
+      "sector": "Kamegeri",
+      "district": "Nyamagabe",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 90.0,
+      "hansen_pct": 39.483,
+      "n_pixels": 10
+    },
+    {
+      "sector_id": "2403",
+      "sector": "Karama",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 88.889,
+      "hansen_pct": 51.77,
+      "n_pixels": 117
+    },
+    {
+      "sector_id": "4503",
+      "sector": "Byumba",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 88.584,
+      "hansen_pct": 50.282,
+      "n_pixels": 219
+    },
+    {
+      "sector_id": "2213",
+      "sector": "Save",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 88.235,
+      "hansen_pct": 28.907,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "3614",
+      "sector": "Nkungu",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 88.208,
+      "hansen_pct": 29.333,
+      "n_pixels": 212
+    },
+    {
+      "sector_id": "2302",
+      "sector": "Cyahinda",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 87.719,
+      "hansen_pct": 53.522,
+      "n_pixels": 57
+    },
+    {
+      "sector_id": "3605",
+      "sector": "Giheke",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 87.629,
+      "hansen_pct": 42.05,
+      "n_pixels": 194
+    },
+    {
+      "sector_id": "4213",
+      "sector": "Muhondo",
+      "district": "Gakenke",
+      "risk_level": "HIGH",
+      "deforested_pct": 87.037,
+      "hansen_pct": 67.744,
+      "n_pixels": 54
+    },
+    {
+      "sector_id": "3714",
+      "sector": "Ruharambuga",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 86.908,
+      "hansen_pct": 39.319,
+      "n_pixels": 359
+    },
+    {
+      "sector_id": "4106",
+      "sector": "Cyungo",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 86.842,
+      "hansen_pct": 37.47,
+      "n_pixels": 38
+    },
+    {
+      "sector_id": "5308",
+      "sector": "Muhura",
+      "district": "Gatsibo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 86.667,
+      "hansen_pct": 36.107,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "1208",
+      "sector": "Kimihurura",
+      "district": "Gasabo",
+      "risk_level": "HIGH",
+      "deforested_pct": 86.667,
+      "hansen_pct": 12.79,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "1214",
+      "sector": "Rusororo",
+      "district": "Gasabo",
+      "risk_level": "HIGH",
+      "deforested_pct": 86.463,
+      "hansen_pct": 26.478,
+      "n_pixels": 229
+    },
+    {
+      "sector_id": "2307",
+      "sector": "Munini",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 85.981,
+      "hansen_pct": 42.804,
+      "n_pixels": 107
+    },
+    {
+      "sector_id": "1106",
+      "sector": "Muhima",
+      "district": "Nyarugenge",
+      "risk_level": "HIGH",
+      "deforested_pct": 85.714,
+      "hansen_pct": 87.5,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "2313",
+      "sector": "Ruramba",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 85.714,
+      "hansen_pct": 40.759,
+      "n_pixels": 140
+    },
+    {
+      "sector_id": "5214",
+      "sector": "Tabagwe",
+      "district": "Nyagatare",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 85.714,
+      "hansen_pct": 36.777,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "5210",
+      "sector": "Nyagatare",
+      "district": "Nyagatare",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 85.714,
+      "hansen_pct": 11.522,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "4113",
+      "sector": "Ntarabana",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 84.615,
+      "hansen_pct": 26.041,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "2414",
+      "sector": "Tumba",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 84.615,
+      "hansen_pct": 33.487,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "2305",
+      "sector": "Mata",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 83.75,
+      "hansen_pct": 38.955,
+      "n_pixels": 240
+    },
+    {
+      "sector_id": "2410",
+      "sector": "Ruhashya",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 83.333,
+      "hansen_pct": 51.93,
+      "n_pixels": 18
+    },
+    {
+      "sector_id": "2210",
+      "sector": "Musha",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 83.333,
+      "hansen_pct": 34.154,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "3609",
+      "sector": "Kamembe",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 83.333,
+      "hansen_pct": 35.534,
+      "n_pixels": 42
+    },
+    {
+      "sector_id": "2303",
+      "sector": "Kibeho",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 82.836,
+      "hansen_pct": 46.7,
+      "n_pixels": 268
+    },
+    {
+      "sector_id": "1210",
+      "sector": "Kinyinya",
+      "district": "Gasabo",
+      "risk_level": "HIGH",
+      "deforested_pct": 82.759,
+      "hansen_pct": 10.924,
+      "n_pixels": 87
+    },
+    {
+      "sector_id": "1310",
+      "sector": "Nyarugunga",
+      "district": "Kicukiro",
+      "risk_level": "HIGH",
+      "deforested_pct": 82.609,
+      "hansen_pct": 20.245,
+      "n_pixels": 115
+    },
+    {
+      "sector_id": "4109",
+      "sector": "Masoro",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 82.609,
+      "hansen_pct": 35.379,
+      "n_pixels": 23
+    },
+    {
+      "sector_id": "2406",
+      "sector": "Maraba",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 82.353,
+      "hansen_pct": 44.748,
+      "n_pixels": 34
+    },
+    {
+      "sector_id": "1211",
+      "sector": "Ndera",
+      "district": "Gasabo",
+      "risk_level": "HIGH",
+      "deforested_pct": 82.123,
+      "hansen_pct": 22.631,
+      "n_pixels": 179
+    },
+    {
+      "sector_id": "2308",
+      "sector": "Ngera",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 81.818,
+      "hansen_pct": 21.334,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "4412",
+      "sector": "Nemba",
+      "district": "Burera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 81.818,
+      "hansen_pct": 41.274,
+      "n_pixels": 121
+    },
+    {
+      "sector_id": "4104",
+      "sector": "Buyoga",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 81.746,
+      "hansen_pct": 43.694,
+      "n_pixels": 126
+    },
+    {
+      "sector_id": "1103",
+      "sector": "Kigali",
+      "district": "Nyarugenge",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 81.311,
+      "hansen_pct": 32.563,
+      "n_pixels": 305
+    },
+    {
+      "sector_id": "4509",
+      "sector": "Miyove",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 81.25,
+      "hansen_pct": 26.861,
+      "n_pixels": 32
+    },
+    {
+      "sector_id": "3611",
+      "sector": "Mururu",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 80.741,
+      "hansen_pct": 47.09,
+      "n_pixels": 135
+    },
+    {
+      "sector_id": "5404",
+      "sector": "Mukarange",
+      "district": "Kayonza",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 80.0,
+      "hansen_pct": 33.645,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "4514",
+      "sector": "Nyankenke",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 79.31,
+      "hansen_pct": 48.374,
+      "n_pixels": 29
+    },
+    {
+      "sector_id": "1308",
+      "sector": "Masaka",
+      "district": "Kicukiro",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 78.065,
+      "hansen_pct": 25.232,
+      "n_pixels": 155
+    },
+    {
+      "sector_id": "5201",
+      "sector": "Gatunda",
+      "district": "Nyagatare",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 77.778,
+      "hansen_pct": 34.612,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "4102",
+      "sector": "Burega",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 77.778,
+      "hansen_pct": 23.149,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "3715",
+      "sector": "Shangi",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 77.311,
+      "hansen_pct": 50.107,
+      "n_pixels": 119
+    },
+    {
+      "sector_id": "3705",
+      "sector": "Kagano",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 77.305,
+      "hansen_pct": 44.888,
+      "n_pixels": 141
+    },
+    {
+      "sector_id": "1307",
+      "sector": "Kigarama",
+      "district": "Kicukiro",
+      "risk_level": "HIGH",
+      "deforested_pct": 77.273,
+      "hansen_pct": 5.696,
+      "n_pixels": 22
+    },
+    {
+      "sector_id": "5109",
+      "sector": "Musha",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 76.471,
+      "hansen_pct": 34.257,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "4101",
+      "sector": "Base",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 76.364,
+      "hansen_pct": 36.817,
+      "n_pixels": 55
+    },
+    {
+      "sector_id": "4110",
+      "sector": "Mbogo",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 76.0,
+      "hansen_pct": 39.907,
+      "n_pixels": 25
+    },
+    {
+      "sector_id": "4511",
+      "sector": "Muko",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 75.556,
+      "hansen_pct": 25.872,
+      "n_pixels": 45
+    },
+    {
+      "sector_id": "2314",
+      "sector": "Rusenge",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 75.0,
+      "hansen_pct": 52.919,
+      "n_pixels": 32
+    },
+    {
+      "sector_id": "3616",
+      "sector": "Nyakarenzo",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 75.0,
+      "hansen_pct": 52.026,
+      "n_pixels": 104
+    },
+    {
+      "sector_id": "2211",
+      "sector": "Ndora",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 75.0,
+      "hansen_pct": 29.818,
+      "n_pixels": 20
+    },
+    {
+      "sector_id": "5207",
+      "sector": "Mimuri",
+      "district": "Nyagatare",
+      "risk_level": "HIGH",
+      "deforested_pct": 75.0,
+      "hansen_pct": 34.402,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "4116",
+      "sector": "Shyorongi",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 73.913,
+      "hansen_pct": 45.686,
+      "n_pixels": 23
+    },
+    {
+      "sector_id": "3701",
+      "sector": "Bushekeri",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 73.856,
+      "hansen_pct": 30.868,
+      "n_pixels": 459
+    },
+    {
+      "sector_id": "5106",
+      "sector": "Muhazi",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 73.333,
+      "hansen_pct": 28.608,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "5213",
+      "sector": "Rwimiyaga",
+      "district": "Nyagatare",
+      "risk_level": "HIGH",
+      "deforested_pct": 73.016,
+      "hansen_pct": 16.916,
+      "n_pixels": 63
+    },
+    {
+      "sector_id": "5208",
+      "sector": "Mukama",
+      "district": "Nyagatare",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 72.973,
+      "hansen_pct": 47.216,
+      "n_pixels": 37
+    },
+    {
+      "sector_id": "5304",
+      "sector": "Kabarore",
+      "district": "Gatsibo",
+      "risk_level": "HIGH",
+      "deforested_pct": 72.727,
+      "hansen_pct": 22.437,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "5701",
+      "sector": "Gashora",
+      "district": "Bugesera",
+      "risk_level": "HIGH",
+      "deforested_pct": 72.549,
+      "hansen_pct": 21.663,
+      "n_pixels": 51
+    },
+    {
+      "sector_id": "1205",
+      "sector": "Jabana",
+      "district": "Gasabo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 71.429,
+      "hansen_pct": 22.955,
+      "n_pixels": 77
+    },
+    {
+      "sector_id": "3706",
+      "sector": "Kanjongo",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 71.028,
+      "hansen_pct": 38.159,
+      "n_pixels": 107
+    },
+    {
+      "sector_id": "5111",
+      "sector": "Mwulire",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 69.697,
+      "hansen_pct": 35.23,
+      "n_pixels": 33
+    },
+    {
+      "sector_id": "3707",
+      "sector": "Karambi",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 69.62,
+      "hansen_pct": 39.172,
+      "n_pixels": 237
+    },
+    {
+      "sector_id": "1212",
+      "sector": "Nduba",
+      "district": "Gasabo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 69.461,
+      "hansen_pct": 27.084,
+      "n_pixels": 167
+    },
+    {
+      "sector_id": "5205",
+      "sector": "Kiyombe",
+      "district": "Nyagatare",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 69.444,
+      "hansen_pct": 40.489,
+      "n_pixels": 72
+    },
+    {
+      "sector_id": "1201",
+      "sector": "Bumbogo",
+      "district": "Gasabo",
+      "risk_level": "HIGH",
+      "deforested_pct": 68.023,
+      "hansen_pct": 26.91,
+      "n_pixels": 172
+    },
+    {
+      "sector_id": "2306",
+      "sector": "Muganza",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.885,
+      "hansen_pct": 46.514,
+      "n_pixels": 459
+    },
+    {
+      "sector_id": "4219",
+      "sector": "Rushashi",
+      "district": "Gakenke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.667,
+      "hansen_pct": 34.377,
+      "n_pixels": 33
+    },
+    {
+      "sector_id": "5112",
+      "sector": "Nyakaliro",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.667,
+      "hansen_pct": 41.206,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "5202",
+      "sector": "Karama",
+      "district": "Nyagatare",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.667,
+      "hansen_pct": 53.418,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "5212",
+      "sector": "Rwempasha",
+      "district": "Nyagatare",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.667,
+      "hansen_pct": 8.928,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "2409",
+      "sector": "Ngoma",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.667,
+      "hansen_pct": 19.56,
+      "n_pixels": 27
+    },
+    {
+      "sector_id": "2311",
+      "sector": "Nyagisozi",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.667,
+      "hansen_pct": 33.288,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "2309",
+      "sector": "Ngoma",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.667,
+      "hansen_pct": 25.271,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "3604",
+      "sector": "Gashonga",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 66.443,
+      "hansen_pct": 47.372,
+      "n_pixels": 149
+    },
+    {
+      "sector_id": "3703",
+      "sector": "Cyato",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 64.878,
+      "hansen_pct": 33.49,
+      "n_pixels": 410
+    },
+    {
+      "sector_id": "4521",
+      "sector": "Shangasha",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 64.706,
+      "hansen_pct": 41.582,
+      "n_pixels": 85
+    },
+    {
+      "sector_id": "4217",
+      "sector": "Ruli",
+      "district": "Gakenke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 64.103,
+      "hansen_pct": 53.775,
+      "n_pixels": 39
+    },
+    {
+      "sector_id": "3713",
+      "sector": "Rangiro",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 63.81,
+      "hansen_pct": 41.724,
+      "n_pixels": 210
+    },
+    {
+      "sector_id": "5103",
+      "sector": "Gishali",
+      "district": "Rwamagana",
+      "risk_level": "HIGH",
+      "deforested_pct": 63.636,
+      "hansen_pct": 36.99,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "3702",
+      "sector": "Bushenge",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 63.415,
+      "hansen_pct": 48.393,
+      "n_pixels": 82
+    },
+    {
+      "sector_id": "5302",
+      "sector": "Gatsibo",
+      "district": "Gatsibo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 63.158,
+      "hansen_pct": 41.538,
+      "n_pixels": 19
+    },
+    {
+      "sector_id": "5310",
+      "sector": "Ngarama",
+      "district": "Gatsibo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 62.5,
+      "hansen_pct": 17.389,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "5403",
+      "sector": "Kabarondo",
+      "district": "Kayonza",
+      "risk_level": "HIGH",
+      "deforested_pct": 62.5,
+      "hansen_pct": 26.051,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "5307",
+      "sector": "Kiziguro",
+      "district": "Gatsibo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 62.5,
+      "hansen_pct": 21.003,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "2516",
+      "sector": "Tare",
+      "district": "Nyamagabe",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 62.264,
+      "hansen_pct": 33.975,
+      "n_pixels": 53
+    },
+    {
+      "sector_id": "4107",
+      "sector": "Kinihira",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 61.972,
+      "hansen_pct": 39.425,
+      "n_pixels": 71
+    },
+    {
+      "sector_id": "2509",
+      "sector": "Kitabi",
+      "district": "Nyamagabe",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 61.594,
+      "hansen_pct": 24.692,
+      "n_pixels": 414
+    },
+    {
+      "sector_id": "5313",
+      "sector": "Rugarama",
+      "district": "Gatsibo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 61.538,
+      "hansen_pct": 30.584,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "5409",
+      "sector": "Nyamirama",
+      "district": "Kayonza",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 61.538,
+      "hansen_pct": 31.422,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "3606",
+      "sector": "Gihundwe",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 61.538,
+      "hansen_pct": 39.635,
+      "n_pixels": 78
+    },
+    {
+      "sector_id": "3615",
+      "sector": "Nyakabuye",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 60.902,
+      "hansen_pct": 35.287,
+      "n_pixels": 133
+    },
+    {
+      "sector_id": "5110",
+      "sector": "Muyumbu",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 60.0,
+      "hansen_pct": 28.123,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "5702",
+      "sector": "Juru",
+      "district": "Bugesera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 60.0,
+      "hansen_pct": 11.912,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "4301",
+      "sector": "Busogo",
+      "district": "Musanze",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 60.0,
+      "hansen_pct": 30.172,
+      "n_pixels": 60
+    },
+    {
+      "sector_id": "2204",
+      "sector": "Kibirizi",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 60.0,
+      "hansen_pct": 38.008,
+      "n_pixels": 20
+    },
+    {
+      "sector_id": "5107",
+      "sector": "Munyaga",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 59.091,
+      "hansen_pct": 44.647,
+      "n_pixels": 44
+    },
+    {
+      "sector_id": "5105",
+      "sector": "Kigabiro",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 58.333,
+      "hansen_pct": 46.626,
+      "n_pixels": 36
+    },
+    {
+      "sector_id": "2310",
+      "sector": "Nyabimata",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 57.982,
+      "hansen_pct": 34.525,
+      "n_pixels": 664
+    },
+    {
+      "sector_id": "4417",
+      "sector": "Rwerere",
+      "district": "Burera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 57.895,
+      "hansen_pct": 26.19,
+      "n_pixels": 76
+    },
+    {
+      "sector_id": "2312",
+      "sector": "Ruheru",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 57.763,
+      "hansen_pct": 45.289,
+      "n_pixels": 438
+    },
+    {
+      "sector_id": "5303",
+      "sector": "Gitoki",
+      "district": "Gatsibo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 57.143,
+      "hansen_pct": 15.284,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "4517",
+      "sector": "Rushaki",
+      "district": "Gicumbi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 57.143,
+      "hansen_pct": 53.731,
+      "n_pixels": 91
+    },
+    {
+      "sector_id": "2404",
+      "sector": "Kigoma",
+      "district": "Huye",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 57.143,
+      "hansen_pct": 53.157,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "4415",
+      "sector": "Ruhunde",
+      "district": "Burera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 56.818,
+      "hansen_pct": 32.372,
+      "n_pixels": 44
+    },
+    {
+      "sector_id": "5114",
+      "sector": "Rubona",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 55.556,
+      "hansen_pct": 46.292,
+      "n_pixels": 36
+    },
+    {
+      "sector_id": "5311",
+      "sector": "Nyagihanga",
+      "district": "Gatsibo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 55.556,
+      "hansen_pct": 33.858,
+      "n_pixels": 18
+    },
+    {
+      "sector_id": "4114",
+      "sector": "Rukozo",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 54.545,
+      "hansen_pct": 22.459,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "4115",
+      "sector": "Rusiga",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 52.632,
+      "hansen_pct": 26.739,
+      "n_pixels": 19
+    },
+    {
+      "sector_id": "4305",
+      "sector": "Gataraga",
+      "district": "Musanze",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 52.344,
+      "hansen_pct": 46.172,
+      "n_pixels": 256
+    },
+    {
+      "sector_id": "3617",
+      "sector": "Nzahaha",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 50.549,
+      "hansen_pct": 37.259,
+      "n_pixels": 91
+    },
+    {
+      "sector_id": "2203",
+      "sector": "Kansi",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 50.0,
+      "hansen_pct": 33.325,
+      "n_pixels": 20
+    },
+    {
+      "sector_id": "5312",
+      "sector": "Remera",
+      "district": "Gatsibo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 50.0,
+      "hansen_pct": 39.379,
+      "n_pixels": 10
+    },
+    {
+      "sector_id": "2207",
+      "sector": "Muganza",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 48.98,
+      "hansen_pct": 47.61,
+      "n_pixels": 49
+    },
+    {
+      "sector_id": "4205",
+      "sector": "Gashenyi",
+      "district": "Gakenke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 48.889,
+      "hansen_pct": 28.443,
+      "n_pixels": 45
+    },
+    {
+      "sector_id": "3708",
+      "sector": "Karengera",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 48.0,
+      "hansen_pct": 34.251,
+      "n_pixels": 150
+    },
+    {
+      "sector_id": "1305",
+      "sector": "Kanombe",
+      "district": "Kicukiro",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 47.826,
+      "hansen_pct": 25.684,
+      "n_pixels": 92
+    },
+    {
+      "sector_id": "3602",
+      "sector": "Butare",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 47.755,
+      "hansen_pct": 41.907,
+      "n_pixels": 490
+    },
+    {
+      "sector_id": "4103",
+      "sector": "Bushoki",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 47.619,
+      "hansen_pct": 40.026,
+      "n_pixels": 21
+    },
+    {
+      "sector_id": "2304",
+      "sector": "Kivu",
+      "district": "Nyaruguru",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 47.491,
+      "hansen_pct": 43.898,
+      "n_pixels": 558
+    },
+    {
+      "sector_id": "4117",
+      "sector": "Tumba",
+      "district": "Rulindo",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 47.059,
+      "hansen_pct": 24.358,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "4311",
+      "sector": "Nkotsi",
+      "district": "Musanze",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 47.0,
+      "hansen_pct": 79.358,
+      "n_pixels": 100
+    },
+    {
+      "sector_id": "1105",
+      "sector": "Mageregere",
+      "district": "Nyarugenge",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 46.715,
+      "hansen_pct": 15.346,
+      "n_pixels": 137
+    },
+    {
+      "sector_id": "1102",
+      "sector": "Kanyinya",
+      "district": "Nyarugenge",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 46.053,
+      "hansen_pct": 22.206,
+      "n_pixels": 76
+    },
+    {
+      "sector_id": "4207",
+      "sector": "Kamubuga",
+      "district": "Gakenke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 45.714,
+      "hansen_pct": 25.748,
+      "n_pixels": 35
+    },
+    {
+      "sector_id": "3612",
+      "sector": "Nkanka",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 45.455,
+      "hansen_pct": 39.048,
+      "n_pixels": 22
+    },
+    {
+      "sector_id": "2208",
+      "sector": "Mugombwa",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 44.444,
+      "hansen_pct": 34.485,
+      "n_pixels": 18
+    },
+    {
+      "sector_id": "5606",
+      "sector": "Mugesera",
+      "district": "Ngoma",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 44.444,
+      "hansen_pct": 43.375,
+      "n_pixels": 27
+    },
+    {
+      "sector_id": "1301",
+      "sector": "Gahanga",
+      "district": "Kicukiro",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 44.444,
+      "hansen_pct": 8.27,
+      "n_pixels": 63
+    },
+    {
+      "sector_id": "4404",
+      "sector": "Cyeru",
+      "district": "Burera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 43.75,
+      "hansen_pct": 42.148,
+      "n_pixels": 48
+    },
+    {
+      "sector_id": "3603",
+      "sector": "Bweyeye",
+      "district": "Rusizi",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 43.625,
+      "hansen_pct": 44.594,
+      "n_pixels": 502
+    },
+    {
+      "sector_id": "4211",
+      "sector": "Minazi",
+      "district": "Gakenke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 40.278,
+      "hansen_pct": 28.856,
+      "n_pixels": 72
+    },
+    {
+      "sector_id": "2212",
+      "sector": "Nyanza",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 40.0,
+      "hansen_pct": 17.502,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "5411",
+      "sector": "Ruramira",
+      "district": "Kayonza",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 40.0,
+      "hansen_pct": 15.159,
+      "n_pixels": 10
+    },
+    {
+      "sector_id": "5612",
+      "sector": "Rurenge",
+      "district": "Ngoma",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 38.462,
+      "hansen_pct": 25.182,
+      "n_pixels": 65
+    },
+    {
+      "sector_id": "5711",
+      "sector": "Nyarugenge",
+      "district": "Bugesera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 37.5,
+      "hansen_pct": 9.157,
+      "n_pixels": 16
+    },
+    {
+      "sector_id": "2205",
+      "sector": "Kigembe",
+      "district": "Gisagara",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 37.5,
+      "hansen_pct": 19.104,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "5113",
+      "sector": "Nzige",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 36.364,
+      "hansen_pct": 43.873,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "3710",
+      "sector": "Macuba",
+      "district": "Nyamasheke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 36.17,
+      "hansen_pct": 29.453,
+      "n_pixels": 47
+    },
+    {
+      "sector_id": "4202",
+      "sector": "Coko",
+      "district": "Gakenke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 33.824,
+      "hansen_pct": 31.375,
+      "n_pixels": 68
+    },
+    {
+      "sector_id": "5608",
+      "sector": "Mutenderi",
+      "district": "Ngoma",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 33.708,
+      "hansen_pct": 38.026,
+      "n_pixels": 89
+    },
+    {
+      "sector_id": "5709",
+      "sector": "Ntarama",
+      "district": "Bugesera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 33.333,
+      "hansen_pct": 9.938,
+      "n_pixels": 12
+    },
+    {
+      "sector_id": "2503",
+      "sector": "Gasaka",
+      "district": "Nyamagabe",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 33.333,
+      "hansen_pct": 30.902,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "5104",
+      "sector": "Karenge",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 33.333,
+      "hansen_pct": 14.451,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "4406",
+      "sector": "Gatebe",
+      "district": "Burera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 32.258,
+      "hansen_pct": 33.022,
+      "n_pixels": 31
+    },
+    {
+      "sector_id": "4209",
+      "sector": "Kivuruga",
+      "district": "Gakenke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 31.707,
+      "hansen_pct": 32.349,
+      "n_pixels": 41
+    },
+    {
+      "sector_id": "5102",
+      "sector": "Gahengeri",
+      "district": "Rwamagana",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 31.579,
+      "hansen_pct": 22.474,
+      "n_pixels": 19
+    },
+    {
+      "sector_id": "4414",
+      "sector": "Rugengabari",
+      "district": "Burera",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 31.25,
+      "hansen_pct": 32.584,
+      "n_pixels": 48
+    },
+    {
+      "sector_id": "4204",
+      "sector": "Gakenke",
+      "district": "Gakenke",
+      "risk_level": "MEDIUM",
+      "deforested_pct": 31.25,
+      "hansen_pct": 23.457,
+      "n_pixels": 32
+    },
+    {
+      "sector_id": "3608",
+      "sector": "Gitambi",
+      "district": "Rusizi",
+      "risk_level": "LOW",
+      "deforested_pct": 29.825,
+      "hansen_pct": 23.199,
+      "n_pixels": 57
+    },
+    {
+      "sector_id": "4216",
+      "sector": "Nemba",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 29.63,
+      "hansen_pct": 34.939,
+      "n_pixels": 27
+    },
+    {
+      "sector_id": "1206",
+      "sector": "Jali",
+      "district": "Gasabo",
+      "risk_level": "LOW",
+      "deforested_pct": 29.412,
+      "hansen_pct": 30.5,
+      "n_pixels": 34
+    },
+    {
+      "sector_id": "4306",
+      "sector": "Kimonyi",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 28.767,
+      "hansen_pct": 43.391,
+      "n_pixels": 73
+    },
+    {
+      "sector_id": "5405",
+      "sector": "Murama",
+      "district": "Kayonza",
+      "risk_level": "LOW",
+      "deforested_pct": 28.571,
+      "hansen_pct": 10.152,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "4208",
+      "sector": "Karambo",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 28.571,
+      "hansen_pct": 23.71,
+      "n_pixels": 21
+    },
+    {
+      "sector_id": "1215",
+      "sector": "Rutunga",
+      "district": "Gasabo",
+      "risk_level": "LOW",
+      "deforested_pct": 27.778,
+      "hansen_pct": 13.814,
+      "n_pixels": 72
+    },
+    {
+      "sector_id": "3601",
+      "sector": "Bugarama",
+      "district": "Rusizi",
+      "risk_level": "LOW",
+      "deforested_pct": 27.273,
+      "hansen_pct": 33.636,
+      "n_pixels": 22
+    },
+    {
+      "sector_id": "1203",
+      "sector": "Gikomero",
+      "district": "Gasabo",
+      "risk_level": "LOW",
+      "deforested_pct": 26.19,
+      "hansen_pct": 13.443,
+      "n_pixels": 42
+    },
+    {
+      "sector_id": "5305",
+      "sector": "Kageyo",
+      "district": "Gatsibo",
+      "risk_level": "LOW",
+      "deforested_pct": 25.0,
+      "hansen_pct": 14.484,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "5605",
+      "sector": "Kibungo",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 24.242,
+      "hansen_pct": 25.719,
+      "n_pixels": 33
+    },
+    {
+      "sector_id": "5314",
+      "sector": "Rwimbogo",
+      "district": "Gatsibo",
+      "risk_level": "LOW",
+      "deforested_pct": 24.044,
+      "hansen_pct": 16.766,
+      "n_pixels": 183
+    },
+    {
+      "sector_id": "5613",
+      "sector": "Sake",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 24.0,
+      "hansen_pct": 19.587,
+      "n_pixels": 25
+    },
+    {
+      "sector_id": "5407",
+      "sector": "Mwiri",
+      "district": "Kayonza",
+      "risk_level": "LOW",
+      "deforested_pct": 23.958,
+      "hansen_pct": 20.324,
+      "n_pixels": 192
+    },
+    {
+      "sector_id": "3607",
+      "sector": "Gikundamvura",
+      "district": "Rusizi",
+      "risk_level": "LOW",
+      "deforested_pct": 23.881,
+      "hansen_pct": 34.449,
+      "n_pixels": 67
+    },
+    {
+      "sector_id": "3712",
+      "sector": "Nyabitekeri",
+      "district": "Nyamasheke",
+      "risk_level": "LOW",
+      "deforested_pct": 23.077,
+      "hansen_pct": 61.828,
+      "n_pixels": 26
+    },
+    {
+      "sector_id": "5503",
+      "sector": "Kigarama",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 22.5,
+      "hansen_pct": 23.995,
+      "n_pixels": 40
+    },
+    {
+      "sector_id": "5610",
+      "sector": "Rukira",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 21.739,
+      "hansen_pct": 34.979,
+      "n_pixels": 23
+    },
+    {
+      "sector_id": "4308",
+      "sector": "Muhoza",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 20.455,
+      "hansen_pct": 17.681,
+      "n_pixels": 44
+    },
+    {
+      "sector_id": "5714",
+      "sector": "Rweru",
+      "district": "Bugesera",
+      "risk_level": "LOW",
+      "deforested_pct": 20.0,
+      "hansen_pct": 4.197,
+      "n_pixels": 125
+    },
+    {
+      "sector_id": "5108",
+      "sector": "Munyiginya",
+      "district": "Rwamagana",
+      "risk_level": "LOW",
+      "deforested_pct": 20.0,
+      "hansen_pct": 49.425,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "5604",
+      "sector": "Kazo",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 19.718,
+      "hansen_pct": 27.623,
+      "n_pixels": 71
+    },
+    {
+      "sector_id": "5609",
+      "sector": "Remera",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 19.355,
+      "hansen_pct": 26.759,
+      "n_pixels": 31
+    },
+    {
+      "sector_id": "4304",
+      "sector": "Gashaki",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 18.75,
+      "hansen_pct": 27.594,
+      "n_pixels": 16
+    },
+    {
+      "sector_id": "2209",
+      "sector": "Mukindo",
+      "district": "Gisagara",
+      "risk_level": "LOW",
+      "deforested_pct": 18.182,
+      "hansen_pct": 33.62,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "5614",
+      "sector": "Zaza",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 16.667,
+      "hansen_pct": 42.453,
+      "n_pixels": 24
+    },
+    {
+      "sector_id": "2517",
+      "sector": "Uwinkingi",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 16.129,
+      "hansen_pct": 20.204,
+      "n_pixels": 217
+    },
+    {
+      "sector_id": "5607",
+      "sector": "Murama",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 15.909,
+      "hansen_pct": 32.858,
+      "n_pixels": 44
+    },
+    {
+      "sector_id": "5504",
+      "sector": "Kigina",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 15.789,
+      "hansen_pct": 18.625,
+      "n_pixels": 19
+    },
+    {
+      "sector_id": "5510",
+      "sector": "Nasho",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 15.385,
+      "hansen_pct": 7.334,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "5507",
+      "sector": "Mpanga",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 15.328,
+      "hansen_pct": 19.737,
+      "n_pixels": 137
+    },
+    {
+      "sector_id": "5203",
+      "sector": "Karangazi",
+      "district": "Nyagatare",
+      "risk_level": "LOW",
+      "deforested_pct": 15.152,
+      "hansen_pct": 10.843,
+      "n_pixels": 99
+    },
+    {
+      "sector_id": "4315",
+      "sector": "Shingiro",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 14.439,
+      "hansen_pct": 30.476,
+      "n_pixels": 187
+    },
+    {
+      "sector_id": "5509",
+      "sector": "Mushikiri",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 14.286,
+      "hansen_pct": 28.646,
+      "n_pixels": 21
+    },
+    {
+      "sector_id": "3618",
+      "sector": "Rwimbogo",
+      "district": "Rusizi",
+      "risk_level": "LOW",
+      "deforested_pct": 13.514,
+      "hansen_pct": 28.285,
+      "n_pixels": 37
+    },
+    {
+      "sector_id": "5505",
+      "sector": "Kirehe",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 13.333,
+      "hansen_pct": 24.214,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "5406",
+      "sector": "Murundi",
+      "district": "Kayonza",
+      "risk_level": "LOW",
+      "deforested_pct": 13.043,
+      "hansen_pct": 20.06,
+      "n_pixels": 115
+    },
+    {
+      "sector_id": "5601",
+      "sector": "Gashanda",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 12.963,
+      "hansen_pct": 23.358,
+      "n_pixels": 54
+    },
+    {
+      "sector_id": "4111",
+      "sector": "Murambi",
+      "district": "Rulindo",
+      "risk_level": "LOW",
+      "deforested_pct": 12.5,
+      "hansen_pct": 21.018,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "5408",
+      "sector": "Ndego",
+      "district": "Kayonza",
+      "risk_level": "LOW",
+      "deforested_pct": 11.29,
+      "hansen_pct": 1.232,
+      "n_pixels": 62
+    },
+    {
+      "sector_id": "5715",
+      "sector": "Shyara",
+      "district": "Bugesera",
+      "risk_level": "LOW",
+      "deforested_pct": 11.111,
+      "hansen_pct": 19.744,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "5501",
+      "sector": "Gahara",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 10.843,
+      "hansen_pct": 36.022,
+      "n_pixels": 83
+    },
+    {
+      "sector_id": "5603",
+      "sector": "Karembo",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 10.714,
+      "hansen_pct": 42.795,
+      "n_pixels": 28
+    },
+    {
+      "sector_id": "4214",
+      "sector": "Muyongwe",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 10.0,
+      "hansen_pct": 11.987,
+      "n_pixels": 10
+    },
+    {
+      "sector_id": "2206",
+      "sector": "Mamba",
+      "district": "Gisagara",
+      "risk_level": "LOW",
+      "deforested_pct": 9.524,
+      "hansen_pct": 9.798,
+      "n_pixels": 42
+    },
+    {
+      "sector_id": "4201",
+      "sector": "Busengo",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 8.621,
+      "hansen_pct": 19.833,
+      "n_pixels": 58
+    },
+    {
+      "sector_id": "4215",
+      "sector": "Muzo",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 8.527,
+      "hansen_pct": 18.963,
+      "n_pixels": 129
+    },
+    {
+      "sector_id": "5512",
+      "sector": "Nyarubuye",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 8.0,
+      "hansen_pct": 4.951,
+      "n_pixels": 25
+    },
+    {
+      "sector_id": "4212",
+      "sector": "Mugunga",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 6.757,
+      "hansen_pct": 29.077,
+      "n_pixels": 74
+    },
+    {
+      "sector_id": "5508",
+      "sector": "Musaza",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 5.882,
+      "hansen_pct": 24.681,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "4314",
+      "sector": "Rwaza",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 5.882,
+      "hansen_pct": 33.81,
+      "n_pixels": 51
+    },
+    {
+      "sector_id": "4210",
+      "sector": "Mataba",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 5.882,
+      "hansen_pct": 8.621,
+      "n_pixels": 51
+    },
+    {
+      "sector_id": "4313",
+      "sector": "Remera",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 5.263,
+      "hansen_pct": 16.105,
+      "n_pixels": 19
+    },
+    {
+      "sector_id": "4407",
+      "sector": "Gitovu",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 5.128,
+      "hansen_pct": 16.276,
+      "n_pixels": 39
+    },
+    {
+      "sector_id": "5602",
+      "sector": "Jarama",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 4.255,
+      "hansen_pct": 2.995,
+      "n_pixels": 47
+    },
+    {
+      "sector_id": "4218",
+      "sector": "Rusasa",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 3.371,
+      "hansen_pct": 51.645,
+      "n_pixels": 89
+    },
+    {
+      "sector_id": "2202",
+      "sector": "Gishubi",
+      "district": "Gisagara",
+      "risk_level": "LOW",
+      "deforested_pct": 3.226,
+      "hansen_pct": 6.714,
+      "n_pixels": 31
+    },
+    {
+      "sector_id": "4310",
+      "sector": "Musanze",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 2.941,
+      "hansen_pct": 40.851,
+      "n_pixels": 102
+    },
+    {
+      "sector_id": "4303",
+      "sector": "Gacaca",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 2.703,
+      "hansen_pct": 12.154,
+      "n_pixels": 37
+    },
+    {
+      "sector_id": "4206",
+      "sector": "Janja",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 1.818,
+      "hansen_pct": 25.192,
+      "n_pixels": 55
+    },
+    {
+      "sector_id": "4309",
+      "sector": "Muko",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 1.639,
+      "hansen_pct": 59.972,
+      "n_pixels": 61
+    },
+    {
+      "sector_id": "5402",
+      "sector": "Kabare",
+      "district": "Kayonza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 3.77,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "2104",
+      "sector": "Kibilizi",
+      "district": "Nyanza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 15.107,
+      "n_pixels": 14
+    },
+    {
+      "sector_id": "3310",
+      "sector": "Nyundo",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 39.028,
+      "n_pixels": 28
+    },
+    {
+      "sector_id": "3709",
+      "sector": "Kirimbi",
+      "district": "Nyamasheke",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 23.577,
+      "n_pixels": 37
+    },
+    {
+      "sector_id": "3711",
+      "sector": "Mahembe",
+      "district": "Nyamasheke",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 30.592,
+      "n_pixels": 39
+    },
+    {
+      "sector_id": "2505",
+      "sector": "Kaduha",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 33.545,
+      "n_pixels": 34
+    },
+    {
+      "sector_id": "3309",
+      "sector": "Nyamyumba",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 26.987,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "2106",
+      "sector": "Mukingo",
+      "district": "Nyanza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 29.304,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "2504",
+      "sector": "Gatare",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 53.525,
+      "n_pixels": 95
+    },
+    {
+      "sector_id": "2107",
+      "sector": "Muyira",
+      "district": "Nyanza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 16.569,
+      "n_pixels": 14
+    },
+    {
+      "sector_id": "3301",
+      "sector": "Bugeshi",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 9.056,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "2502",
+      "sector": "Cyanika",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 17.24,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "2501",
+      "sector": "Buruhukiro",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 38.628,
+      "n_pixels": 330
+    },
+    {
+      "sector_id": "3305",
+      "sector": "Kanama",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 47.623,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "2108",
+      "sector": "Ntyazo",
+      "district": "Nyanza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 5.802,
+      "n_pixels": 12
+    },
+    {
+      "sector_id": "3308",
+      "sector": "Nyakiriba",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 29.009,
+      "n_pixels": 14
+    },
+    {
+      "sector_id": "2109",
+      "sector": "Nyagisozi",
+      "district": "Nyanza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 12.912,
+      "n_pixels": 16
+    },
+    {
+      "sector_id": "2110",
+      "sector": "Rwabicuma",
+      "district": "Nyanza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 30.219,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "2201",
+      "sector": "Gikonko",
+      "district": "Gisagara",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 7.607,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "2412",
+      "sector": "Rwaniro",
+      "district": "Huye",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 35.952,
+      "n_pixels": 10
+    },
+    {
+      "sector_id": "3307",
+      "sector": "Mudende",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 14.7,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "2411",
+      "sector": "Rusatira",
+      "district": "Huye",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 20.428,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "3302",
+      "sector": "Busasamana",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 36.067,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "3303",
+      "sector": "Cyanzarwe",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 10.076,
+      "n_pixels": 25
+    },
+    {
+      "sector_id": "3306",
+      "sector": "Kanzenze",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 24.759,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "3311",
+      "sector": "Rubavu",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 14.566,
+      "n_pixels": 19
+    },
+    {
+      "sector_id": "3403",
+      "sector": "Jomba",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 41.278,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "5502",
+      "sector": "Gatore",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 35.12,
+      "n_pixels": 30
+    },
+    {
+      "sector_id": "5611",
+      "sector": "Rukumberi",
+      "district": "Ngoma",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 5.726,
+      "n_pixels": 23
+    },
+    {
+      "sector_id": "3506",
+      "sector": "Kavumu",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 37.292,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "3507",
+      "sector": "Matyazo",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 47.754,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "3508",
+      "sector": "Muhanda",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 30.839,
+      "n_pixels": 36
+    },
+    {
+      "sector_id": "3509",
+      "sector": "Muhororo",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 19.853,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "3510",
+      "sector": "Ndaro",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 18.107,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "5706",
+      "sector": "Musenyi",
+      "district": "Bugesera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 8.778,
+      "n_pixels": 24
+    },
+    {
+      "sector_id": "3511",
+      "sector": "Ngororero",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 30.401,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "3512",
+      "sector": "Nyange",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 13.67,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "2102",
+      "sector": "Busoro",
+      "district": "Nyanza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 14.811,
+      "n_pixels": 20
+    },
+    {
+      "sector_id": "2103",
+      "sector": "Cyabakamyi",
+      "district": "Nyanza",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 16.872,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "3502",
+      "sector": "Gatumba",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 9.458,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "3501",
+      "sector": "Bwira",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 20.069,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "3412",
+      "sector": "Shyira",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 44.358,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "3411",
+      "sector": "Rurembo",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 33.43,
+      "n_pixels": 12
+    },
+    {
+      "sector_id": "3312",
+      "sector": "Rugerero",
+      "district": "Rubavu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 20.185,
+      "n_pixels": 34
+    },
+    {
+      "sector_id": "3410",
+      "sector": "Rugera",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 32.444,
+      "n_pixels": 19
+    },
+    {
+      "sector_id": "3610",
+      "sector": "Muganza",
+      "district": "Rusizi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 2.257,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "3409",
+      "sector": "Rambura",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 39.111,
+      "n_pixels": 30
+    },
+    {
+      "sector_id": "3408",
+      "sector": "Muringa",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 41.765,
+      "n_pixels": 38
+    },
+    {
+      "sector_id": "3407",
+      "sector": "Mukamira",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 32.221,
+      "n_pixels": 14
+    },
+    {
+      "sector_id": "3406",
+      "sector": "Kintobo",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 28.868,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "3405",
+      "sector": "Karago",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 27.889,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "3404",
+      "sector": "Kabatwa",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 25.812,
+      "n_pixels": 41
+    },
+    {
+      "sector_id": "2507",
+      "sector": "Kibirizi",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 29.116,
+      "n_pixels": 12
+    },
+    {
+      "sector_id": "3402",
+      "sector": "Jenda",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 25.734,
+      "n_pixels": 14
+    },
+    {
+      "sector_id": "5506",
+      "sector": "Mahama",
+      "district": "Kirehe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 0.899,
+      "n_pixels": 16
+    },
+    {
+      "sector_id": "3704",
+      "sector": "Gihombo",
+      "district": "Nyamasheke",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 37.671,
+      "n_pixels": 32
+    },
+    {
+      "sector_id": "3401",
+      "sector": "Bigogwe",
+      "district": "Nyabihu",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 10.575,
+      "n_pixels": 26
+    },
+    {
+      "sector_id": "3213",
+      "sector": "Rusebeya",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 25.897,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "2513",
+      "sector": "Musebeya",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 33.749,
+      "n_pixels": 41
+    },
+    {
+      "sector_id": "2508",
+      "sector": "Kibumbwe",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 33.37,
+      "n_pixels": 21
+    },
+    {
+      "sector_id": "3105",
+      "sector": "Mubuga",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 15.137,
+      "n_pixels": 26
+    },
+    {
+      "sector_id": "4416",
+      "sector": "Rusarabuye",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 21.351,
+      "n_pixels": 50
+    },
+    {
+      "sector_id": "3107",
+      "sector": "Murundi",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 19.08,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "3505",
+      "sector": "Kageyo",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 34.873,
+      "n_pixels": 6
+    },
+    {
+      "sector_id": "4413",
+      "sector": "Rugarama",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 42.554,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "3108",
+      "sector": "Mutuntu",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 26.759,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "4411",
+      "sector": "Kivuye",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 32.007,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "4410",
+      "sector": "Kinyababa",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 19.646,
+      "n_pixels": 67
+    },
+    {
+      "sector_id": "4409",
+      "sector": "Kinoni",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 23.121,
+      "n_pixels": 25
+    },
+    {
+      "sector_id": "4408",
+      "sector": "Kagogo",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 50.406,
+      "n_pixels": 45
+    },
+    {
+      "sector_id": "3207",
+      "sector": "Murunda",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 27.97,
+      "n_pixels": 24
+    },
+    {
+      "sector_id": "4405",
+      "sector": "Gahunga",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 11.039,
+      "n_pixels": 75
+    },
+    {
+      "sector_id": "3206",
+      "sector": "Mukura",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 35.251,
+      "n_pixels": 56
+    },
+    {
+      "sector_id": "4403",
+      "sector": "Cyanika",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 26.27,
+      "n_pixels": 53
+    },
+    {
+      "sector_id": "4402",
+      "sector": "Butaro",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 24.185,
+      "n_pixels": 45
+    },
+    {
+      "sector_id": "4401",
+      "sector": "Bungwe",
+      "district": "Burera",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 37.745,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "3205",
+      "sector": "Manihira",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 39.617,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "4312",
+      "sector": "Nyange",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 39.397,
+      "n_pixels": 161
+    },
+    {
+      "sector_id": "3109",
+      "sector": "Rubengera",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 29.068,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "3204",
+      "sector": "Kivumu",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 40.199,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "4307",
+      "sector": "Kinigi",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 33.033,
+      "n_pixels": 259
+    },
+    {
+      "sector_id": "3203",
+      "sector": "Kigeyo",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 33.866,
+      "n_pixels": 24
+    },
+    {
+      "sector_id": "3110",
+      "sector": "Rugabano",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 35.596,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "4302",
+      "sector": "Cyuve",
+      "district": "Musanze",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 40.058,
+      "n_pixels": 67
+    },
+    {
+      "sector_id": "3111",
+      "sector": "Ruganda",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 17.776,
+      "n_pixels": 13
+    },
+    {
+      "sector_id": "3112",
+      "sector": "Rwankuba",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 34.448,
+      "n_pixels": 26
+    },
+    {
+      "sector_id": "3113",
+      "sector": "Twumba",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 33.218,
+      "n_pixels": 61
+    },
+    {
+      "sector_id": "4203",
+      "sector": "Cyabingo",
+      "district": "Gakenke",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 12.174,
+      "n_pixels": 29
+    },
+    {
+      "sector_id": "3201",
+      "sector": "Boneza",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 24.859,
+      "n_pixels": 31
+    },
+    {
+      "sector_id": "3202",
+      "sector": "Gihango",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 29.909,
+      "n_pixels": 42
+    },
+    {
+      "sector_id": "3106",
+      "sector": "Murambi",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 12.252,
+      "n_pixels": 10
+    },
+    {
+      "sector_id": "3104",
+      "sector": "Gitesi",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 35.71,
+      "n_pixels": 22
+    },
+    {
+      "sector_id": "2510",
+      "sector": "Mbazi",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 20.326,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "3103",
+      "sector": "Gishyita",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 17.02,
+      "n_pixels": 33
+    },
+    {
+      "sector_id": "3212",
+      "sector": "Ruhango",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 25.382,
+      "n_pixels": 23
+    },
+    {
+      "sector_id": "2511",
+      "sector": "Mugano",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 34.382,
+      "n_pixels": 46
+    },
+    {
+      "sector_id": "2512",
+      "sector": "Musange",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 38.523,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "2514",
+      "sector": "Mushubi",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 36.186,
+      "n_pixels": 8
+    },
+    {
+      "sector_id": "3211",
+      "sector": "Nyabirasi",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 36.516,
+      "n_pixels": 47
+    },
+    {
+      "sector_id": "2515",
+      "sector": "Nkomane",
+      "district": "Nyamagabe",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 30.704,
+      "n_pixels": 133
+    },
+    {
+      "sector_id": "3210",
+      "sector": "Mushubati",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 29.883,
+      "n_pixels": 18
+    },
+    {
+      "sector_id": "2603",
+      "sector": "Kabagali",
+      "district": "Ruhango",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 14.766,
+      "n_pixels": 7
+    },
+    {
+      "sector_id": "3209",
+      "sector": "Mushonyi",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 28.502,
+      "n_pixels": 15
+    },
+    {
+      "sector_id": "2604",
+      "sector": "Kinazi",
+      "district": "Ruhango",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 7.062,
+      "n_pixels": 10
+    },
+    {
+      "sector_id": "3208",
+      "sector": "Musasa",
+      "district": "Rutsiro",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 29.107,
+      "n_pixels": 29
+    },
+    {
+      "sector_id": "2605",
+      "sector": "Kinihira",
+      "district": "Ruhango",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 21.986,
+      "n_pixels": 11
+    },
+    {
+      "sector_id": "2702",
+      "sector": "Kabacuzi",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 27.895,
+      "n_pixels": 22
+    },
+    {
+      "sector_id": "2703",
+      "sector": "Kibangu",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 51.394,
+      "n_pixels": 65
+    },
+    {
+      "sector_id": "2704",
+      "sector": "Kiyumba",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 39.208,
+      "n_pixels": 26
+    },
+    {
+      "sector_id": "2705",
+      "sector": "Muhanga",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 21.681,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "2706",
+      "sector": "Mushishiro",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 27.684,
+      "n_pixels": 17
+    },
+    {
+      "sector_id": "4515",
+      "sector": "Rubaya",
+      "district": "Gicumbi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 76.497,
+      "n_pixels": 5
+    },
+    {
+      "sector_id": "2707",
+      "sector": "Nyabinoni",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 44.393,
+      "n_pixels": 62
+    },
+    {
+      "sector_id": "2709",
+      "sector": "Nyarusange",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 17.957,
+      "n_pixels": 12
+    },
+    {
+      "sector_id": "2710",
+      "sector": "Rongi",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 50.136,
+      "n_pixels": 50
+    },
+    {
+      "sector_id": "2711",
+      "sector": "Rugendabari",
+      "district": "Muhanga",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 37.102,
+      "n_pixels": 26
+    },
+    {
+      "sector_id": "4510",
+      "sector": "Mukarange",
+      "district": "Gicumbi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 44.103,
+      "n_pixels": 40
+    },
+    {
+      "sector_id": "2803",
+      "sector": "Kayenzi",
+      "district": "Kamonyi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 32.323,
+      "n_pixels": 12
+    },
+    {
+      "sector_id": "2805",
+      "sector": "Mugina",
+      "district": "Kamonyi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 22.489,
+      "n_pixels": 28
+    },
+    {
+      "sector_id": "4507",
+      "sector": "Kaniga",
+      "district": "Gicumbi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 54.271,
+      "n_pixels": 30
+    },
+    {
+      "sector_id": "3101",
+      "sector": "Bwishyura",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 15.328,
+      "n_pixels": 25
+    },
+    {
+      "sector_id": "3102",
+      "sector": "Gashari",
+      "district": "Karongi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 19.433,
+      "n_pixels": 9
+    },
+    {
+      "sector_id": "4504",
+      "sector": "Cyumba",
+      "district": "Gicumbi",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 43.834,
+      "n_pixels": 14
+    },
+    {
+      "sector_id": "3504",
+      "sector": "Kabaya",
+      "district": "Ngororero",
+      "risk_level": "LOW",
+      "deforested_pct": 0.0,
+      "hansen_pct": 27.444,
+      "n_pixels": 5
+    }
+  ]
+}

@@ -24,7 +24,9 @@ from shapely.geometry import Point
 HERE = Path(__file__).resolve().parent.parent
 
 print("[1/4] Load training pixels with geometry …")
-df = pd.read_csv(HERE / "data" / "raw" / "training_data.csv")
+# National sample (whole country) so every sector with ≥5 labelled pixels gets a
+# risk; the old Nyungwe-only training_data.csv only lit up the south-west.
+df = pd.read_csv(HERE / "data" / "raw" / "training_data_national.csv")
 df["lng"] = df[".geo"].apply(lambda s: json.loads(s)["coordinates"][0])
 df["lat"] = df[".geo"].apply(lambda s: json.loads(s)["coordinates"][1])
 print(f"   {len(df):,} pixels, classes={df['label'].value_counts().to_dict()}")

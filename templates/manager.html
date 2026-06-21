@@ -83,7 +83,7 @@
 <div class="flex items-center gap-4">
 <div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded-full border border-outline-variant/20">
 <span class="w-2 h-2 rounded-full bg-status-live ping-animate"></span>
-<span class="text-xs font-bold">SECTOR RISK · RF-D</span>
+<span class="text-xs font-bold">RECENT FOREST LOSS · HANSEN 2020–24</span>
 </div>
 </div>
 </header>
@@ -229,8 +229,8 @@ async function renderSectorDetail(props) {
     <div class="space-y-1">
       <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">District</span><span class="font-bold">${props.district}</span></div>
       ${r && r.risk_level!=='UNKNOWN' ? `
-      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Historical Deforestation</span><span class="font-bold">${r.deforested_pct.toFixed(1)}%</span></div>
-      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Sample Size</span><span class="font-bold">${r.n_pixels} pixels</span></div>` : ''}
+      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Forest lost 2020–24</span><span class="font-bold">${r.deforested_pct.toFixed(1)}% of forest</span></div>
+      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Forest assessed</span><span class="font-bold">${r.forest_ha ?? '—'} ha</span></div>` : ''}
       <div class="mt-4 p-4 bg-primary-container/5 rounded-lg border border-primary/10" id="liveBox">
         <div class="flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-primary text-lg">biotech</span><span class="font-bold text-sm text-primary">Live Model Output</span></div>
         <p class="text-xs text-on-surface-variant">Running model on sector centroid…</p>
