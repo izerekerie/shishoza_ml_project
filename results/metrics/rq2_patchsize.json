@@ -1,0 +1,33 @@
+{
+  "method": "Hansen connectedPixelCount real patch sizes; 5-fold out-of-fold RF preds",
+  "loss_window": "2020-2022 (matches label definition in GEE export)",
+  "n_deforested_pixels": 11543,
+  "overall_recall": 0.838,
+  "by_patch_size": [
+    {
+      "bucket": "0.09\u20130.18 ha (1\u20132 px)",
+      "n_patches_pixels": 1023,
+      "recall": 0.771
+    },
+    {
+      "bucket": "0.18\u20130.45 ha (2\u20135 px)",
+      "n_patches_pixels": 1759,
+      "recall": 0.799
+    },
+    {
+      "bucket": "0.45\u20130.9 ha (5\u201310 px)",
+      "n_patches_pixels": 2019,
+      "recall": 0.833
+    },
+    {
+      "bucket": "0.9\u20131.8 ha (10\u201320 px)",
+      "n_patches_pixels": 1976,
+      "recall": 0.837
+    },
+    {
+      "bucket": ">1.8 ha (20+ px)",
+      "n_patches_pixels": 4766,
+      "recall": 0.873
+    }
+  ]
+}
