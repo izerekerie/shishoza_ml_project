@@ -57,7 +57,7 @@ COPY models/ models/
 # ready-to-run. Anyone deploying gets the demo accounts pre-loaded.
 RUN python scripts/seed_users.py
 
-# Render injects $PORT at runtime — fall back to 5050 for local docker run
+# Platform injects $PORT at runtime (Railway / Render) — fall back to 5050 for local
 EXPOSE 5050
 ENV PORT=5050
 

@@ -33,6 +33,16 @@ __pycache__/
 *.pyc
 *.log
 ml_deliverables/
+
+# Only rf_D_national.pkl is loaded by the app — exclude everything else
+# to keep the Docker build context small (~325 MB vs ~1.7 GB)
+models/rf_A.pkl
+models/rf_A_national.pkl
+models/rf_B.pkl
+models/rf_B_national.pkl
+models/rf_C.pkl
+models/rf_C_national.pkl
+models/rf_D.pkl
 models/rf_D_tuned.pkl
 
 # Temporary uploads

@@ -60,11 +60,9 @@ scripts/rewrite_descriptions.py
 # ── Derivative bundle (regenerable from results/) ──────────────────
 ml_deliverables/
 
-# ── Over-100MB binary (exceeds GitHub hard limit) ───────────────────
-# rf_D_tuned.pkl is the grid-search winner but NOT deployed (rf_D.pkl beats
-# it on inference cost vs marginal F1 gain). Search RESULTS are preserved in
-# results/hyperparameter_tuning/ — the .pkl itself is regenerable by running
-# scripts/hyperparameter_tune.py
+# ── Model binaries — all *.pkl tracked via Git LFS (.gitattributes) ────
+# rf_D_tuned.pkl is NOT deployed and NOT LFS-tracked — regenerable by running
+# scripts/hyperparameter_tune.py. All other pkl files are LFS-tracked.
 models/rf_D_tuned.pkl
 
 # ════════════════════════════════════════════════════════════════════
