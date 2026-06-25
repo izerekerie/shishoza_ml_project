@@ -1,0 +1,2 @@
+# Git LFS — model binaries exceed GitHub's 100 MB per-file limit
+models/*.pkl filter=lfs diff=lfs merge=lfs -text
