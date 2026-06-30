@@ -56,11 +56,11 @@ COPY data/ data/
 COPY results/ results/
 
 # The 325 MB national model is too big for GitHub's repo (100 MB limit), so it's
-# hosted as a GitHub Release asset and downloaded here at build time. Bump the
-# tag in MODEL_URL whenever you publish a retrained model. Public repo → no auth.
-# The `test -s` guard fails the build loudly if the download is missing/empty
-# (e.g. the Release/tag doesn't exist yet) instead of crashing at boot.
-ARG MODEL_URL=https://github.com/izerekerie/umurinzi_ml_project/releases/download/model-v1/rf_D_national.pkl
+# hosted on the Hugging Face Hub and downloaded here at build time. The HF repo
+# (Kerie1/shishoza_model) is PUBLIC so no token is needed. The `test -s` guard
+# fails the build loudly if the download is missing/empty instead of letting the
+# app crash at boot. Update MODEL_URL if you republish the model elsewhere.
+ARG MODEL_URL=https://huggingface.co/Kerie1/shishoza_model/resolve/main/rf_D_national.pkl
 RUN mkdir -p models \
  && curl -fSL "$MODEL_URL" -o models/rf_D_national.pkl \
  && test -s models/rf_D_national.pkl \
