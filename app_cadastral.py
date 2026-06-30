@@ -93,15 +93,9 @@ def find_nearest_pixels(lat: float, lng: float, k: int = 25):
     return _train_raw.iloc[idx], nearest_km
 
 
-# ══════════════════════════════════════════════════════════════════════
-# LIVE Earth Engine parcel analysis (optional — falls back to nearest sample)
-# ══════════════════════════════════════════════════════════════════════
-# When EE auth is available, /api/analyse pulls CURRENT Sentinel-2 + Sentinel-1
-# + SRTM features for the EXACT parcel (recent 2025-26 window vs 2020 baseline)
-# instead of reading the nearest 2024 training pixel. Same 17 features, same
-# model — only the data source changes. If EE is unavailable (no auth, offline,
-# timeout) the request transparently falls back to the nearest-sample path so
-# the app never breaks.
+# Live Earth Engine parcel analysis. When EE auth is available, /api/analyse
+# pulls current 2025-26 Sentinel/SRTM features for the exact parcel and runs the
+# model; otherwise it falls back to the nearest-sample path so the app never breaks.
 EE_PROJECT  = os.environ.get("EE_PROJECT", "vocal-orbit-490015-m2")
 BASE_START, BASE_END = "2020-01-01", "2022-12-31"   # baseline (matches training)
 NOW_START,  NOW_END  = "2025-01-01", "2026-06-30"   # current window

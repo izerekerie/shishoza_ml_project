@@ -1,27 +1,14 @@
-"""Precompute per-sector risk from CURRENT (2026) imagery.
+"""Per-sector risk from current 2025-2026 imagery.
 
-This is the live-data twin of precompute_sector_risk.py. Same model, same
-scoring formula, same output schema — the ONLY difference is the input:
+Reads data/raw/sector_features_current.csv (from 02b_GEE_Export_Sectors_Current.js),
+runs the model on each pixel, groups by sector, and writes sector_risk.json with
+the same scoring and schema as precompute_sector_risk.py:
 
-    precompute_sector_risk.py     reads  data/raw/training_data_national.csv
-                                  (imagery frozen at the 2023-2024 test window)
+    score = 0.50 * mean_model_prob + 0.30 * hotspot_pct + 0.20 * median_ndvi_loss
+    HIGH >= 0.45 | MEDIUM >= 0.20 | LOW < 0.20 | UNKNOWN if < 5 pixels
 
-    THIS script                   reads  data/raw/sector_features_current.csv
-                                  (exported by 02b_GEE_Export_Sectors_Current.js
-                                   with the recent window = 2025-2026)
-
-So the sector map becomes "the model's verdict on CURRENT imagery", not a
-recount of 2024 training pixels. The Flask app and manager.html read the same
-sector_risk.json with no change.
-
-Scoring (unchanged, so the methodology in the report still holds):
-    score = 0.50 × mean_model_prob + 0.30 × hotspot_pct + 0.20 × median_ndvi_loss
-    HIGH ≥ 0.45 | MEDIUM ≥ 0.20 | LOW < 0.20 | UNKNOWN if < 5 pixels in sector
-
-Note: the current export has NO Hansen label column (we are PREDICTING, not
-training). `n_deforested` / `deforested_pct` therefore hold the count/percent of
-pixels the MODEL flags as cleared (prob ≥ 0.50) — a current prediction, not a
-historical Hansen count.
+The current export has no Hansen label, so n_deforested / deforested_pct are the
+count and percent of pixels the model flags as cleared (prob >= 0.50).
 
 Run:  .venv/bin/python scripts/precompute_sector_current.py
 """

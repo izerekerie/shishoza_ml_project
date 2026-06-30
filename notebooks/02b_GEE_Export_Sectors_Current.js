@@ -1,33 +1,11 @@
-// ============================================================
-// FILE: 02b_GEE_Export_Sectors_Current.js
-// PURPOSE: Export CURRENT (2026) satellite features for forest
-//          pixels across all of Rwanda, so the sector-risk map
-//          reflects what the land looks like NOW — not the 2024
-//          imagery frozen inside the training CSV.
+// Current-imagery sector features for all of Rwanda.
+// Same 17 features as the national training export, but the recent window is
+// 2025-2026 (current) against the 2020-2022 baseline, and pixels are unlabelled
+// because we score with the trained model rather than train a new one.
+// Baseline stays 2020-2022 so NDVI_change still means "change since 2020".
 //
-// HOW THIS DIFFERS FROM 01_GEE_Export_National.js:
-//   - That script exports a BALANCED training sample (defor/stable)
-//     with Hansen LABELS, recent window = 2023-2024.
-//   - THIS script exports UNLABELLED forest pixels with recent
-//     window = 2025-01-01 .. 2026-06-30 (current). No labels: we are
-//     SCORING with the trained model, not training a new one.
-//   - The 17 feature bands + their names are IDENTICAL, so the model
-//     (rf_D_national.pkl) and the precompute script read them unchanged.
-//
-// IMPORTANT — keep the BASELINE window at 2020-2022:
-//   The model learned "change relative to a 2020-2022 baseline"
-//   (NDVI_change = recent - baseline, and the *_train bands ARE the
-//   baseline). So *_train stays 2020-2022; only the recent (*_test)
-//   window slides forward to today. That is what makes the result
-//   "deforestation since 2020, measured with 2026 imagery".
-//
-// HOW TO USE:
-//   1. code.earthengine.google.com  →  paste  →  RUN
-//   2. Open Tasks (top right)  →  RUN  TreeSight_Sector_Features_Current
-//   3. Download from Drive: TreeSight_Rwanda/sector_features_current.csv
-//   4. Put it in data/raw/  and run:
-//        .venv/bin/python scripts/precompute_sector_current.py
-// ============================================================
+// Run in code.earthengine.google.com, then run the export Task, download
+// sector_features_current.csv into data/raw/, and run precompute_sector_current.py.
 
 // ── STUDY AREA: all of Rwanda, split into its 5 provinces ───
 var provinces = ee.FeatureCollection('FAO/GAUL/2015/level1')
