@@ -110,3 +110,7 @@ data/patch_size_*.csv              # now results/patch_size_analysis/
 data/data_check_*.png              # old prototype, deleted
 data/deforestation_map.png         # old prototype, deleted
 data/hyperparam_results.csv        # duplicate, deleted
+
+# Large national models — too big for GitHub (100MB limit); shipped to Railway via `railway up`
+models/*_national.pkl
+models/rf_D_tuned.pkl
