@@ -42,12 +42,18 @@
 <body class="bg-background text-on-surface overflow-hidden h-screen flex flex-col" style="background-color:#f8fafc;">
 <!-- Top nav -->
 <header class="bg-surface-bright shadow-sm flex justify-between items-center h-16 px-container-margin w-full border-b border-outline-variant z-50 shrink-0">
-<div class="flex items-center gap-6">
+<div class="flex items-center gap-4">
 <h1 class="font-headline-md text-headline-md font-bold text-primary">Umurinzi</h1>
 <nav class="hidden md:flex gap-4">
 <a class="text-primary border-b-2 border-primary font-bold font-label-md text-label-md px-1 py-1" href="/citizen">Citizen</a>
 <a class="text-on-surface-variant font-medium font-label-md text-label-md px-1 py-1 hover:text-primary transition-colors" href="/manager">Manager</a>
 </nav>
+<!-- Language selector -->
+<div class="flex items-center gap-0.5 bg-surface-container border border-outline-variant/40 rounded-lg p-0.5">
+  <button onclick="setLang('en')" id="btn-lang-en" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all bg-primary text-on-primary">EN</button>
+  <button onclick="setLang('rw')" id="btn-lang-rw" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">RW</button>
+  <button onclick="setLang('fr')" id="btn-lang-fr" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">FR</button>
+</div>
 </div>
 <a href="/" class="flex items-center gap-2 px-4 py-2 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors">
 <span class="material-symbols-outlined text-[18px]">west</span> Landing</a>
@@ -58,32 +64,32 @@
 <section class="w-panel-width h-full bg-surface overflow-y-auto border-r border-outline-variant shrink-0 z-40">
 <div class="p-container-margin space-y-6">
 <header>
-<h2 class="font-title-lg text-title-lg text-primary">Citizen Portal</h2>
-<p class="font-label-sm text-label-sm text-on-surface-variant mt-1">Land management &amp; risk monitoring</p>
+<h2 class="font-title-lg text-title-lg text-primary" data-i18n="citizen_portal">Citizen Portal</h2>
+<p class="font-label-sm text-label-sm text-on-surface-variant mt-1" data-i18n="citizen_sub">Land management &amp; risk monitoring</p>
 </header>
 
 <!-- Identify land -->
 <div class="bg-white p-5 rounded-xl border border-outline-variant/50 space-y-4" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
 <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">fmd_good</span>
-<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline">Identify Your Land</h3></div>
+<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline" data-i18n="identify">Identify Your Land</h3></div>
 <label class="border border-dashed border-outline-variant rounded-xl p-8 text-center cursor-pointer hover:bg-surface-container-low transition-all group bg-white flex flex-col items-center" for="file">
 <input class="hidden" id="file" type="file" accept=".pdf,.png,.jpg,.jpeg"/>
 <div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-3"><span class="material-symbols-outlined text-primary text-2xl">upload_file</span></div>
-<p class="font-label-md text-label-md font-medium text-on-surface">Upload Land Title</p>
-<p class="font-label-sm text-label-sm text-outline mt-1">PDF, PNG, or JPG · crop out your name first</p>
+<p class="font-label-md text-label-md font-medium text-on-surface" data-i18n="upload_label">Upload Land Title</p>
+<p class="font-label-sm text-label-sm text-outline mt-1" data-i18n="upload_sub">PDF, PNG, or JPG · crop out your name first</p>
 </label>
 <p class="font-label-sm text-label-sm text-on-surface-variant" id="status"></p>
-<button id="go" disabled class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-label-md text-label-md font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed" style="background-color:#14532D;">Extract Location</button>
+<button id="go" disabled class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-label-md text-label-md font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed" style="background-color:#14532D;" data-i18n="extract_btn">Extract Location</button>
 <details class="group">
 <summary class="flex items-center justify-between font-label-sm text-label-sm text-primary cursor-pointer hover:underline list-none">
-<span>Manual coordinate entry</span><span class="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span></summary>
+<span data-i18n="manual_entry">Manual coordinate entry</span><span class="material-symbols-outlined text-[16px] group-open:rotate-180 transition-transform">expand_more</span></summary>
 <div class="mt-4 space-y-3">
 <div class="grid grid-cols-2 gap-4">
-<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline">Easting</label><input id="manEasting" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="527187" type="number"></div>
-<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline">Northing</label><input id="manNorthing" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="4781470" type="number"></div>
+<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline" data-i18n="lbl_easting">Easting</label><input id="manEasting" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="527187" type="number"></div>
+<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline" data-i18n="lbl_northing">Northing</label><input id="manNorthing" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="4781470" type="number"></div>
 </div>
-<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline">Surface area m² (optional)</label><input id="manArea" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="383" type="number" step="0.1"></div>
-<button id="manSubmit" class="w-full bg-primary-container text-on-primary py-2.5 rounded-lg font-label-sm text-label-sm font-bold hover:opacity-90 transition-all">Use these coordinates</button>
+<div class="space-y-1"><label class="font-label-sm text-label-sm text-outline" data-i18n="lbl_area">Surface area m² (optional)</label><input id="manArea" class="w-full border-outline-variant rounded-md bg-surface p-2 text-label-md" placeholder="383" type="number" step="0.1"></div>
+<button id="manSubmit" class="w-full bg-primary-container text-on-primary py-2.5 rounded-lg font-label-sm text-label-sm font-bold hover:opacity-90 transition-all" data-i18n="manual_submit">Use these coordinates</button>
 <p class="font-label-sm text-label-sm" id="manStatus"></p>
 </div>
 </details>
@@ -92,12 +98,12 @@
 <!-- Land data inventory -->
 <div class="bg-white p-5 rounded-xl border border-outline-variant/50 space-y-4" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
 <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">inventory_2</span>
-<h3 class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">Land Data Inventory</h3></div>
+<h3 class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant" data-i18n="inventory_title">Land Data Inventory</h3></div>
 <div class="grid grid-cols-1 gap-px bg-outline-variant/20 rounded-lg overflow-hidden border border-outline-variant/20" id="inventory">
 <div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">UPI</span><span class="font-data-mono text-data-mono font-medium" id="v-upi">—</span></div>
-<div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">Surface Area</span><span class="font-data-mono text-data-mono font-medium" id="v-area">—</span></div>
-<div class="flex justify-between items-start p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">Location</span><span class="font-data-mono text-data-mono text-right font-medium" id="v-loc">—</span></div>
-<div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">Lat/Lng</span><span class="font-data-mono text-data-mono font-medium" id="v-latlng">—</span></div>
+<div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline" data-i18n="lbl_surface">Surface Area</span><span class="font-data-mono text-data-mono font-medium" id="v-area">—</span></div>
+<div class="flex justify-between items-start p-3 bg-white"><span class="font-label-sm text-label-sm text-outline" data-i18n="lbl_location">Location</span><span class="font-data-mono text-data-mono text-right font-medium" id="v-loc">—</span></div>
+<div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline" data-i18n="lbl_latlng">Lat/Lng</span><span class="font-data-mono text-data-mono font-medium" id="v-latlng">—</span></div>
 </div>
 </div>
 
@@ -109,40 +115,38 @@
 <span class="px-2.5 py-0.5 text-on-primary font-label-sm text-label-sm font-bold rounded-full" id="riskBadge" style="background:#DC2626;">—</span>
 </div>
 <div class="p-4 bg-white rounded-xl border border-outline-variant/30">
-<div class="flex justify-between items-end mb-2"><p class="font-label-sm text-label-sm text-outline">Deforestation Probability</p><p class="font-headline-md text-headline-md font-bold tabular-nums" id="defProb" style="color:#DC2626">—</p></div>
+<div class="flex justify-between items-end mb-2"><p class="font-label-sm text-label-sm text-outline" data-i18n="defo_prob">Chance of tree loss</p><p class="font-headline-md text-headline-md font-bold tabular-nums" id="defProb" style="color:#DC2626">—</p></div>
 <div class="w-full bg-outline-variant/20 h-1.5 rounded-full overflow-hidden"><div class="h-full" id="defProbBar" style="width:0%;background:#DC2626"></div></div>
 </div>
 <div class="grid grid-cols-2 gap-3">
-<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1">Tree Cover</p><p class="font-title-lg text-title-lg text-primary tabular-nums font-bold" id="treeCover">—</p></div>
-<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1">NDVI 2020 → now</p><p class="font-title-lg text-title-lg tabular-nums font-bold" id="ndviTrend">—</p></div>
+<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1" data-i18n="tree_cover">Tree cover</p><p class="font-title-lg text-title-lg text-primary tabular-nums font-bold" id="treeCover">—</p></div>
+<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1" data-i18n="tree_health">Tree health 2020→today</p><p class="font-title-lg text-title-lg tabular-nums font-bold" id="ndviTrend">—</p><p class="font-label-sm text-label-sm text-outline mt-0.5" id="ndviDir" style="font-size:11px;"></p></div>
 </div>
 <p class="font-label-sm text-label-sm text-outline" id="confNote"></p>
-<p class="font-label-sm text-label-sm text-outline mt-2" style="font-size:11px;line-height:1.4;opacity:0.8;">
-ℹ️ Based on 30 m satellite pixels (~900 m²). Results describe the area <b>around</b> your
-parcel, not a single small plot. Trained on 2020–2024 data — not a live reading.</p>
+<p id="disclaimerEl" class="hidden"></p>
 </div>
 
 <!-- Simulation -->
 <div id="simPanel" class="hidden bg-white p-5 rounded-xl border border-outline-variant/50 space-y-4" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
 <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">model_training</span>
-<h3 class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant">Simulate a Cut</h3></div>
+<h3 class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant" data-i18n="sim_title">Simulate a Cut</h3></div>
 <div class="space-y-3">
-<div class="flex justify-between items-center"><label class="font-label-sm text-label-sm text-on-surface-variant">Target cleared area</label><span class="font-data-mono text-data-mono font-bold text-primary tabular-nums" id="cutVal">0 ha</span></div>
+<div class="flex justify-between items-center"><label class="font-label-sm text-label-sm text-on-surface-variant" data-i18n="target_area">Area to clear</label><span class="font-data-mono text-data-mono font-bold text-primary tabular-nums" id="cutVal">0 ha</span></div>
 <input id="cutSlider" class="w-full h-1 bg-outline-variant rounded-lg appearance-none cursor-pointer" max="100" min="0" value="0" step="1" type="range" style="accent-color:#14532D;">
 </div>
-<button id="simulateBtn" class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2" style="background-color:#14532D;"><span class="material-symbols-outlined text-[18px]">play_circle</span> Run Simulation</button>
+<button id="simulateBtn" class="w-full bg-primary text-on-primary py-3 rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-all flex items-center justify-center gap-2" style="background-color:#14532D;"><span class="material-symbols-outlined text-[18px]">play_circle</span> <span data-i18n="run_sim">Run Simulation</span></button>
 <div id="simResult"></div>
 </div>
 
 <!-- Alternatives -->
 <div id="altPanel" class="hidden bg-white p-5 rounded-xl border border-outline-variant/50 space-y-4" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
 <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">alt_route</span>
-<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline">Why are you considering cutting?</h3></div>
+<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline" data-i18n="alt_title">Why are you considering cutting?</h3></div>
 <div class="grid grid-cols-2 gap-2">
-<button data-reason="firewood" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all">Firewood</button>
-<button data-reason="timber" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all">Timber</button>
-<button data-reason="farming" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all">Farming</button>
-<button data-reason="income" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all">Income</button>
+<button data-reason="firewood" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all" data-i18n="reason_fw">Firewood</button>
+<button data-reason="timber" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all" data-i18n="reason_tm">Timber</button>
+<button data-reason="farming" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all" data-i18n="reason_fa">Farming</button>
+<button data-reason="income" class="p-2 text-center border border-outline-variant/50 rounded-lg font-label-sm text-label-sm hover:bg-primary/5 hover:border-primary/30 transition-all" data-i18n="reason_in">Income</button>
 </div>
 <div id="altCards"></div>
 </div>
@@ -158,6 +162,111 @@ parcel, not a single small plot. Trained on 2020–2024 data — not a live read
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script src="https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js"></script>
 <script>
+// ── i18n ────────────────────────────────────────────────────────────────────
+const STRINGS = {
+  en: {
+    citizen_portal:'Citizen Portal', citizen_sub:'Land management & risk monitoring',
+    identify:'Identify Your Land', upload_label:'Upload Land Title',
+    upload_sub:'PDF, PNG, or JPG · crop out your name first',
+    extract_btn:'Extract Location', manual_entry:'Manual coordinate entry',
+    lbl_easting:'Easting', lbl_northing:'Northing', lbl_area:'Surface area m² (optional)',
+    manual_submit:'Use these coordinates', inventory_title:'Land Data Inventory',
+    lbl_surface:'Surface Area', lbl_location:'Location', lbl_latlng:'Lat / Lng',
+    defo_prob:'Chance of tree loss', tree_cover:'Tree cover', tree_health:'Tree health 2020→today',
+    ndvi_up:'Forest recovering', ndvi_down:'Forest declining', ndvi_flat:'Forest stable',
+    conf_label:'Data accuracy',
+    conf_high:'Good — results are reliable for this area',
+    conf_medium:'Moderate — results are fairly reliable',
+    conf_low:'Limited — use results with caution',
+    disclaimer:'These results describe the area around your land — not your exact plot. Based on satellite data (2020–2024), not a live reading.',
+    sim_title:'Simulate a Cut', target_area:'Area to clear', run_sim:'Run Simulation',
+    risk_after:'Risk if you cut', cover_after:'Tree cover after cut',
+    alt_title:'Why are you considering cutting?',
+    reason_fw:'Firewood', reason_tm:'Timber', reason_fa:'Farming', reason_in:'Income',
+    no_sugg:'No suggestions found for that reason.',
+    learn_more:'Learn more →',
+    sim_same:(cb,ca,nb,na)=>`If you clear this area, your tree cover drops from ${cb}% to ${ca}%. The surrounding 500m area has ${na}% cleared land — the risk level stays the same.`,
+    sim_worse:(cb,ca,nb,na)=>`If you clear this area, your tree cover drops from ${cb}% to ${ca}% and the risk increases. The 500m neighbourhood goes from ${nb}% to ${na}% cleared.`,
+    sim_better:(cb,ca,nb,na)=>`After clearing, tree cover would be ${ca}% — the risk actually improves.`,
+  },
+  rw: {
+    citizen_portal:'Umunyamuryango', citizen_sub:'Gucunga ubutaka no gukurikirana inzara',
+    identify:'Menya Ubutaka Bwawe', upload_label:'Shyiraho Impapuro z\'Ubutaka',
+    upload_sub:'PDF, PNG, cyangwa JPG · kura izina ryawe mbere',
+    extract_btn:'Shakisha Aho Ubutaka Buherereye', manual_entry:'Injiza intego ku maboko',
+    lbl_easting:'Ubuso bw\'Ubumanuko', lbl_northing:'Ubuso bw\'Amajyaruguru', lbl_area:'Ubuso mu m² (bisabwa)',
+    manual_submit:'Koresha izi ntego', inventory_title:'Amakuru y\'Ubutaka',
+    lbl_surface:'Ubuso bw\'Ubutaka', lbl_location:'Aho biherereye', lbl_latlng:'Lat / Lng',
+    defo_prob:'Amahirwe yo kubura ibiti', tree_cover:'Ibiti bihari ubu', tree_health:'Ubuzima bw\'ibiti 2020→ubu',
+    ndvi_up:'Ishyamba rireba', ndvi_down:'Ishyamba rigabanuka', ndvi_flat:'Ishyamba ntirigenda ryaragera',
+    conf_label:'Ubukanwe bw\'amakuru',
+    conf_high:'Buhagije — ibisubizo ni ukuri kuri aka karere',
+    conf_medium:'Bihagije — ibisubizo ni ukuri mu buryo bwinshi',
+    conf_low:'Bukeya — fata ibisubizo witewe',
+    disclaimer:'Ibisubizo biri aha bisobanura akarere kandi k\'ubutaka bwawe — si parcelle nyayo. Bivuye kuri satelite (2020–2024), si isoma ry\'igihe.',
+    sim_title:'Gerageza Gukata', target_area:'Ubuso bw\'ugukata', run_sim:'Kora Gerageza',
+    risk_after:'Inzara nyuma yo gukata', cover_after:'Ibiti nyuma yo gukata',
+    alt_title:'Kuki witeguye gukata?',
+    reason_fw:'Inkwi', reason_tm:'Ibiti by\'imbaho', reason_fa:'Ubuhinzi', reason_in:'Umusaruro',
+    no_sugg:'Nta makuru yo gusubiza kuri iyo mpamvu.',
+    learn_more:'Menya byinshi →',
+    sim_same:(cb,ca,nb,na)=>`Gukata aho, ibiti biri ${cb}% biramanuka kugera ${ca}%. Akarere ka 500m hafi yawe gifite ${na}% yahagaritswe — inzara iguma ingana.`,
+    sim_worse:(cb,ca,nb,na)=>`Gukata aho, ibiti biramanuka ${cb}% → ${ca}%, kandi inzara iriyongera. Akarere ka 500m kijya ${nb}% → ${na}% yahagaritswe.`,
+    sim_better:(cb,ca,nb,na)=>`Nyuma yo gukata, ibiti bizaba ${ca}% — inzara irageuka nziza.`,
+  },
+  fr: {
+    citizen_portal:'Portail Citoyen', citizen_sub:'Gestion foncière & suivi des risques',
+    identify:'Identifiez votre Terrain', upload_label:'Télécharger le Titre Foncier',
+    upload_sub:'PDF, PNG ou JPG · masquez votre nom d\'abord',
+    extract_btn:'Extraire la localisation', manual_entry:'Saisie manuelle des coordonnées',
+    lbl_easting:'Coordonnée Est', lbl_northing:'Coordonnée Nord', lbl_area:'Surface m² (facultatif)',
+    manual_submit:'Utiliser ces coordonnées', inventory_title:'Données du Terrain',
+    lbl_surface:'Surface du terrain', lbl_location:'Localisation', lbl_latlng:'Lat / Lng',
+    defo_prob:'Risque de perte d\'arbres', tree_cover:'Couverture arborée', tree_health:'Santé des arbres 2020→auj.',
+    ndvi_up:'Forêt en récupération', ndvi_down:'Forêt en déclin', ndvi_flat:'Forêt stable',
+    conf_label:'Fiabilité des données',
+    conf_high:'Bonne — les résultats sont fiables pour cette zone',
+    conf_medium:'Modérée — les résultats sont assez fiables',
+    conf_low:'Limitée — utilisez les résultats avec précaution',
+    disclaimer:'Ces résultats décrivent la zone autour de votre terrain — pas exactement votre parcelle. Basé sur des données satellites (2020–2024), pas une lecture en direct.',
+    sim_title:'Simuler une Coupe', target_area:'Surface à déboiser', run_sim:'Lancer la Simulation',
+    risk_after:'Risque si vous coupez', cover_after:'Couverture après coupe',
+    alt_title:'Pourquoi envisagez-vous de couper?',
+    reason_fw:'Bois de chauffe', reason_tm:'Bois d\'œuvre', reason_fa:'Agriculture', reason_in:'Revenus',
+    no_sugg:'Aucune suggestion trouvée pour cette raison.',
+    learn_more:'En savoir plus →',
+    sim_same:(cb,ca,nb,na)=>`Si vous déboisez, la couverture arborée passe de ${cb}% à ${ca}%. La zone de 500m autour a ${na}% de terres déboisées — le risque reste le même.`,
+    sim_worse:(cb,ca,nb,na)=>`Si vous déboisez, la couverture passe de ${cb}% à ${ca}% et le risque augmente. Le voisinage 500m passe de ${nb}% à ${na}% déboisé.`,
+    sim_better:(cb,ca,nb,na)=>`Après déforestation, la couverture serait de ${ca}% — le risque s\'améliore.`,
+  }
+};
+
+let currentLang = 'en';
+function t(key){ const s=STRINGS[currentLang]||STRINGS.en; return s[key]!==undefined?s[key]:STRINGS.en[key]||key; }
+
+function setLang(code){
+  currentLang=code;
+  ['en','rw','fr'].forEach(c=>{
+    const b=document.getElementById(`btn-lang-${c}`);
+    if(b) b.className=`px-2.5 py-1 text-xs font-bold rounded-md transition-all ${c===code?'bg-primary text-on-primary':'text-on-surface-variant hover:bg-primary/10'}`;
+  });
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const v=t(el.getAttribute('data-i18n'));
+    if(typeof v==='string') el.textContent=v;
+  });
+  if(lastAnalysis){
+    document.getElementById('confNote').textContent=confNoteText(lastAnalysis);
+    // disclaimer kept in dissertation, not shown in UI
+  }
+  document.documentElement.lang=code;
+}
+
+function confNoteText(r){
+  const map={HIGH:t('conf_high'),MEDIUM:t('conf_medium'),LOW:t('conf_low')};
+  return `${t('conf_label')}: ${r.confidence} — ${map[r.confidence]||r.confidence_note}`;
+}
+// ────────────────────────────────────────────────────────────────────────────
+
 const RISK_COLOUR = { HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a' };
 function rc(r){ return RISK_COLOUR[r] || '#6b7280'; }
 
@@ -246,7 +355,8 @@ function render(d){
   if (d.lat && d.lng){
     if(marker) marker.remove(); if(circle500) circle500.remove(); drawnItems.clearLayers(); parcelPolygon=null;
     marker=L.marker([d.lat,d.lng]).addTo(map).bindPopup(`<strong>${d.upi||'parcel'}</strong><br/>${d.sector||''}, ${d.district||''}`);
-    circle500=L.circle([d.lat,d.lng],{radius:500,color:'#22c55e',fillColor:'#22c55e',fillOpacity:0.1,weight:2,dashArray:'5,5'}).addTo(map);
+    circle500=L.circle([d.lat,d.lng],{radius:500,color:'#f59e0b',fillColor:'#f59e0b',fillOpacity:0.10,weight:4,dashArray:'8,5'}).addTo(map);
+    circle500.bindTooltip('500m analysis area',{permanent:false,direction:'top',className:'text-xs'});
     if (d.polygon_wgs84 && d.polygon_wgs84.length>=4){
       const ring=d.polygon_wgs84.map(([lng,lat])=>[lat,lng]).slice(0,-1);
       parcelPolygon=L.polygon(ring,{color:'#facc15',weight:4,fillColor:'#facc15',fillOpacity:0.22});
@@ -283,16 +393,23 @@ function renderRisk(r){
   document.getElementById('treeCover').textContent=r.tree_cover_pct.toFixed(0)+'%';
   document.getElementById('ndviTrend').textContent=`${r.ndvi_2020.toFixed(2)} → ${r.ndvi_current.toFixed(2)}`;
   document.getElementById('confNote').textContent=`Confidence: ${r.confidence} — ${r.confidence_note}`;
-  if(circle500) circle500.setStyle({color:c,fillColor:c});
+  // circle stays amber regardless of risk — risk colour blended with parcel and satellite
   if(parcelPolygon) parcelPolygon.setStyle({color:c,fillColor:c});
   // simulation
   if (r.parcel_area_ha && r.parcel_area_ha>0){
     document.getElementById('simPanel').classList.remove('hidden');
     updateCut();
   }
-  // alternatives
-  const alt=document.getElementById('altPanel');
-  if (r.risk_level==='HIGH'||r.risk_level==='MEDIUM') alt.classList.remove('hidden'); else alt.classList.add('hidden');
+  // confidence note — plain language
+  document.getElementById('confNote').textContent = confNoteText(r);
+  // disclaimer kept in dissertation, not shown in UI
+  // NDVI direction hint
+  const dir = document.getElementById('ndviDir');
+  if (r.ndvi_current > r.ndvi_2020) { dir.textContent = '↑ ' + t('ndvi_up'); dir.style.color='#15803d'; }
+  else if (r.ndvi_current < r.ndvi_2020) { dir.textContent = '↓ ' + t('ndvi_down'); dir.style.color='#b91c1c'; }
+  else { dir.textContent = '→ ' + t('ndvi_flat'); dir.style.color='#6b7280'; }
+  // alternatives — always show so citizen can explore options at any risk level
+  document.getElementById('altPanel').classList.remove('hidden');
 }
 
 // ── Simulation ──
@@ -306,15 +423,18 @@ document.getElementById('simulateBtn').addEventListener('click', async () => {
   try {
     const s = await (await fetch('/api/simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id,cut_area_ha:cut})})).json();
     if (s.error){ simResult.innerHTML=`<div class="err">${s.error}</div>`; return; }
-    const jump = s.delta.risk_level_change>0?'Risk worsened':(s.delta.risk_level_change<0?'Risk improved':'Risk unchanged');
+    const cb = s.before.tree_cover_pct.toFixed(0), ca = s.after.tree_cover_pct.toFixed(0);
+    const nb = s.before.neighbourhood_500m_deforested_pct.toFixed(0), na = s.after.neighbourhood_500m_deforested_pct.toFixed(0);
+    const chg = s.delta.risk_level_change;
+    const plainSentence = chg > 0 ? t('sim_worse')(cb,ca,nb,na) : (chg < 0 ? t('sim_better')(cb,ca,nb,na) : t('sim_same')(cb,ca,nb,na));
     simResult.innerHTML = `
       <div class="grid grid-cols-2 gap-4 mt-1">
-        <div class="space-y-1"><p class="font-label-sm text-label-sm text-outline text-center">Risk after cut</p>
+        <div class="space-y-1"><p class="font-label-sm text-label-sm text-outline text-center" data-i18n="risk_after">${t('risk_after')}</p>
           <div class="h-12 flex items-center justify-center rounded border" style="background:${rc(s.after.risk_level)}1a;border-color:${rc(s.after.risk_level)}33"><span class="font-title-lg text-title-lg font-bold" style="color:${rc(s.after.risk_level)}">${s.after.risk_level}</span></div></div>
-        <div class="space-y-1"><p class="font-label-sm text-label-sm text-outline text-center">Tree cover after</p>
-          <div class="h-12 flex items-center justify-center bg-surface-container-low rounded border border-outline-variant/20"><span class="font-title-lg text-title-lg font-bold text-primary tabular-nums">${s.after.tree_cover_pct.toFixed(0)}%</span></div></div>
+        <div class="space-y-1"><p class="font-label-sm text-label-sm text-outline text-center" data-i18n="cover_after">${t('cover_after')}</p>
+          <div class="h-12 flex items-center justify-center bg-surface-container-low rounded border border-outline-variant/20"><span class="font-title-lg text-title-lg font-bold text-primary tabular-nums">${ca}%</span></div></div>
       </div>
-      <p class="font-label-sm text-label-sm mt-3" style="color:${s.delta.risk_level_change>0?'#b91c1c':'#15803d'}">${jump} — tree cover ${s.before.tree_cover_pct.toFixed(0)}% → ${s.after.tree_cover_pct.toFixed(0)}%, 500 m deforested ${s.before.neighbourhood_500m_deforested_pct.toFixed(0)}% → ${s.after.neighbourhood_500m_deforested_pct.toFixed(0)}%</p>`;
+      <p class="font-label-sm text-label-sm mt-3 leading-relaxed" style="color:${chg>0?'#b91c1c':chg<0?'#15803d':'#374151'}">${plainSentence}</p>`;
   } catch(e){ simResult.innerHTML=`<div class="err">${e.message}</div>`; }
 });
 
@@ -329,8 +449,8 @@ document.querySelectorAll('#altPanel [data-reason]').forEach(btn => btn.addEvent
     altCards.innerHTML = sugg.length ? sugg.map(s => `
       <div class="mt-3 p-4 rounded-xl border border-primary/20 bg-primary/5">
         <p class="font-label-sm text-label-sm text-on-surface mb-2">${s.suggestion_text}</p>
-        ${s.gov_program_url?`<a href="${s.gov_program_url}" target="_blank" class="font-label-sm text-label-sm font-bold text-primary hover:underline">Learn more →</a>`:''}
-      </div>`).join('') : '<p class="font-label-sm text-label-sm text-error mt-3">No suggestions for that reason.</p>';
+        ${s.gov_program_url?`<a href="${s.gov_program_url}" target="_blank" class="font-label-sm text-label-sm font-bold text-primary hover:underline">${t('learn_more')}</a>`:''}
+      </div>`).join('') : `<p class="font-label-sm text-label-sm text-error mt-3">${t('no_sugg')}</p>`;
   } catch(e){ altCards.innerHTML=`<div class="err">${e.message}</div>`; }
 }));
 </script>
