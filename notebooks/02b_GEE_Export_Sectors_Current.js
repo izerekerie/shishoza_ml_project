@@ -85,7 +85,7 @@ var features = ee.Image.cat([
 ]).float().unmask(-9999);   // precompute script treats -9999 as missing
 
 // ── PER-PROVINCE SAMPLING of forest pixels (for even coverage) ──
-var PER_PROVINCE = 18000;   // ~90k pixels nationally → good per-sector coverage
+var PER_PROVINCE = 35000;   // denser sampling → fewer sectors fall below the min-pixel cut
 var provList = provinces.toList(N_PROV);
 var allPts = ee.FeatureCollection([]);
 for (var i = 0; i < N_PROV; i++) {
