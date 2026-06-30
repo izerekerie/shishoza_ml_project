@@ -80,7 +80,7 @@ not yet *measured* — it will be re-checked once Hansen releases 2025/2026 loss
 
 | Resource | URL |
 |---|---|
-| **GitHub repo** | https://github.com/izerekerie/umurinzi_ml_project |
+| **GitHub repo** | https://github.com/izerekerie/shishoza_ml_project |
 | **Demo video & deliverables (Google Drive)** | https://drive.google.com/drive/folders/1e_M-3ZgYuXzDoA0rYtnfsLZew7jWrzK3?usp=sharing |
 | Demo video (YouTube mirror) | https://youtu.be/L10J9Ie8IDE?si=BFBF2ZC2SGKSbF63 |
 | **Live demo (Railway)** | `https://shishoza.up.railway.app` — *deployed, beta: slow first boot / cold start (see §5)* |
@@ -90,8 +90,8 @@ not yet *measured* — it will be re-checked once Hansen releases 2025/2026 loss
 To clone:
 
 ```bash
-git clone https://github.com/izerekerie/umurinzi_ml_project.git
-cd umurinzi_ml_project
+git clone https://github.com/izerekerie/shishoza_ml_project.git
+cd shishoza_ml_project
 ```
 
 ---
