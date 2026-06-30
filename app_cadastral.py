@@ -561,15 +561,69 @@ def sectors_geojson():
     }
 
 
-_CUT_RECENT = {}   # analysis_id → last full analyse result (for simulate to look up)
+_CUT_RECENT = {}   # analysis_id → last full analyse result (in-process fast path)
 
-# ── Lookup the seeded ALTERNATIVES SQLite table ────────────────────────
-import sqlite3
+# ── Shared lookup DB (seeded ALTERNATIVES + runtime analysis cache) ─────
+# With gunicorn --workers 4, /api/analyse, /api/simulate and /api/alternatives
+# may each land on a DIFFERENT worker process. An in-memory dict is per-process,
+# so an analysis stored by one worker is invisible to its siblings — which made
+# /api/alternatives silently fall back to risk_level "HIGH" and /api/simulate
+# 404 even on valid ids. We persist every analysis to SQLite (shared across
+# workers) and keep _CUT_RECENT only as a fast in-process cache.
 _DB_PATH = Path(__file__).parent / "data" / "database" / "treesight.db"
 if not _DB_PATH.exists():
-    print(f"[boot]   ⚠ {_DB_PATH} not found — alternatives endpoint will return empty")
+    print(f"[boot]   ⚠ {_DB_PATH} not found — alternatives + analysis cache disabled")
 else:
-    print(f"[boot]   alternatives DB: {_DB_PATH}")
+    print(f"[boot]   lookup DB: {_DB_PATH}")
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as _con:
+            _con.execute(
+                "CREATE TABLE IF NOT EXISTS ANALYSIS_CACHE ("
+                "  analysis_id INTEGER PRIMARY KEY,"
+                "  payload     TEXT NOT NULL,"
+                "  created_at  TEXT DEFAULT CURRENT_TIMESTAMP)"
+            )
+    except sqlite3.Error as e:
+        print(f"[boot]   ⚠ could not create ANALYSIS_CACHE table: {e}")
+
+
+def _remember_analysis(result):
+    """Persist a full analyse result so any gunicorn worker can recall it."""
+    aid = result["analysis_id"]
+    _CUT_RECENT[aid] = result                       # fast in-process path
+    if not _DB_PATH.exists():
+        return
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            con.execute(
+                "INSERT OR REPLACE INTO ANALYSIS_CACHE (analysis_id, payload) "
+                "VALUES (?, ?)",
+                (aid, json.dumps(result)),
+            )
+    except sqlite3.Error as e:
+        print(f"[warn] analysis cache write failed for {aid}: {e}")
+
+
+def _recall_analysis(aid):
+    """Look up a prior analyse result: in-process cache first, then shared DB."""
+    hit = _CUT_RECENT.get(aid)
+    if hit is not None:
+        return hit
+    if not _DB_PATH.exists():
+        return None
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            row = con.execute(
+                "SELECT payload FROM ANALYSIS_CACHE WHERE analysis_id = ?", (aid,)
+            ).fetchone()
+    except sqlite3.Error as e:
+        print(f"[warn] analysis cache read failed for {aid}: {e}")
+        return None
+    if row is None:
+        return None
+    result = json.loads(row[0])
+    _CUT_RECENT[aid] = result                        # warm the in-process cache
+    return result
 
 
 @app.post("/api/alternatives")
@@ -631,7 +685,7 @@ def api_alternatives():
         return jsonify({"error": "reason must be firewood, timber, farming, or income"}), 400
     language = data.get("language", "en")
 
-    orig = _CUT_RECENT.get(aid)
+    orig = _recall_analysis(aid)
     risk_level = orig["risk_level"] if orig else "HIGH"
 
     if not _DB_PATH.exists():
@@ -708,7 +762,7 @@ def api_simulate():
     except (KeyError, ValueError, TypeError):
         return jsonify({"error": "analysis_id and cut_area_ha required"}), 400
 
-    orig = _CUT_RECENT.get(aid)
+    orig = _recall_analysis(aid)
     if orig is None:
         return jsonify({"error": "analysis_id not found — run /api/analyse first"}), 404
     parcel_area = orig.get("parcel_area_ha") or 0.05
@@ -816,8 +870,9 @@ def api_analyse():
         return jsonify({"error": "lat and lng are required floats"}), 400
     area_ha = data.get("area_ha")
     result = analyse_parcel(lat, lng, area_ha=area_ha)
-    # Store so /api/simulate can reference this analysis by id later
-    _CUT_RECENT[result["analysis_id"]] = result
+    # Persist so /api/simulate and /api/alternatives can reference it from ANY
+    # gunicorn worker, not just the one that ran this request.
+    _remember_analysis(result)
     return jsonify(result)
 
 
