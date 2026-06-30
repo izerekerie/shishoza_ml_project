@@ -263,7 +263,10 @@ function setLang(code){
 
 function confNoteText(r){
   const map={HIGH:t('conf_high'),MEDIUM:t('conf_medium'),LOW:t('conf_low')};
-  return `${t('conf_label')}: ${r.confidence} — ${map[r.confidence]||r.confidence_note}`;
+  const src = r.data_source === 'live_gee'
+    ? 'Live satellite (this parcel, 2025–26) · '
+    : 'Nearest monitored sample · ';
+  return `${src}${t('conf_label')}: ${r.confidence} — ${map[r.confidence]||r.confidence_note}`;
 }
 // ────────────────────────────────────────────────────────────────────────────
 

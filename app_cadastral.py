@@ -93,6 +93,184 @@ def find_nearest_pixels(lat: float, lng: float, k: int = 25):
     return _train_raw.iloc[idx], nearest_km
 
 
+# ══════════════════════════════════════════════════════════════════════
+# LIVE Earth Engine parcel analysis (optional — falls back to nearest sample)
+# ══════════════════════════════════════════════════════════════════════
+# When EE auth is available, /api/analyse pulls CURRENT Sentinel-2 + Sentinel-1
+# + SRTM features for the EXACT parcel (recent 2025-26 window vs 2020 baseline)
+# instead of reading the nearest 2024 training pixel. Same 17 features, same
+# model — only the data source changes. If EE is unavailable (no auth, offline,
+# timeout) the request transparently falls back to the nearest-sample path so
+# the app never breaks.
+EE_PROJECT  = os.environ.get("EE_PROJECT", "vocal-orbit-490015-m2")
+BASE_START, BASE_END = "2020-01-01", "2022-12-31"   # baseline (matches training)
+NOW_START,  NOW_END  = "2025-01-01", "2026-06-30"   # current window
+_EE_READY = False
+_EE_IMG   = None     # cached 17-band feature image
+_EE_TRIED = False     # only attempt init once unless it succeeds
+
+
+def _ee_build_feature_image(ee):
+    """Build the same 17-band feature image as 02b_GEE_Export_Sectors_Current.js."""
+    rwanda = (ee.FeatureCollection("FAO/GAUL/2015/level1")
+              .filter(ee.Filter.eq("ADM0_NAME", "Rwanda")).geometry())
+    cs = ee.ImageCollection("GOOGLE/CLOUD_SCORE_PLUS/V1/S2_HARMONIZED")
+
+    def mask_s2(col):
+        return col.linkCollection(cs, ["cs_cdf"]).map(
+            lambda img: img.updateMask(img.select("cs_cdf").gte(0.60)).divide(10000))
+
+    s2_base = mask_s2(ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+                      .filterBounds(rwanda).filterDate(BASE_START, BASE_END)).median()
+    s2_now  = mask_s2(ee.ImageCollection("COPERNICUS/S2_SR_HARMONIZED")
+                      .filterBounds(rwanda).filterDate(NOW_START, NOW_END)).median()
+
+    ndvi_train  = s2_base.normalizedDifference(["B8", "B4"]).rename("NDVI_train")
+    ndvi_test   = s2_now.normalizedDifference(["B8", "B4"]).rename("NDVI_test")
+    ndvi_change = ndvi_test.subtract(ndvi_train).rename("NDVI_change")
+    evi_train = s2_base.expression(
+        "2.5 * (NIR - RED) / (NIR + 6 * RED - 7.5 * BLUE + 1)",
+        {"NIR": s2_base.select("B8"), "RED": s2_base.select("B4"),
+         "BLUE": s2_base.select("B2")}).rename("EVI_train")
+    swir_train = s2_base.select("B11").rename("SWIR_train")
+    swir_test  = s2_now.select("B11").rename("SWIR_test")
+    nbr_train  = s2_base.normalizedDifference(["B8", "B12"]).rename("NBR_train")
+
+    def s1(start, end):
+        return (ee.ImageCollection("COPERNICUS/S1_GRD")
+                .filterBounds(rwanda).filterDate(start, end)
+                .filter(ee.Filter.eq("instrumentMode", "IW"))
+                .filter(ee.Filter.listContains("transmitterReceiverPolarisation", "VV"))
+                .filter(ee.Filter.listContains("transmitterReceiverPolarisation", "VH"))
+                .select(["VV", "VH"]).median())
+    s1_base, s1_now = s1(BASE_START, BASE_END), s1(NOW_START, NOW_END)
+    ratio = s1_base.select("VH").divide(s1_base.select("VV")).rename("VH_VV_ratio")
+
+    srtm = ee.Image("USGS/SRTMGL1_003")
+    elevation = srtm.select("elevation")
+    slope  = ee.Terrain.slope(srtm).rename("slope")
+    aspect = ee.Terrain.aspect(srtm).rename("aspect")
+
+    return ee.Image.cat([
+        ndvi_train, ndvi_test, ndvi_change, evi_train, swir_train, swir_test,
+        nbr_train, s2_base.select("B4").rename("RED_train"),
+        s2_base.select("B8").rename("NIR_train"),
+        s1_base.select("VH").rename("VH_train"), s1_base.select("VV").rename("VV_train"),
+        s1_now.select("VH").rename("VH_test"), s1_now.select("VV").rename("VV_test"),
+        ratio, elevation, slope, aspect,
+    ]).float().clip(rwanda)
+
+
+def _ensure_ee() -> bool:
+    """Lazy-init Earth Engine once. Returns True if live mode is usable."""
+    global _EE_READY, _EE_IMG, _EE_TRIED
+    if _EE_READY:
+        return True
+    if _EE_TRIED:
+        return False
+    _EE_TRIED = True
+    try:
+        import ee
+        sa_key = os.environ.get("EE_SERVICE_ACCOUNT_JSON")
+        if sa_key:   # production: service-account JSON in an env var
+            info = json.loads(sa_key)
+            creds = ee.ServiceAccountCredentials(info["client_email"], key_data=sa_key)
+            ee.Initialize(creds, project=EE_PROJECT)
+        else:        # local: cached `earthengine authenticate` credentials
+            ee.Initialize(project=EE_PROJECT)
+        _EE_IMG = _ee_build_feature_image(ee)
+        _EE_READY = True
+        print("[boot] Earth Engine LIVE parcel mode ready")
+        return True
+    except Exception as e:
+        print(f"[warn] Earth Engine unavailable — using nearest-sample fallback ({e})")
+        return False
+
+
+def _classify_and_build(*, prob, ndvi_current, ndvi_2020, ndvi_change,
+                        deforested_pct_500m, avg_ndvi_500m, area_ha, lat, lng,
+                        confidence, confidence_note, data_source, extra=None):
+    """Shared 3-rule classifier + result dict, used by both the live and the
+    nearest-sample paths so the risk logic can never diverge between them."""
+    tree_cover_pct = max(0.0, min(100.0, ndvi_current * 100.0))
+    rule1_high = (prob > 0.65) or (tree_cover_pct < 30)
+    rule2_high = (deforested_pct_500m > 50) and (ndvi_current < avg_ndvi_500m * 0.70)
+    rule3_med  = (0.35 < prob <= 0.65) and (deforested_pct_500m > 0)
+    if rule1_high or rule2_high:
+        risk_level = 'HIGH'
+        fired_rule = 'Rule 1 (parcel)' if rule1_high else 'Rule 2 (neighbourhood)'
+    elif rule3_med:
+        risk_level = 'MEDIUM'
+        fired_rule = 'Rule 3 (intermediate)'
+    else:
+        risk_level = 'LOW'
+        fired_rule = 'default'
+    result = {
+        'risk_level':           risk_level,
+        'rule_fired':           fired_rule,
+        'deforestation_prob':   round(prob, 3),
+        'ndvi_current':         round(ndvi_current, 3),
+        'ndvi_2020':            round(ndvi_2020, 3),
+        'ndvi_change':          round(ndvi_change, 3),
+        'tree_cover_pct':       round(tree_cover_pct, 1),
+        'neighbourhood_500m_avg_ndvi':       round(avg_ndvi_500m, 3),
+        'neighbourhood_500m_deforested_pct': round(deforested_pct_500m, 1),
+        'parcel_area_ha':       area_ha,
+        'analysis_id':          abs(hash((round(lat, 5), round(lng, 5)))) % 10_000_000,
+        'confidence':           confidence,
+        'confidence_note':      confidence_note,
+        'data_source':          data_source,
+    }
+    if extra:
+        result.update(extra)
+    return result
+
+
+def analyse_parcel_live(lat: float, lng: float, area_ha: float = None) -> dict:
+    """Live analysis: pull CURRENT Sentinel/SRTM features for the exact parcel
+    from Earth Engine and run the model. Raises on any failure so the caller can
+    fall back to the nearest-sample path."""
+    import ee
+    pt  = ee.Geometry.Point([lng, lat])
+    buf = pt.buffer(500)   # 500 m neighbourhood, same radius as the proxy path
+    fc  = _EE_IMG.sample(region=buf, scale=30, numPixels=60, geometries=False)
+    rows = [f["properties"] for f in fc.getInfo()["features"]]
+    if not rows:
+        raise RuntimeError("no Sentinel pixels returned for this parcel")
+
+    df = pd.DataFrame(rows)
+    missing = [c for c in FEATURE_COLS if c not in df.columns]
+    if missing:
+        raise RuntimeError(f"missing features {missing}")
+    df[FEATURE_COLS] = df[FEATURE_COLS].replace(-9999, np.nan)
+    df = df.dropna(subset=FEATURE_COLS, thresh=len(FEATURE_COLS) - 3)
+    if df.empty:
+        raise RuntimeError("all sampled pixels were cloud/no-data")
+    df[FEATURE_COLS] = df[FEATURE_COLS].fillna(df[FEATURE_COLS].median())
+
+    feats = df[FEATURE_COLS].median().values.reshape(1, -1)
+    prob  = float(_MODEL.predict_proba(feats)[0][1])
+    ndvi_current   = float(df['NDVI_test'].median())
+    ndvi_2020      = float(df['NDVI_train'].median())
+    ndvi_change    = float(df['NDVI_change'].median())
+    # No Hansen labels live → neighbourhood clearing = share of pixels the model
+    # flags (prob ≥ 0.5), not a label count.
+    pix_probs = _MODEL.predict_proba(df[FEATURE_COLS].values)[:, 1]
+    deforested_pct_500m = float((pix_probs >= 0.5).mean() * 100)
+    avg_ndvi_500m       = float(df['NDVI_test'].mean())
+
+    return _classify_and_build(
+        prob=prob, ndvi_current=ndvi_current, ndvi_2020=ndvi_2020,
+        ndvi_change=ndvi_change, deforested_pct_500m=deforested_pct_500m,
+        avg_ndvi_500m=avg_ndvi_500m, area_ha=area_ha, lat=lat, lng=lng,
+        confidence='HIGH',
+        confidence_note=('Live Sentinel-2/1 + SRTM imagery for this parcel '
+                         f'({NOW_START[:4]}–{NOW_END[:4]} vs 2020 baseline)'),
+        data_source='live_gee',
+        extra={'n_live_pixels': int(len(df))},
+    )
+
+
 def analyse_parcel(lat: float, lng: float, area_ha: float = None) -> dict:
     """Run the full Shishoza analysis for one parcel.
 
@@ -116,25 +294,10 @@ def analyse_parcel(lat: float, lng: float, area_ha: float = None) -> dict:
     ndvi_current = float(nbrs['NDVI_test'].median())
     ndvi_train_avg = float(nbrs['NDVI_train'].median())
     ndvi_change = float(nbrs['NDVI_change'].median())
-    tree_cover_pct = max(0.0, min(100.0, ndvi_current * 100.0))
 
     # 500-metre neighbourhood: K-nearest as a spatial proxy
     deforested_pct_500m = float(nbrs['label'].mean() * 100)
     avg_ndvi_500m = float(nbrs['NDVI_test'].mean())
-
-    # ── 3-rule Risk Classifier ─────────────────────────────────────
-    rule1_high = (prob > 0.65) or (tree_cover_pct < 30)
-    rule2_high = (deforested_pct_500m > 50) and (ndvi_current < avg_ndvi_500m * 0.70)
-    rule3_med  = (0.35 < prob <= 0.65) and (deforested_pct_500m > 0)
-    if rule1_high or rule2_high:
-        risk_level = 'HIGH'
-        fired_rule = 'Rule 1 (parcel)' if rule1_high else 'Rule 2 (neighbourhood)'
-    elif rule3_med:
-        risk_level = 'MEDIUM'
-        fired_rule = 'Rule 3 (intermediate)'
-    else:
-        risk_level = 'LOW'
-        fired_rule = 'default'
 
     # Training-domain confidence based on KD-tree distance to nearest sample
     if nearest_km <= 5:
@@ -148,22 +311,14 @@ def analyse_parcel(lat: float, lng: float, area_ha: float = None) -> dict:
         confidence_note = (f'Sparse sampling here ({nearest_km:.0f} km from nearest '
                            f'sample) — production deployment should query GEE live')
 
-    return {
-        'risk_level':           risk_level,
-        'rule_fired':           fired_rule,
-        'deforestation_prob':   round(prob, 3),
-        'ndvi_current':         round(ndvi_current, 3),
-        'ndvi_2020':            round(ndvi_train_avg, 3),
-        'ndvi_change':          round(ndvi_change, 3),
-        'tree_cover_pct':       round(tree_cover_pct, 1),
-        'neighbourhood_500m_avg_ndvi':      round(avg_ndvi_500m, 3),
-        'neighbourhood_500m_deforested_pct': round(deforested_pct_500m, 1),
-        'parcel_area_ha':       area_ha,
-        'analysis_id':          abs(hash((round(lat, 5), round(lng, 5)))) % 10_000_000,
-        'confidence':           confidence,
-        'confidence_note':      confidence_note,
-        'km_from_training':     round(nearest_km, 1),
-    }
+    return _classify_and_build(
+        prob=prob, ndvi_current=ndvi_current, ndvi_2020=ndvi_train_avg,
+        ndvi_change=ndvi_change, deforested_pct_500m=deforested_pct_500m,
+        avg_ndvi_500m=avg_ndvi_500m, area_ha=area_ha, lat=lat, lng=lng,
+        confidence=confidence, confidence_note=confidence_note,
+        data_source='nearest_sample',
+        extra={'km_from_training': round(nearest_km, 1)},
+    )
 
 
 # Forest-manager / admin accounts live in the same SQLite DB as alternatives.
@@ -869,7 +1024,16 @@ def api_analyse():
     except (KeyError, ValueError, TypeError):
         return jsonify({"error": "lat and lng are required floats"}), 400
     area_ha = data.get("area_ha")
-    result = analyse_parcel(lat, lng, area_ha=area_ha)
+    # Prefer LIVE Earth Engine imagery for the exact parcel; fall back to the
+    # nearest-sample path if EE is unavailable or the live pull fails.
+    result = None
+    if _ensure_ee():
+        try:
+            result = analyse_parcel_live(lat, lng, area_ha=area_ha)
+        except Exception as e:
+            print(f"[warn] live parcel analysis failed, falling back ({e})")
+    if result is None:
+        result = analyse_parcel(lat, lng, area_ha=area_ha)
     # Persist so /api/simulate and /api/alternatives can reference it from ANY
     # gunicorn worker, not just the one that ran this request.
     _remember_analysis(result)
