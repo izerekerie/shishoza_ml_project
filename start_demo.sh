@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────
-#  Umurinzi — local demo server
+#  Shishoza — local demo server
 #  Run:  bash start_demo.sh
 #
 #  Starts gunicorn + Cloudflare Tunnel so the app is publicly
@@ -60,8 +60,8 @@ for i in $(seq 1 30); do
 done
 
 # ── 4. Start Cloudflare Tunnel ────────────────────────────────
-#  If you have a named tunnel (cloudflared tunnel create umurinzi),
-#  replace "--url" with "--tunnel umurinzi".
+#  If you have a named tunnel (cloudflared tunnel create shishoza),
+#  replace "--url" with "--tunnel shishoza".
 #  Quick tunnel (no account) gives a random URL — fine for one-off demos.
 echo ""
 echo "[demo] starting Cloudflare Tunnel …"
@@ -72,7 +72,7 @@ cloudflared tunnel --url "http://localhost:$PORT" 2>&1 | tee "$LOG_DIR/tunnel.lo
 # ── 5. Keep running until Ctrl+C ─────────────────────────────
 echo ""
 echo "──────────────────────────────────────────────"
-echo "  Umurinzi is live.  Press Ctrl+C to stop."
+echo "  Shishoza is live.  Press Ctrl+C to stop."
 echo "  Local:   http://localhost:$PORT"
 echo "  Logs:    $LOG_DIR/"
 echo "──────────────────────────────────────────────"

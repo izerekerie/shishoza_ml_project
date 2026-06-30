@@ -1,4 +1,4 @@
-# Umurinzi — Rwanda Forest Risk Intelligence
+# Shishoza — Rwanda Forest Risk Intelligence
 
 > *Open-data satellite monitoring and localised risk assessment to help
 > Rwandan citizens protect forest **before** cutting.*
@@ -7,7 +7,7 @@
 
 ## 1 · Description
 
-Umurinzi (Kinyarwanda for *guardian / protector*) is a BSc Software
+Shishoza (Kinyarwanda for *guardian / protector*) is a BSc Software
 Engineering capstone (African Leadership University) that addresses the
 core gap in Rwanda's smallholder deforestation: most clearings are below
 the 1-hectare detection threshold of published global forest monitoring,
@@ -45,7 +45,7 @@ The system answers four research questions:
 |---|---|
 | **GitHub repo** | https://github.com/izerekerie/umurinzi_ml_project |
 | **Demo video** | https://youtu.be/L10J9Ie8IDE?si=BFBF2ZC2SGKSbF63 |
-| Live demo URL | *planned:* `https://umurinzi-web.onrender.com` *(not yet deployed — see §5)* |
+| Live demo URL | *planned:* `https://shishoza-web.onrender.com` *(not yet deployed — see §5)* |
 | Swagger UI | `http://localhost:5050/apidocs` *(when running locally)* |
 | Dissertation prose | `results/experiments/rq1_writeup.md` |
 
@@ -116,7 +116,7 @@ Then open **http://localhost:5050**.
 ### Folder structure (each folder has ONE purpose)
 
 ```
-umurinzi/
+shishoza/
 ├── data/
 │   ├── raw/          GEE exports (training_data.csv) + sample cadastral PDFs
 │   ├── processed/    Cleaned training data
@@ -169,7 +169,7 @@ The visual design system was prototyped in Figma before any HTML was
 written. The mockups cover all five user-facing views — landing, login,
 citizen, forest manager, and admin.
 
-**Figma file:** https://www.figma.com/design/mYF9We3btINQNbOsiuRl5I/Umurinzi?node-id=0-1
+**Figma file:** https://www.figma.com/design/mYF9We3btINQNbOsiuRl5I/Shishoza?node-id=0-1
 
 Design system in use (replicated 1:1 in the Flask templates):
 
@@ -186,7 +186,7 @@ Muted text           #6b7280
 
 ### 4.2 Architecture diagrams
 
-Architecture diagrams documented in Chapter 3 of the dissertation. Umurinzi is
+Architecture diagrams documented in Chapter 3 of the dissertation. Shishoza is
 a software-only system, so the "circuit diagram" requirement is met by the
 system data-flow and entity-relationship diagrams below.
 
@@ -222,21 +222,21 @@ API from one process, so it deploys as one web service — no separate frontend
 host is required. The target platform is **Render**, built from the included
 `Dockerfile` / `render.yaml` (Docker, gunicorn, Frankfurt region).
 
-Planned URL once deployed: `https://umurinzi-web.onrender.com`.
+Planned URL once deployed: `https://shishoza-web.onrender.com`.
 
 Planned steps:
 
 1. Push to GitHub (done).
 2. Render → **New → Web Service** → connect this repo.
 3. Render builds from the `Dockerfile` (~6–8 min first build).
-4. Add the `UMURINZI_SECRET` environment variable (Render can auto-generate it)
+4. Add the `SHISHOZA_SECRET` environment variable (Render can auto-generate it)
    before the service is made public.
 
 Local Docker test:
 
 ```bash
-docker build -t umurinzi .
-docker run -p 5050:5050 -e PORT=5050 umurinzi
+docker build -t shishoza .
+docker run -p 5050:5050 -e PORT=5050 shishoza
 # → http://localhost:5050
 ```
 

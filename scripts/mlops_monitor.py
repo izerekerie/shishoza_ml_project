@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Umurinzi MLOps monitor — the "keep the model healthy in production" layer.
+Shishoza MLOps monitor — the "keep the model healthy in production" layer.
 
 This is the operations side of machine learning: a model is not finished when
 training ends; it must be watched in production. This module does three jobs:

@@ -1,5 +1,5 @@
 # ════════════════════════════════════════════════════════════════════
-#  Umurinzi — production container
+#  Shishoza — production container
 #  • Python 3.13 slim
 #  • Tesseract OCR (for cadastral PDF / photo extraction)
 #  • poppler-utils (for pdfplumber text extraction)

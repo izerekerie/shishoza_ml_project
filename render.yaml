@@ -1,5 +1,5 @@
 # ════════════════════════════════════════════════════════════════════
-#  Umurinzi — Render service blueprint
+#  Shishoza — Render service blueprint
 #  Reading: https://render.com/docs/blueprint-spec
 #
 #  Quick deploy:
@@ -18,7 +18,7 @@
 
 services:
   - type: web
-    name: umurinzi-web
+    name: shishoza-web
     runtime: docker                       # build from ./Dockerfile
     plan: standard                        # 2 GB RAM — change to "free" for demos
     region: frankfurt                     # closest Render region to Rwanda
