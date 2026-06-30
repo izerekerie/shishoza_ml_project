@@ -82,7 +82,6 @@ not yet *measured* — it will be re-checked once Hansen releases 2025/2026 loss
 |---|---|
 | **GitHub repo** | https://github.com/izerekerie/shishoza_ml_project |
 | **Demo video & deliverables (Google Drive)** | https://drive.google.com/drive/folders/1e_M-3ZgYuXzDoA0rYtnfsLZew7jWrzK3?usp=sharing |
-| Demo video (YouTube mirror) | https://youtu.be/L10J9Ie8IDE?si=BFBF2ZC2SGKSbF63 |
 | **Live demo (Railway)** | `https://shishoza.up.railway.app` — *deployed, beta: slow first boot / cold start (see §5)* |
 | Swagger UI | `https://shishoza.up.railway.app/apidocs` — or `http://localhost:5050/apidocs` when running locally |
 | Dissertation prose | `results/experiments/rq1_writeup.md` |
@@ -236,7 +235,7 @@ system data-flow and entity-relationship diagrams below.
 ### 4.3 App interface
 
 A full walkthrough of all five views (landing, login, citizen, forest
-manager, admin) is in the **[demo video](https://youtu.be/L10J9Ie8IDE?si=BFBF2ZC2SGKSbF63)**.
+manager, admin) is in the **[demo video](https://drive.google.com/drive/folders/1e_M-3ZgYuXzDoA0rYtnfsLZew7jWrzK3?usp=sharing)**.
 
 Screenshots:
 
