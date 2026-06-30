@@ -1,0 +1,68 @@
+{
+  "scope": "Rwamagana district DLUP (per-district service; national = future work)",
+  "source": "Rwamagana_DLUP ArcGIS FeatureServer + national training labels (Hansen)",
+  "headline": {
+    "n_pixels_total": 465,
+    "n_deforested_total": 273,
+    "n_deforested_in_protected_zones": 72,
+    "pct_of_clearings_in_protected_zones": 26.4,
+    "deforestation_rate_protected_pct": 70.6,
+    "deforestation_rate_other_pct": 55.4
+  },
+  "by_landuse": [
+    {
+      "gen_lu": "Public Administration",
+      "n_pixels": 1,
+      "n_deforested": 1,
+      "deforestation_rate_pct": 100.0
+    },
+    {
+      "gen_lu": "Forest",
+      "n_pixels": 82,
+      "n_deforested": 69,
+      "deforestation_rate_pct": 84.1
+    },
+    {
+      "gen_lu": "Industrial",
+      "n_pixels": 4,
+      "n_deforested": 3,
+      "deforestation_rate_pct": 75.0
+    },
+    {
+      "gen_lu": "Transportation",
+      "n_pixels": 217,
+      "n_deforested": 132,
+      "deforestation_rate_pct": 60.8
+    },
+    {
+      "gen_lu": "Agriculture",
+      "n_pixels": 122,
+      "n_deforested": 61,
+      "deforestation_rate_pct": 50.0
+    },
+    {
+      "gen_lu": "Residential",
+      "n_pixels": 19,
+      "n_deforested": 4,
+      "deforestation_rate_pct": 21.1
+    },
+    {
+      "gen_lu": "Wetland",
+      "n_pixels": 17,
+      "n_deforested": 3,
+      "deforestation_rate_pct": 17.6
+    },
+    {
+      "gen_lu": "Buffer",
+      "n_pixels": 1,
+      "n_deforested": 0,
+      "deforestation_rate_pct": 0.0
+    },
+    {
+      "gen_lu": "Water Body",
+      "n_pixels": 2,
+      "n_deforested": 0,
+      "deforestation_rate_pct": 0.0
+    }
+  ]
+}
