@@ -38,6 +38,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         poppler-utils \
         libgl1 \
         libglib2.0-0 \
+        curl \
+        ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy the virtualenv from the builder stage
@@ -52,7 +54,17 @@ COPY templates/ templates/
 COPY scripts/ scripts/
 COPY data/ data/
 COPY results/ results/
-COPY models/ models/
+
+# The 325 MB national model is too big for GitHub's repo (100 MB limit), so it's
+# hosted as a GitHub Release asset and downloaded here at build time. Bump the
+# tag in MODEL_URL whenever you publish a retrained model. Public repo → no auth.
+# The `test -s` guard fails the build loudly if the download is missing/empty
+# (e.g. the Release/tag doesn't exist yet) instead of crashing at boot.
+ARG MODEL_URL=https://github.com/izerekerie/umurinzi_ml_project/releases/download/model-v1/rf_D_national.pkl
+RUN mkdir -p models \
+ && curl -fSL "$MODEL_URL" -o models/rf_D_national.pkl \
+ && test -s models/rf_D_national.pkl \
+ && echo "model downloaded: $(du -h models/rf_D_national.pkl | cut -f1)"
 
 # Seed the SQLite DB (ALTERNATIVES + USERS) at container build time so the
 # image is ready-to-run. seed_alternatives.sql creates the DB + ALTERNATIVES
