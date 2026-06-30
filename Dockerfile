@@ -48,26 +48,28 @@ ENV PYTHONDONTWRITEBYTECODE=1
 
 # Copy the application — only what the runtime actually needs
 COPY app_cadastral.py .
+COPY templates/ templates/
 COPY scripts/ scripts/
 COPY data/ data/
 COPY results/ results/
 COPY models/ models/
 
-# Seed the SQLite USERS table at container build time so the image is
-# ready-to-run. Anyone deploying gets the demo accounts pre-loaded.
-RUN python scripts/seed_users.py
+# Seed the SQLite DB (ALTERNATIVES + USERS) at container build time so the
+# image is ready-to-run. seed_alternatives.sql creates the DB + ALTERNATIVES
+# table; seed_users.py then adds the demo accounts. Without this the app boots
+# with no alternatives AND no shared ANALYSIS_CACHE (multi-worker fix needs it).
+RUN python -c "import sqlite3; con=sqlite3.connect('data/database/treesight.db'); con.executescript(open('data/database/seed_alternatives.sql').read()); con.close()" \
+ && python scripts/seed_users.py
 
 # Platform injects $PORT at runtime (Railway / Render) — fall back to 5050 for local
 EXPOSE 5050
 ENV PORT=5050
 
-# Gunicorn config:
-#   --workers 4          handles ~10-20 concurrent users (sync worker mode)
+# Gunicorn config (exec form + `sh -c` so $PORT is ALWAYS shell-expanded —
+# bare exec form leaves it literal, which Railway rejects: "'$PORT' is not a
+# valid port number"). ${PORT:-5050} also defaults the port if none is injected.
+#   --preload            load the 325 MB model ONCE in the master, share via COW
+#                        across workers (avoids N× model RAM → cheaper tier OK)
+#   --workers ${WEB_CONCURRENCY:-2}  override via env; 2 is enough for a demo
 #   --timeout 90         the OCR path can take 30-60s on a Bugesera-scale PDF
-#   --bind 0.0.0.0:$PORT bind to the platform-injected port
-CMD gunicorn app_cadastral:app \
-    --workers 4 \
-    --timeout 90 \
-    --bind 0.0.0.0:$PORT \
-    --access-logfile - \
-    --error-logfile -
+CMD ["sh", "-c", "gunicorn app_cadastral:app --preload --workers ${WEB_CONCURRENCY:-2} --timeout 90 --bind 0.0.0.0:${PORT:-5050} --access-logfile - --error-logfile -"]
