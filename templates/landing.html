@@ -1,7 +1,7 @@
 <!DOCTYPE html><html class="light" lang="en"><head>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
-<title>Umurinzi — Rwanda Forest Risk Intelligence</title>
+<title>Shishoza — Rwanda Forest Risk Intelligence</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
@@ -68,7 +68,7 @@
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 bg-white/85 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm">
 <div class="flex justify-between items-center h-20 px-container-margin max-w-[1280px] mx-auto">
-<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Umurinzi</div>
+<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Shishoza</div>
 <div class="hidden md:flex gap-8 items-center">
 <a class="font-body-lg text-body-lg text-primary border-b-2 border-primary pb-1" href="/citizen" data-i18n="nav.citizen">Citizen</a>
 <a class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors" href="/manager" data-i18n="nav.manager">Manager</a>
@@ -92,7 +92,7 @@
 <section class="relative w-full h-[52vh] flex flex-col items-center justify-center overflow-hidden">
 <div class="absolute inset-0 z-0"><div class="absolute inset-0 bg-gradient-to-b from-transparent to-background"></div></div>
 <div class="relative z-10 text-center px-gutter max-w-4xl">
-<h1 class="font-display-lg text-display-lg text-primary mb-4" data-i18n="hero.title">Umurinzi — Rwanda Forest Risk Intelligence</h1>
+<h1 class="font-display-lg text-display-lg text-primary mb-4" data-i18n="hero.title">Shishoza — Rwanda Forest Risk Intelligence</h1>
 <p class="font-title-md text-title-md text-on-surface-variant max-w-2xl mx-auto opacity-80" data-i18n="hero.sub">
                     Satellite monitoring and parcel-level risk assessment to support sustainable forest management in Rwanda.
                 </p>
@@ -158,7 +158,7 @@
 <div class="max-w-[1280px] mx-auto px-container-margin">
 <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
 <div class="md:col-span-6 flex flex-col gap-4">
-<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Umurinzi</div>
+<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Shishoza</div>
 <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xs" data-i18n="hero.sub">Satellite monitoring and parcel-level risk assessment to support sustainable forest management in Rwanda.</p>
 </div>
 <div class="md:col-span-3 flex flex-col gap-4">
@@ -177,7 +177,7 @@
 </div>
 </div>
 <div class="pt-8 border-t border-outline-variant/40 flex flex-col md:flex-row justify-between items-center gap-4">
-<div class="font-body-sm text-body-sm text-on-surface-variant">© 2026 Umurinzi · African Leadership University · BSc Software Engineering</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">© 2026 Shishoza · African Leadership University · BSc Software Engineering</div>
 </div>
 </div>
 </footer>
@@ -185,7 +185,7 @@
 const I18N = {
   en: {
     "nav.citizen":"Citizen","nav.manager":"Manager","nav.login":"Login",
-    "hero.title":"Umurinzi — Rwanda Forest Risk Intelligence",
+    "hero.title":"Shishoza — Rwanda Forest Risk Intelligence",
     "hero.sub":"Satellite monitoring and parcel-level risk assessment to support sustainable forest management in Rwanda.",
     "c.title":"Citizen","c.tag":"Check the risk on my land.",
     "c.b1":"Upload your land certificate for automatic parcel detection",
@@ -207,7 +207,7 @@ const I18N = {
   },
   rw: {
     "nav.citizen":"Umuturage","nav.manager":"Umuyobozi","nav.login":"Injira",
-    "hero.title":"Umurinzi — Ubwenge ku byago by'amashyamba mu Rwanda",
+    "hero.title":"Shishoza — Ubwenge ku byago by'amashyamba mu Rwanda",
     "hero.sub":"Gukurikirana hifashishijwe icyogajuru no gusuzuma ibyago ku rwego rw'isambu kugira ngo dushyigikire imicungire irambye y'amashyamba mu Rwanda.",
     "c.title":"Umuturage","c.tag":"Reba ibyago ku butaka bwanjye.",
     "c.b1":"Ohereza impamyabutaka kugira ngo isambu yawe imenyekane",
@@ -229,7 +229,7 @@ const I18N = {
   },
   fr: {
     "nav.citizen":"Citoyen","nav.manager":"Gestionnaire","nav.login":"Connexion",
-    "hero.title":"Umurinzi — Renseignement sur le risque forestier au Rwanda",
+    "hero.title":"Shishoza — Renseignement sur le risque forestier au Rwanda",
     "hero.sub":"Surveillance satellitaire et évaluation des risques à l'échelle de la parcelle pour soutenir la gestion durable des forêts au Rwanda.",
     "c.title":"Citoyen","c.tag":"Vérifier le risque sur ma terre.",
     "c.b1":"Téléversez votre titre foncier pour la détection automatique de la parcelle",
@@ -257,12 +257,12 @@ function setLang(lang){
     var v=I18N[lang][el.getAttribute("data-i18n")];
     if(v!=null) el.textContent=v;
   });
-  try{ localStorage.setItem("umurinzi_lang",lang); }catch(e){}
+  try{ localStorage.setItem("shishoza_lang",lang); }catch(e){}
   var sel=document.getElementById("langSel"); if(sel) sel.value=lang;
 }
 (function(){
   var saved="en";
-  try{ saved=localStorage.getItem("umurinzi_lang")||"en"; }catch(e){}
+  try{ saved=localStorage.getItem("shishoza_lang")||"en"; }catch(e){}
   setLang(saved);
   var sel=document.getElementById("langSel");
   if(sel) sel.addEventListener("change",function(e){ setLang(e.target.value); });

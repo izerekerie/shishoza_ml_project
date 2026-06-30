@@ -1,4 +1,4 @@
-"""Umurinzi — split audit + patch-size accuracy curve.
+"""Shishoza — split audit + patch-size accuracy curve.
 
 Closes RESEARCH_TODO items #1 and #2:
 
@@ -184,7 +184,7 @@ ax.axvline(1.0, ls=":", color="#dc2626", lw=1.3,
 ax.set_ylim(0, 1.05)
 ax.set_ylabel("Recall on deforested test pixels")
 ax.set_title("RQ2 — Detection recall vs clearing patch size\n"
-             "Umurinzi rf_D, n=1000 deforested test pixels, Nyungwe buffer zone")
+             "Shishoza rf_D, n=1000 deforested test pixels, Nyungwe buffer zone")
 ax.legend(loc="lower right", fontsize=9)
 for x, v, n in zip(buckets_with_data["bucket"],
                     buckets_with_data["recall"], buckets_with_data["n_test"]):

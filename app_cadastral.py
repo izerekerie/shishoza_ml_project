@@ -1,4 +1,4 @@
-"""Umurinzi — Cadastral Plan Extractor (browser demo)
+"""Shishoza — Cadastral Plan Extractor (browser demo)
 
 Run:    .venv/bin/python app_cadastral.py
 Open:   http://localhost:5050/
@@ -94,7 +94,7 @@ def find_nearest_pixels(lat: float, lng: float, k: int = 25):
 
 
 def analyse_parcel(lat: float, lng: float, area_ha: float = None) -> dict:
-    """Run the full Umurinzi analysis for one parcel.
+    """Run the full Shishoza analysis for one parcel.
 
     The model is trained on pixels sampled nationally (all five provinces), so
     it is calibrated across Rwanda. We still return a `confidence` field based
@@ -221,8 +221,8 @@ def login_required(fn):
 
 app = Flask(__name__)
 # Secret key for signing the login session cookie. Fixed dev value for the
-# capstone demo; set UMURINZI_SECRET in the environment for any real deployment.
-app.secret_key = os.environ.get("UMURINZI_SECRET", "umurinzi-dev-secret-change-me")
+# capstone demo; set SHISHOZA_SECRET in the environment for any real deployment.
+app.secret_key = os.environ.get("SHISHOZA_SECRET", "shishoza-dev-secret-change-me")
 # Allow up to 16 MB uploads (covers any phone photo + PDF)
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
@@ -232,17 +232,17 @@ app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 # The raw OpenAPI 2.0 spec is served at   http://localhost:5050/apispec_1.json
 from flasgger import Swagger
 
-app.config["SWAGGER"] = {"title": "Umurinzi API", "uiversion": 3}
+app.config["SWAGGER"] = {"title": "Shishoza API", "uiversion": 3}
 swagger = Swagger(app, template={
     "swagger": "2.0",
     "info": {
-        "title": "Umurinzi Rwanda — Deforestation Risk API",
+        "title": "Shishoza Rwanda — Deforestation Risk API",
         "description": (
-            "Backend for the Umurinzi MVP. Given a land parcel (from an uploaded "
+            "Backend for the Shishoza MVP. Given a land parcel (from an uploaded "
             "land-title PDF/photo, manual coordinates, or a lat/lng), it predicts "
             "deforestation risk with a tuned Random Forest (Experiment D, F1≈0.79), "
             "forward-simulates a proposed cut, and returns vetted alternatives. "
-            "Final-year capstone — Umurinzi Rwanda, ALU."
+            "Final-year capstone — Shishoza Rwanda, ALU."
         ),
         "version": "1.0.0",
         "contact": {"email": "twagirinno@gmail.com"},
@@ -474,7 +474,7 @@ def manager():
 @app.post("/api/analyse-sector")
 @login_required
 def api_analyse_sector():
-    """Run the full Umurinzi model on an arbitrary sector — used when the
+    """Run the full Shishoza model on an arbitrary sector — used when the
     Forest Manager clicks a sector on the choropleth. Same pipeline as the
     citizen flow, just keyed by sector_id instead of GPS/draw/upload."""
     data = request.get_json() or {}
@@ -1030,7 +1030,7 @@ def api_extract():
 
 
 if __name__ == "__main__":
-    print("\n🛡️  Umurinzi running")
+    print("\n🛡️  Shishoza running")
     print("   Landing:   http://localhost:5050/")
     print("   Citizen:   http://localhost:5050/citizen")
     print("   Manager:   http://localhost:5050/manager")

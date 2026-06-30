@@ -1,6 +1,6 @@
-# Umurinzi — Deployment plan
+# Shishoza — Deployment plan
 
-This document describes how Umurinzi is intended to be deployed. The target
+This document describes how Shishoza is intended to be deployed. The target
 platform is **Render** with **Docker**. The app is not yet deployed; the
 sections below set out the architecture, rationale, and cost of the plan.
 
@@ -61,7 +61,7 @@ pre-loaded. This makes deployments simple, cheap, and reliable.
 | Render web service | Alternative: Free (cold starts, 512 MB) | USD 0 |
 | GitHub repo + Actions | Free academic tier | USD 0 |
 | Docker Hub | Free for public images | USD 0 |
-| Custom domain `umurinzi.rw` | `.rw` registrar via RICTA | ~USD 1 / month amortised (USD 12 / yr) |
+| Custom domain `shishoza.rw` | `.rw` registrar via RICTA | ~USD 1 / month amortised (USD 12 / yr) |
 | **Total — production demo** |   | **~USD 26 / month** |
 | **Total — free tier only** |   | **USD 0** |
 
@@ -92,10 +92,10 @@ ever launches.
 
 ```bash
 # Build the image
-docker build -t umurinzi:latest .
+docker build -t shishoza:latest .
 
 # Run it
-docker run -p 5050:5050 -e PORT=5050 umurinzi:latest
+docker run -p 5050:5050 -e PORT=5050 shishoza:latest
 
 # Open http://localhost:5050 in your browser — same as production
 ```
