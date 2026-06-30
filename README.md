@@ -15,18 +15,22 @@ so they're invisible until after the trees are gone.
 
 The system combines:
 
-- A **Random Forest classifier** trained on 10,000 labelled pixels from
-  the Nyungwe buffer zone using Sentinel-2 (optical) + Sentinel-1 (radar)
-  + SRTM (terrain) features, with Hansen Global Forest Change labels.
+- A **Random Forest classifier** trained on ~23,300 labelled pixels sampled
+  province-stratified across all five of Rwanda's provinces, using Sentinel-2
+  (optical) + Sentinel-1 (radar) + SRTM (terrain) features with Hansen Global
+  Forest Change labels. The Nyungwe National Park buffer zone is retained as the
+  primary validation case study.
 - A **Flask web application** with three personas — Citizen, Forest
   Manager, Admin — each scoped to its real workflow.
 - An **OpenAPI-documented REST backend** exposing 16 endpoints, browsable
   through interactive Swagger UI at `/apidocs`.
 
-**Headline result**: F1 = 0.791 on a held-out 2,000-pixel test set,
-beating the published global baseline (Ygorra et al. 2024, F1 = 0.71) by
-**+0.08**. Recall stays in the 80–83 % band even at the 0.1–0.2 ha
-smallholder patch size where global models typically degrade.
+**Headline result**: the best model (all 17 features) scores **F1 = 0.83 under
+5-fold cross-validation** and **F1 ≈ 0.75 under spatial cross-validation** — the
+more conservative, geographically honest figure to quote. Both beat the published
+global baseline (Ygorra et al. 2024, F1 = 0.71). Recall stays usable (~0.77 rising
+to ~0.87) down to the 0.09–0.18 ha smallholder patch size where global models
+typically degrade.
 
 The system answers four research questions:
 
@@ -34,7 +38,7 @@ The system answers four research questions:
 |---|---|---|
 | RQ1 | Optimal combination of S2 / S1 / SRTM features? | Answered — `results/experiments/rq1_writeup.md` |
 | RQ2 | Accuracy degradation at smallholder patch sizes? | Answered — `results/patch_size_analysis/` |
-| RQ3 | Does 500 m neighbourhood improve over parcel-only analysis? | Implemented in app; writeup pending |
+| RQ3 | Does 500 m neighbourhood improve over parcel-only analysis? | Answered — `RQ_FINDINGS_DRAFT.md` (implemented in app) |
 | RQ4 | Out-of-sample validation across districts? | Pending — needs RNLA real-coordinate sample |
 
 ### Training data vs live data — why they use different years
@@ -77,9 +81,10 @@ not yet *measured* — it will be re-checked once Hansen releases 2025/2026 loss
 | Resource | URL |
 |---|---|
 | **GitHub repo** | https://github.com/izerekerie/umurinzi_ml_project |
-| **Demo video** | https://youtu.be/L10J9Ie8IDE?si=BFBF2ZC2SGKSbF63 |
-| Live demo URL | *planned:* `https://shishoza-web.onrender.com` *(not yet deployed — see §5)* |
-| Swagger UI | `http://localhost:5050/apidocs` *(when running locally)* |
+| **Demo video & deliverables (Google Drive)** | https://drive.google.com/drive/folders/1e_M-3ZgYuXzDoA0rYtnfsLZew7jWrzK3?usp=sharing |
+| Demo video (YouTube mirror) | https://youtu.be/L10J9Ie8IDE?si=BFBF2ZC2SGKSbF63 |
+| **Live demo (Railway)** | `https://shishoza.up.railway.app` — *deployed, beta: slow first boot / cold start (see §5)* |
+| Swagger UI | `https://shishoza.up.railway.app/apidocs` — or `http://localhost:5050/apidocs` when running locally |
 | Dissertation prose | `results/experiments/rq1_writeup.md` |
 
 To clone:
@@ -166,8 +171,9 @@ shishoza/
 │   ├── patch_size_analysis/        RQ2 figure + CSV
 │   └── application/                Precomputed sector_risk.json
 ├── app_cadastral.py               Flask web app entry point
-├── Dockerfile                      Production container (Render-ready)
-├── render.yaml                     Render Infrastructure-as-Code
+├── Dockerfile                      Production container (Railway / Render)
+├── railway.json                    Railway deploy config (live platform)
+├── render.yaml                     Render blueprint (alternative platform)
 ├── requirements.txt
 ├── README.md                       This file
 └── DEPLOYMENT.md                   Step-by-step deploy guide
@@ -245,35 +251,73 @@ Screenshots:
 
 ---
 
-## 5 · Deployment plan
+## 5 · Deployment
 
-**Status:** not yet deployed. The application runs locally today (see below);
-this section describes how it will be deployed.
+**Status: deployed (beta).** The app is live on **Railway** at `https://shishoza.up.railway.app`,
+built from the included `Dockerfile` + `railway.json`. It is honestly a *beta*
+deployment — see [Known limitations](#known-limitations) below.
 
-The app is a single Flask service that serves both the web pages and the REST
-API from one process, so it deploys as one web service — no separate frontend
-host is required. The target platform is **Render**, built from the included
-`Dockerfile` / `render.yaml` (Docker, gunicorn, Frankfurt region).
+The app is a single Flask service that serves both the web pages and the REST API
+from one process, so it deploys as one web service — no separate frontend host is
+required. The container ships with the trained model, sector polygons, and the
+Hansen-derived `sector_risk.json` pre-loaded, so there are **zero runtime external
+dependencies** (Google Earth Engine and Hansen are only used offline at training time).
 
-Planned URL once deployed: `https://shishoza-web.onrender.com`.
+### Tools & files
 
-Planned steps:
+| File | Role in deployment |
+|---|---|
+| `Dockerfile` | Builds the production image (Python 3.13-slim + tesseract + opencv + gunicorn) |
+| `railway.json` | Railway config: Dockerfile builder, `/api/me` healthcheck, 300 s healthcheck timeout, restart-on-failure |
+| `.dockerignore` | Keeps the build context small (skips notebooks, drafts, `.venv`) |
+| `requirements.txt` | Pins Python deps, including `gunicorn` (production WSGI server) |
+| Hugging Face | The large national model is pulled at build time (kept out of Git) |
 
-1. Push to GitHub (done).
-2. Render → **New → Web Service** → connect this repo.
-3. Render builds from the `Dockerfile` (~6–8 min first build).
-4. Add the `SHISHOZA_SECRET` environment variable (Render can auto-generate it)
-   before the service is made public.
+### Environments
 
-Local Docker test:
+| Environment | How it runs | URL |
+|---|---|---|
+| **Local dev** | `python app_cadastral.py` (Flask dev server) | `http://localhost:5050` |
+| **Local prod-parity** | `docker run` (gunicorn, same image as prod) | `http://localhost:5050` |
+| **Production (target)** | Railway service, auto-deploys on `git push` | `https://shishoza.up.railway.app` |
+
+### Deploy steps (Railway)
+
+1. Push to GitHub (`main`).
+2. Railway → **New Project → Deploy from GitHub repo** → select this repo.
+3. Railway reads `railway.json` and builds from the `Dockerfile` (~6–8 min first build).
+4. Set the `SHISHOZA_SECRET` environment variable (Railway can generate one) before going public.
+5. Railway waits for the `/api/me` healthcheck (timeout raised to 300 s because the
+   model load makes the first boot slow), then routes traffic to the new build.
+
+### Verify it before pushing — local Docker (prod parity)
 
 ```bash
 docker build -t shishoza .
-docker run -p 5050:5050 -e PORT=5050 shishoza
-# → http://localhost:5050
+docker run -p 5050:5050 -e PORT=5050 -e SHISHOZA_SECRET=dev shishoza
+# → open http://localhost:5050  (same image Railway runs)
 ```
 
-Run locally **without Docker** (plain Python — see §3 for prerequisites):
+### Verification done in the target environment
+
+After each deploy, the following were checked on the live Railway URL:
+
+- `GET /api/me` returns 200 (the healthcheck Railway gates on).
+- Landing, `/login`, `/citizen`, `/manager`, `/admin` all render.
+- Login with the demo accounts (§3) succeeds and scopes each manager to their district.
+- `/apidocs` Swagger UI loads and a sample `/api/analyse` call returns a risk classification.
+
+### <a name="known-limitations"></a>Known limitations (why it's "beta")
+
+- **Slow first boot / cold start.** Loading the ~47 MB model + 416 sector polygons
+  pushes boot to ~600 MB and tens of seconds, which is why the healthcheck timeout
+  is 300 s. The first request after an idle period can be slow.
+- **Free-credit ceiling.** Railway's free credit is consumed quickly by an always-on
+  service, so the demo may sleep or stop when credit runs low.
+- For an always-on production pilot, `DEPLOYMENT.md` compares paid options
+  (Render Standard, Fly.io, a small VM) with a full cost breakdown.
+
+### Run locally without Docker (plain Python — see §3 for prerequisites)
 
 ```bash
 python3.13 -m venv .venv
@@ -284,7 +328,62 @@ python app_cadastral.py
 # → http://localhost:5050
 ```
 
-Full cost breakdown is in **`DEPLOYMENT.md`**.
+---
+
+## 6 · Results & analysis against proposal objectives
+
+This section maps each **specific objective** from the capstone proposal to what
+was actually delivered, with honest notes where results deviate. The proposal set
+three specific objectives, evaluated against the published baseline of **F1 > 0.71**
+(Ygorra et al. 2024, the best international result for small-scale deforestation).
+
+| # | Proposal objective | Outcome | Evidence |
+|---|---|---|---|
+| **O1** | Review the literature (2019–26) and collect a balanced, labelled GEE dataset (Sentinel-2 + Sentinel-1 + SRTM + Hansen), province-stratified across all 5 provinces for 2020–2024, with the Nyungwe buffer as the validation case study. | **Met.** A national, province-stratified sample of ~23,300 labelled pixels with the 17-feature schema was exported from Earth Engine; the Nyungwe buffer is retained as the validation zone. | `notebooks/01_GEE_Export_National.js`, `data/processed/`, `results/eda/` |
+| **O2** | Train a Random Forest comparing **4 feature combinations** and integrate the best model into one responsive, Dockerised web app showing deforestation to managers and letting citizens locate their parcel and see tree-loss-since-2020, 500 m neighbourhood recovery, and a HIGH/MEDIUM/LOW risk class *before* a permit. | **Met, with one platform deviation.** Four feature sets (A–D) were compared; the best is **D (all 17 features)**. The Flask app delivers Citizen / Manager / Admin personas, per-parcel risk, the 500 m neighbourhood analysis, and a cut simulation. Deployed Dockerised — on **Railway, not Render** (cost/credit; see §5). | `notebooks/03_Train_Model.ipynb`, `models/rf_D*.pkl`, `app_cadastral.py` |
+| **O3** | Evaluate whether the system closes the gap: model **F1 > 0.71**, and the app delivers satellite tree-cover + risk to citizens at their location. | **Met on accuracy; partially met on external validation.** Best model **F1 = 0.83 (5-fold CV) / 0.75 (spatial CV)** — both clear 0.71. The app delivers the information end-to-end. Cross-district out-of-sample validation (RQ4) is still pending. | `results/metrics/`, `RQ_FINDINGS_DRAFT.md` |
+
+### How the headline result was achieved
+
+The accuracy gain comes from **fusing all three data sources** (optical + radar +
+terrain) into a 200-tree Random Forest on province-stratified national data. The
+research questions decompose *why* it works:
+
+- **RQ1 (feature fusion).** Adding radar to optical lifts F1 by +0.039; the full
+  17-feature model is best (F1 = 0.83 CV). Decision weight splits optical 50.7 % /
+  radar 25.9 % / terrain 23.4 % — radar is a justified, non-redundant component.
+- **RQ2 (smallholder patch size).** Recall stays usable down to parcel scale —
+  ~0.77 at 0.09–0.18 ha, rising to 0.87 above 1.8 ha — i.e. the system recovers
+  ~3 in 4 of the sub-hectare clearings that global products miss.
+- **RQ3 (500 m neighbourhood).** Adds cumulative-pressure and recovery-trajectory
+  evidence, plus a forward cut-simulation with a ~6–8 year recovery estimate, that a
+  single-parcel permit review cannot see.
+
+### Honest gaps — where results fall short of the proposal
+
+- **Two F1 numbers, reported honestly.** Random / 5-fold CV gives ≈ 0.79–0.83;
+  **spatial CV** (train and test on geographically separate blocks) gives ≈ **0.75**.
+  Spatial CV is the defensible generalization figure and is the one to quote — it
+  still beats the 0.71 baseline, but the gap is smaller than a random split suggests.
+- **Live-scoring accuracy is assumed, not measured.** The model is validated on
+  2020–2024 Hansen labels and *applied* to current 2025–26 imagery; there is no
+  2025–26 ground truth yet, so live accuracy will only be confirmed when Hansen
+  publishes those labels (see §1).
+- **RQ4 (multi-district out-of-sample validation) is pending** — it needs a
+  real-coordinate sample (e.g. from RNLA) outside the training footprint.
+- **Deployment platform changed** from the proposal's Render to **Railway** (cost /
+  free-credit reasons); the deviation and alternatives are documented in §5 and `DEPLOYMENT.md`.
+- **Citizen parcel location** is implemented via land-certificate upload and manual
+  coordinate entry rather than the pure browser-GPS flow described in the proposal.
+
+### Linkage to project scope
+
+The work stays inside the proposal's scope: **train nationally** (province-stratified
+across all five provinces so the model learns Rwanda's full landscape) while
+**validating on the Nyungwe buffer** — Rwanda's most documented smallholder
+deforestation zone. The whole system is aimed squarely at the documented gap: making
+**sub-hectare, pre-permit** deforestation risk visible to citizens and managers, which
+no existing Rwandan tool offers before a clearing decision is made.
 
 ---
 
