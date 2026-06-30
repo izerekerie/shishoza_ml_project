@@ -1,8 +1,14 @@
 # Shishoza — Deployment plan
 
-This document describes how Shishoza is intended to be deployed. The target
-platform is **Render** with **Docker**. The app is not yet deployed; the
-sections below set out the architecture, rationale, and cost of the plan.
+**Current status:** the app is **deployed (beta) on Railway** with **Docker** —
+see §5 of the README for the live URL, deploy steps, and verification checklist.
+
+This document is the deeper deployment reference: the architecture, the runtime
+properties, and a **platform cost comparison**. It was originally written around
+**Render**; Render is now kept here as a costed *alternative* for an always-on
+production pilot, while Railway is the platform the demo actually runs on. The
+architecture, Dockerfile, and "zero runtime external dependencies" property below
+apply identically to both.
 
 ---
 
