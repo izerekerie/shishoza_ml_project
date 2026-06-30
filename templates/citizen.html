@@ -355,7 +355,7 @@ function render(d){
   document.getElementById('v-latlng').textContent = (d.lat&&d.lng) ? `${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}` : '—';
   if (!d.polygon_wgs84 || !d.polygon_wgs84.length){
     const det=document.querySelector('details'); if(det) det.open=true;
-    manStatus.textContent='OCR could not read the polygon — enter coordinates below.'; manStatus.style.color='#b91c1c';
+    manStatus.textContent = `Could not read the parcel outline${d.polygon_status && d.polygon_status!=='extracted' ? ' ('+d.polygon_status+')' : ''} — enter coordinates below.`; manStatus.style.color='#b91c1c';
     if(d.easting) document.getElementById('manEasting').value=Math.round(d.easting);
     if(d.northing) document.getElementById('manNorthing').value=Math.round(d.northing);
     if(d.surface_sqm) document.getElementById('manArea').value=d.surface_sqm;
