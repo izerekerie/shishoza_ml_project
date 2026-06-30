@@ -37,6 +37,39 @@ The system answers four research questions:
 | RQ3 | Does 500 m neighbourhood improve over parcel-only analysis? | Implemented in app; writeup pending |
 | RQ4 | Out-of-sample validation across districts? | Pending — needs RNLA real-coordinate sample |
 
+### Training data vs live data — why they use different years
+
+The system uses satellite data for **two different jobs**, and they follow
+different rules. This distinction matters for the defense:
+
+| | **Training** (teach + measure the model) | **Live scoring** (use the model now) |
+|---|---|---|
+| Needs Hansen **labels**? | Yes — every pixel needs a known answer | No |
+| Latest year the data exists | **2024** (Hansen ground truth lags ~1 yr) | **up to today** (Sentinel is an ongoing mission) |
+| Years used | 2020 → 2024 | 2020 baseline + **2025–2026** recent window |
+| Produces an F1 score? | **Yes — F1 ≈ 0.83** (this is the only place labels exist) | **No** — you cannot score accuracy without labels |
+| Lives in | the notebooks | the live map / parcel lookup |
+
+**Both windows produce the identical 17 features** — same NDVI, radar, terrain,
+NDVI_change. The *only* differences: (a) which calendar window fills the
+"recent" half of the vector, and (b) the 2020–24 data additionally carries a
+Hansen `label` column. The model is year-agnostic: it takes 17 numbers and
+returns a probability, so it consumes 2025–26 imagery natively.
+
+**Why training stops at 2024:** training needs an answer key for every pixel,
+and Hansen — the answer key — only publishes forest loss **through 2024**. There
+is no 2025/2026 ground truth yet, so the model is *trained and validated* on
+2020–24, then *applied* to current 2025–26 imagery for live predictions. This is
+standard practice: learn from the labeled past, predict on the unlabeled present,
+re-validate when new labels are published.
+
+**Honest caveat:** F1 = 0.83 is measured on 2023–24 labels. Applying the model to
+2025–26 is slightly beyond the validated window, so live accuracy is *assumed*,
+not yet *measured* — it will be re-checked once Hansen releases 2025/2026 loss.
+
+> Refresh the live sector map by running `notebooks/02b_GEE_Export_Sectors_Current.js`
+> in Earth Engine, then `scripts/precompute_sector_current.py`.
+
 ---
 
 ## 2 · Repository

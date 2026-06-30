@@ -82,6 +82,7 @@ ENV PORT=5050
 # valid port number"). ${PORT:-5050} also defaults the port if none is injected.
 #   --preload            load the 325 MB model ONCE in the master, share via COW
 #                        across workers (avoids N× model RAM → cheaper tier OK)
-#   --workers ${WEB_CONCURRENCY:-2}  override via env; 2 is enough for a demo
+#   --workers ${WEB_CONCURRENCY:-1}  override via env; 1 keeps memory low on the
+#                        cheap tier (the 325 MB model is the dominant cost)
 #   --timeout 90         the OCR path can take 30-60s on a Bugesera-scale PDF
-CMD ["sh", "-c", "gunicorn app_cadastral:app --preload --workers ${WEB_CONCURRENCY:-2} --timeout 90 --bind 0.0.0.0:${PORT:-5050} --access-logfile - --error-logfile -"]
+CMD ["sh", "-c", "gunicorn app_cadastral:app --preload --workers ${WEB_CONCURRENCY:-1} --timeout 90 --bind 0.0.0.0:${PORT:-5050} --access-logfile - --error-logfile -"]
