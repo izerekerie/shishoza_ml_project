@@ -2,9 +2,12 @@
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Shishoza — Rwanda Forest Risk Intelligence</title>
+<script>document.documentElement.classList.add('cloak');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -53,7 +56,13 @@
       }
     </script>
 <style>
+        /* Anti-FOUC: hide the page until fonts/styles are ready, then fade in.
+           The `cloak` class is added by JS, so users without JS never get hidden. */
+        html.cloak body { opacity: 0; }
+        body { opacity: 1; transition: opacity 0.25s ease-in; }
         body { font-family: 'Inter', sans-serif; }
+        /* Reserve icon space so swapping in the glyph doesn't shift layout. */
+        .material-symbols-outlined { display: inline-block; line-height: 1; }
         .glass-card {
             background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(12px);
@@ -181,6 +190,18 @@
 </div>
 </div>
 </footer>
+<script>
+// Reveal the page once the icon + text fonts have loaded (removes the flash of
+// raw "check_circle" / "landscape" ligature text). Fallback timer guarantees the
+// page never stays hidden if a font request is slow or fails.
+(function(){
+  function reveal(){ document.documentElement.classList.remove('cloak'); }
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(reveal); }
+  else { reveal(); }
+  window.addEventListener('load', reveal);
+  setTimeout(reveal, 1500);
+})();
+</script>
 <script>
 const I18N = {
   en: {
