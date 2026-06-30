@@ -115,8 +115,8 @@ agg["deforested_pct"] = agg["n_deforested"] / agg["n_pixels"] * 100
 
 
 def classify_sector(row):
-    if row["n_pixels"] < 5:
-        return "UNKNOWN", 0.0, "insufficient sample (<5 pixels)"
+    if row["n_pixels"] < 3:
+        return "UNKNOWN", 0.0, "too little forest sampled here to score"
     score = (
         0.50 * row["mean_model_prob"]
       + 0.30 * row["hotspot_pct"]

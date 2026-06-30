@@ -1,8 +1,13 @@
 <!DOCTYPE html><html class="light" lang="en"><head>
+<script>document.documentElement.classList.add('cloak');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<style>html.cloak body{opacity:0;}body{opacity:1;transition:opacity .25s ease-in;}.material-symbols-outlined{display:inline-block;line-height:1;}</style>
+<script>(function(){function r(){document.documentElement.classList.remove('cloak');}if(document.fonts&&document.fonts.ready){document.fonts.ready.then(r);}else{r();}window.addEventListener('load',r);setTimeout(r,1500);})();</script>
 <meta charset="utf-8">
 <meta content="width=device-width, initial-scale=1.0" name="viewport">
 <title>Shishoza Intelligence | Forest Manager Dashboard</title>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
@@ -153,6 +158,13 @@ document.getElementById('logoutLink').addEventListener('click', async (e) => {
 });
 
 const RISK_COLOUR = { HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a', UNKNOWN:'#9ca3af' };
+const RISK_LABEL  = { HIGH:'HIGH', MEDIUM:'MEDIUM', LOW:'LOW', UNKNOWN:'NOT ASSESSED' };
+const RULE_PLAIN  = {
+  'Rule 1 (parcel)':'Low tree cover and strong clearing signal',
+  'Rule 2 (neighbourhood)':'Heavy clearing in the surrounding area',
+  'Rule 3 (intermediate)':'Some signs of clearing',
+  'default':'No strong clearing signal' };
+const CONF_PLAIN  = { HIGH:'High', MEDIUM:'Medium', LOW:'Low' };
 function dot(l){ return `<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${RISK_COLOUR[l]||'#9ca3af'};margin-right:6px;vertical-align:middle;"></span>`; }
 const CONF_PCT = { HIGH:'100%', MEDIUM:'60%', LOW:'30%' };
 
@@ -223,14 +235,15 @@ async function renderSectorDetail(props) {
     <header class="flex justify-between items-center mb-4">
       <div class="flex items-center gap-2"><span class="material-symbols-outlined text-sm" style="color:${RISK_COLOUR[level]}">warning</span>
         <h2 class="font-label-caps text-label-caps text-on-surface-variant">SECTOR · ${props.sector}</h2></div>
-      <span class="text-[10px] text-white px-2 py-0.5 rounded-full font-bold" style="background:${RISK_COLOUR[level]}">${level}</span>
+      <span class="text-[10px] text-white px-2 py-0.5 rounded-full font-bold" style="background:${RISK_COLOUR[level]}">${RISK_LABEL[level]}</span>
     </header>
     <div class="space-y-1">
       <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">District</span><span class="font-bold">${props.district}</span></div>
       ${r && r.risk_level!=='UNKNOWN' ? `
-      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Flagged as cleared (model)</span><span class="font-bold">${r.deforested_pct.toFixed(1)}% of pixels</span></div>
-      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Mean model confidence</span><span class="font-bold">${r.mean_model_prob != null ? (r.mean_model_prob*100).toFixed(0)+'%' : '—'}</span></div>` : ''}
-      <p class="text-[11px] text-on-surface-variant mt-2" style="line-height:1.4;opacity:0.85;">The model is run on <b>current Sentinel imagery (2025–26)</b>. Figures above = share of this sector's forest pixels the model currently flags as cleared, and its average confidence. The reading below applies the model to the sector centroid.</p>
+      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Forest showing clearing</span><span class="font-bold">${r.deforested_pct.toFixed(0)}% of this sector</span></div>
+      <div class="flex justify-between text-sm py-2 border-b border-outline-variant/20"><span class="text-on-surface-variant">Model confidence</span><span class="font-bold">${r.mean_model_prob != null ? (r.mean_model_prob*100).toFixed(0)+'%' : '—'}</span></div>
+      <p class="text-[11px] text-on-surface-variant mt-2" style="line-height:1.4;opacity:0.85;">Based on <b>current satellite imagery (2025–26)</b>. The reading below checks this sector's centre right now.</p>` : `
+      <p class="text-[12px] text-on-surface-variant mt-2 p-3 bg-surface-container-low rounded-lg" style="line-height:1.5;">This sector has <b>little or no forest</b> to monitor, so it is not given a risk level. This is normal — not an error.</p>`}
       <div class="mt-3 p-4 bg-primary-container/5 rounded-lg border border-primary/10" id="liveBox">
         <div class="flex items-center gap-2 mb-3"><span class="material-symbols-outlined text-primary text-lg">biotech</span><span class="font-bold text-sm text-primary">Current condition (model)</span></div>
         <p class="text-xs text-on-surface-variant">Running model on sector centroid…</p>
@@ -240,19 +253,19 @@ async function renderSectorDetail(props) {
     const live = await (await fetch('/api/analyse-sector', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ sector_id: sid }) })).json();
     const box = document.getElementById('liveBox');
     if (live.error) { box.innerHTML = `<p class="text-xs text-error">${live.error}</p>`; return; }
+    const trend = live.ndvi_current > live.ndvi_2020 + 0.02 ? 'Greener than 2020'
+                : live.ndvi_current < live.ndvi_2020 - 0.02 ? 'Less green than 2020' : 'About the same as 2020';
     box.innerHTML = `
-      <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-lg">biotech</span><span class="font-bold text-sm text-primary">Live Model Output</span></div>
-        <span class="text-xs font-bold" style="color:${RISK_COLOUR[live.risk_level]}">${dot(live.risk_level)}${live.risk_level}</span></div>
+      <div class="flex items-center justify-between mb-3"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-lg">biotech</span><span class="font-bold text-sm text-primary">Live satellite reading</span></div>
+        <span class="text-xs font-bold" style="color:${RISK_COLOUR[live.risk_level]}">${dot(live.risk_level)}${RISK_LABEL[live.risk_level]}</span></div>
       <div class="grid grid-cols-2 gap-y-2 text-xs">
-        <span class="text-on-surface-variant">Tree Cover Index</span><span class="text-right font-medium">${(live.tree_cover_pct/100).toFixed(2)}</span>
-        <span class="text-on-surface-variant">NDVI Reading</span><span class="text-right font-medium">${live.ndvi_current.toFixed(2)}</span>
-        <span class="text-on-surface-variant">NDVI 2020 → now</span><span class="text-right font-medium">${live.ndvi_2020.toFixed(2)} → ${live.ndvi_current.toFixed(2)}</span>
-        <span class="text-on-surface-variant">Resolution</span><span class="text-right font-medium">Sentinel-2 / S1 / SRTM</span>
-        <span class="text-on-surface-variant">System Rule</span><span class="text-right font-bold" style="color:${RISK_COLOUR[live.risk_level]}">${live.rule_fired}</span>
+        <span class="text-on-surface-variant">Tree cover now</span><span class="text-right font-medium">${live.tree_cover_pct.toFixed(0)}%</span>
+        <span class="text-on-surface-variant">Vegetation vs 2020</span><span class="text-right font-medium">${trend}</span>
+        <span class="text-on-surface-variant">Why this level</span><span class="text-right font-medium">${RULE_PLAIN[live.rule_fired]||live.rule_fired}</span>
+        <span class="text-on-surface-variant">Source</span><span class="text-right font-medium">Sentinel satellites</span>
       </div>
-      <div class="mt-4"><div class="flex justify-between text-[10px] font-bold mb-1"><span>MODEL CONFIDENCE</span><span class="text-primary">${live.confidence}</span></div>
-        <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden"><div class="h-full bg-primary" style="width:${CONF_PCT[live.confidence]||'50%'}"></div></div>
-        <p class="text-[10px] text-on-surface-variant mt-1">${live.confidence_note}</p></div>`;
+      <div class="mt-4"><div class="flex justify-between text-[10px] font-bold mb-1"><span>CONFIDENCE</span><span class="text-primary">${CONF_PLAIN[live.confidence]||live.confidence}</span></div>
+        <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden"><div class="h-full bg-primary" style="width:${CONF_PCT[live.confidence]||'50%'}"></div></div></div>`;
   } catch (e) {
     const box = document.getElementById('liveBox'); if (box) box.innerHTML = `<p class="text-xs text-error">Network error: ${e.message}</p>`;
   }
