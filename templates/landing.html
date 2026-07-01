@@ -77,19 +77,16 @@
 <!-- TopNavBar -->
 <nav class="fixed top-0 w-full z-50 bg-white/85 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm">
 <div class="flex justify-between items-center h-20 px-container-margin max-w-[1280px] mx-auto">
-<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Shishoza</div>
+<a href="/" class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary hover:opacity-70 transition-opacity cursor-pointer">Shishoza</a>
 <div class="hidden md:flex gap-8 items-center">
 <a class="font-body-lg text-body-lg text-primary border-b-2 border-primary pb-1" href="/citizen" data-i18n="nav.citizen">Citizen</a>
 <a class="font-body-lg text-body-lg text-on-surface-variant hover:text-primary transition-colors" href="/manager" data-i18n="nav.manager">Manager</a>
 </div>
 <div class="flex items-center gap-4">
-<div class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-container-low transition-all">
-<span class="material-symbols-outlined text-on-surface-variant">language</span>
-<select id="langSel" class="lang-select font-body-lg text-body-lg" aria-label="Language">
-<option value="en">English</option>
-<option value="rw">Kinyarwanda</option>
-<option value="fr">Français</option>
-</select>
+<div class="flex items-center gap-0.5 bg-surface-container-low border border-outline-variant/40 rounded-full p-0.5" role="group" aria-label="Language">
+<button type="button" onclick="setLang('en')" id="btn-lang-en" class="px-3 py-1 text-sm font-bold rounded-full transition-all">EN</button>
+<button type="button" onclick="setLang('rw')" id="btn-lang-rw" class="px-3 py-1 text-sm font-bold rounded-full transition-all">RW</button>
+<button type="button" onclick="setLang('fr')" id="btn-lang-fr" class="px-3 py-1 text-sm font-bold rounded-full transition-all">FR</button>
 </div>
 <a href="/login" class="px-6 py-2 bg-primary-container text-on-tertiary font-bold rounded-full active:scale-95 transition-transform duration-150" data-i18n="nav.login">Login</a>
 </div>
@@ -167,7 +164,7 @@
 <div class="max-w-[1280px] mx-auto px-container-margin">
 <div class="grid grid-cols-1 md:grid-cols-12 gap-12 mb-16">
 <div class="md:col-span-6 flex flex-col gap-4">
-<div class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary">Shishoza</div>
+<a href="/" class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary hover:opacity-70 transition-opacity cursor-pointer">Shishoza</a>
 <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xs" data-i18n="hero.sub">Satellite monitoring and parcel-level risk assessment to support sustainable forest management in Rwanda.</p>
 </div>
 <div class="md:col-span-3 flex flex-col gap-4">
@@ -279,14 +276,17 @@ function setLang(lang){
     if(v!=null) el.textContent=v;
   });
   try{ localStorage.setItem("shishoza_lang",lang); }catch(e){}
-  var sel=document.getElementById("langSel"); if(sel) sel.value=lang;
+  ["en","rw","fr"].forEach(function(c){
+    var b=document.getElementById("btn-lang-"+c);
+    if(!b) return;
+    b.className = "px-3 py-1 text-sm font-bold rounded-full transition-all " +
+      (c===lang ? "bg-primary text-on-primary" : "text-on-surface-variant hover:bg-primary/10");
+  });
 }
 (function(){
   var saved="en";
   try{ saved=localStorage.getItem("shishoza_lang")||"en"; }catch(e){}
   setLang(saved);
-  var sel=document.getElementById("langSel");
-  if(sel) sel.addEventListener("change",function(e){ setLang(e.target.value); });
 })();
 </script>
 </body></html>
