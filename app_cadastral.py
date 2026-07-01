@@ -181,6 +181,28 @@ def _ensure_ee() -> bool:
         return False
 
 
+def _subrisks(prob, tree_cover_pct, deforested_pct_500m):
+    """Two presentation-level sub-risks shown side by side in the citizen UI.
+    They do NOT change the combined risk_level — they just make transparent
+    whether a HIGH is driven by the parcel itself or by the surrounding area:
+      * parcel        — this plot's own risk (model probability / its tree cover)
+      * neighbourhood — how cleared the surrounding 500 m already is (environment)
+    """
+    if prob > 0.65 or tree_cover_pct < 30:
+        parcel = 'HIGH'
+    elif 0.35 < prob <= 0.65:
+        parcel = 'MEDIUM'
+    else:
+        parcel = 'LOW'
+    if deforested_pct_500m > 50:
+        neighbourhood = 'HIGH'
+    elif deforested_pct_500m > 25:
+        neighbourhood = 'MEDIUM'
+    else:
+        neighbourhood = 'LOW'
+    return parcel, neighbourhood
+
+
 def _classify_and_build(*, prob, ndvi_current, ndvi_2020, ndvi_change,
                         deforested_pct_500m, avg_ndvi_500m, area_ha, lat, lng,
                         confidence, confidence_note, data_source, extra=None):
@@ -199,6 +221,7 @@ def _classify_and_build(*, prob, ndvi_current, ndvi_2020, ndvi_change,
     else:
         risk_level = 'LOW'
         fired_rule = 'default'
+    parcel_risk, neighbourhood_risk = _subrisks(prob, tree_cover_pct, deforested_pct_500m)
     result = {
         'risk_level':           risk_level,
         'rule_fired':           fired_rule,
@@ -209,6 +232,8 @@ def _classify_and_build(*, prob, ndvi_current, ndvi_2020, ndvi_change,
         'tree_cover_pct':       round(tree_cover_pct, 1),
         'neighbourhood_500m_avg_ndvi':       round(avg_ndvi_500m, 3),
         'neighbourhood_500m_deforested_pct': round(deforested_pct_500m, 1),
+        'parcel_risk':          parcel_risk,
+        'neighbourhood_risk':   neighbourhood_risk,
         'parcel_area_ha':       area_ha,
         'analysis_id':          abs(hash((round(lat, 5), round(lng, 5)))) % 10_000_000,
         'confidence':           confidence,
@@ -967,15 +992,22 @@ def api_simulate():
     risk_order = {"LOW": 0, "MEDIUM": 1, "HIGH": 2}
     delta_risk = risk_order[new_risk] - risk_order[orig["risk_level"]]
 
+    before_parcel, before_nbr = _subrisks(prob, orig["tree_cover_pct"], orig["neighbourhood_500m_deforested_pct"])
+    after_parcel,  after_nbr  = _subrisks(prob, new_tree_cover, new_neigh_def)
+
     return jsonify({
         "before": {
             "risk_level":            orig["risk_level"],
+            "parcel_risk":           before_parcel,
+            "neighbourhood_risk":    before_nbr,
             "tree_cover_pct":        orig["tree_cover_pct"],
             "ndvi_current":          orig["ndvi_current"],
             "neighbourhood_500m_deforested_pct": orig["neighbourhood_500m_deforested_pct"],
         },
         "after": {
             "risk_level":            new_risk,
+            "parcel_risk":           after_parcel,
+            "neighbourhood_risk":    after_nbr,
             "tree_cover_pct":        round(new_tree_cover, 1),
             "ndvi_current":          round(new_ndvi, 3),
             "neighbourhood_500m_deforested_pct": round(new_neigh_def, 1),
