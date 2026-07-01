@@ -47,6 +47,13 @@ COPY --from=builder /opt/venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
+# Memory tuning for a small single-worker instance: cap glibc malloc arenas and
+# BLAS/OpenMP threads so numpy/sklearn/opencv don't balloon RSS. This frees a few
+# hundred MB and gives PDF extraction room to run without OOM-killing the worker.
+ENV MALLOC_ARENA_MAX=2 \
+    OMP_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1
 
 # Copy the application — only what the runtime actually needs
 COPY app_cadastral.py .
