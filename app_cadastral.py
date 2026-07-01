@@ -777,10 +777,11 @@ def _recall_analysis(aid):
 
 @app.post("/api/alternatives")
 def api_alternatives():
-    """Return vetted alternatives for a given cutting reason and risk level.
-    Triggered when current OR simulated risk is HIGH/MEDIUM and the citizen
-    selects a cutting reason; returns pre-written, source-verified suggestions
-    (e.g. government programs) in the requested language.
+    """Return vetted alternatives for a given cutting reason.
+    Triggered when the citizen selects a cutting reason; returns pre-written,
+    source-verified suggestions (e.g. government programs) for that reason,
+    independent of risk level, in the requested language (falling back to
+    English when a translation is not yet available).
     ---
     tags:
       - Guidance
@@ -842,20 +843,46 @@ def api_alternatives():
 
     con = sqlite3.connect(str(_DB_PATH))
     con.row_factory = sqlite3.Row
-    rows = con.execute(
-        "SELECT suggestion_text, gov_program_url, source_verified "
-        "FROM ALTERNATIVES "
-        "WHERE reason = ? AND risk_level = ? AND language = ?",
-        (reason, risk_level, language)
-    ).fetchall()
+
+    # Suggestions are keyed to the cutting REASON, not the parcel's risk level:
+    # a citizen asking for firewood alternatives should get them whether the
+    # parcel reads HIGH, MEDIUM or LOW (the risk level the citizen sees is often
+    # the simulated post-cut risk anyway). We pull all risk levels for the reason,
+    # order the most cautionary (HIGH) first, and fall back to English when the
+    # requested language has no rows yet, so RW/FR never come back empty.
+    def _lookup(lang):
+        return con.execute(
+            "SELECT suggestion_text, gov_program_url, source_verified, risk_level "
+            "FROM ALTERNATIVES WHERE reason = ? AND language = ? "
+            "ORDER BY CASE risk_level WHEN 'HIGH' THEN 0 WHEN 'MEDIUM' THEN 1 ELSE 2 END",
+            (reason, lang)
+        ).fetchall()
+
+    rows = _lookup(language)
+    used_language = language
+    if not rows and language != "en":
+        rows = _lookup("en")
+        used_language = "en"
     con.close()
+
+    # De-duplicate by suggestion text, keeping the first (highest-risk) copy.
+    seen, suggestions = set(), []
+    for r in rows:
+        if r["suggestion_text"] in seen:
+            continue
+        seen.add(r["suggestion_text"])
+        suggestions.append({
+            "suggestion_text": r["suggestion_text"],
+            "gov_program_url": r["gov_program_url"],
+            "source_verified": r["source_verified"],
+        })
 
     return jsonify({
         "analysis_id":  aid,
         "reason":       reason,
         "risk_level":   risk_level,
-        "language":     language,
-        "suggestions":  [dict(r) for r in rows],
+        "language":     used_language,
+        "suggestions":  suggestions,
     })
 
 
