@@ -327,6 +327,7 @@ let picked=null;
 fileEl.addEventListener('change', () => { if (fileEl.files.length){ picked=fileEl.files[0]; go.disabled=false; statusEl.textContent=`Ready: ${picked.name}`; } });
 go.addEventListener('click', async () => {
   if (!picked) return;
+  resetAnalysis();   // drop the previous parcel's result immediately
   go.disabled=true; go.textContent='Extracting…';
   try {
     const fd=new FormData(); fd.append('file', picked);
@@ -344,6 +345,7 @@ manSubmit.addEventListener('click', async () => {
   const northing=parseFloat(document.getElementById('manNorthing').value);
   const a=document.getElementById('manArea').value; const area_sqm=a?parseFloat(a):null;
   if (isNaN(easting)||isNaN(northing)){ manStatus.textContent='Enter both Easting and Northing'; manStatus.style.color='#b91c1c'; return; }
+  resetAnalysis();   // drop the previous parcel's result immediately
   manSubmit.disabled=true; manSubmit.textContent='Submitting…';
   try {
     const data = await (await fetch('/api/manual-coords',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({easting,northing,area_sqm})})).json();
@@ -355,6 +357,7 @@ manSubmit.addEventListener('click', async () => {
 
 // ── Render extracted location + auto-analyse ──
 function render(d){
+  resetAnalysis();   // clear any previous parcel's risk before showing the new one
   parcelMeta=d;
   document.getElementById('v-upi').textContent = d.upi || '—';
   document.getElementById('v-area').textContent = d.surface_sqm ? `${d.surface_sqm} m²` : (d.extracted_area_m2 ? `${d.extracted_area_m2} m²` : '—');
@@ -382,6 +385,27 @@ function render(d){
   }
 }
 
+// ── Reset + loading states (so a new upload never shows the previous parcel) ──
+function resetAnalysis(){
+  lastAnalysis=null;
+  ['riskPanel','simPanel','altPanel'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('hidden'); });
+  const sr=document.getElementById('simResult'); if(sr) sr.innerHTML='';
+  const ac=document.getElementById('altCards'); if(ac) ac.innerHTML='';
+}
+function showAnalysing(){
+  const panel=document.getElementById('riskPanel'); panel.classList.remove('hidden');
+  panel.style.borderLeftColor='#6b7280'; panel.style.backgroundColor='#6b728008';
+  document.getElementById('riskIconEl').style.color='#6b7280';
+  const badge=document.getElementById('riskBadge'); badge.textContent='ANALYSING…'; badge.style.background='#6b7280';
+  setSubBadge('parcelRisk',null); setSubBadge('nbrRisk',null);
+  ['defProb','treeCover','ndviTrend'].forEach(id=>{ const e=document.getElementById(id); if(e) e.textContent='…'; });
+  document.getElementById('confNote').textContent='Reading live satellite data for this parcel…';
+}
+function analyseError(msg){
+  const badge=document.getElementById('riskBadge'); badge.textContent='—'; badge.style.background='#6b7280';
+  document.getElementById('confNote').innerHTML=`<span class="err">${msg}</span>`;
+}
+
 // ── Analyse ──
 async function analyse(){
   if (!parcelMeta || parcelMeta.lat==null) return;
@@ -389,10 +413,12 @@ async function analyse(){
   let area_ha = parcelMeta.extracted_area_m2 ? parcelMeta.extracted_area_m2/10000 : (parcelMeta.surface_sqm ? parcelMeta.surface_sqm/10000 : null);
   if (parcelPolygon){ const c=parcelPolygon.getBounds().getCenter(); lat=c.lat; lng=c.lng;
     const m2=computeAreaM2(parcelPolygon.getLatLngs()[0]||parcelPolygon.getLatLngs()); if(m2) area_ha=m2/10000; }
+  showAnalysing();
   try {
     const r = await (await fetch('/api/analyse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({lat,lng,area_ha})})).json();
+    if (r.error){ analyseError(r.error); return; }
     renderRisk(r);
-  } catch(e){}
+  } catch(e){ analyseError('Could not reach the server — please try again.'); }
 }
 
 function renderRisk(r){
