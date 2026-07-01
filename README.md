@@ -1,7 +1,23 @@
+---
+title: Shishoza
+emoji: 🌳
+colorFrom: green
+colorTo: blue
+sdk: docker
+app_port: 5050
+pinned: false
+license: mit
+---
+
 # Shishoza — Rwanda Forest Risk Intelligence
 
 > *Open-data satellite monitoring and localised risk assessment to help
 > Rwandan citizens protect forest **before** cutting.*
+
+> **Live on Hugging Face Spaces (Docker).** This YAML header is the Space
+> config: `sdk: docker` builds the repo `Dockerfile`; `app_port: 5050` matches
+> the port gunicorn binds to. The model is pulled from the Hugging Face Hub at
+> build time, so the Space needs no extra setup.
 
 ---
 

@@ -80,6 +80,10 @@ RUN mkdir -p models \
 RUN python -c "import sqlite3; con=sqlite3.connect('data/database/treesight.db'); con.executescript(open('data/database/seed_alternatives.sql').read()); con.close()" \
  && python scripts/seed_users.py
 
+# Hugging Face Spaces may run the container as a non-root user, so make the
+# dirs the app writes to at runtime (SQLite DB + upload temp) world-writable.
+RUN chmod -R 777 data
+
 # Platform injects $PORT at runtime (Railway / Render) — fall back to 5050 for local
 EXPOSE 5050
 ENV PORT=5050
