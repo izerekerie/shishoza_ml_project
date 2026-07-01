@@ -85,4 +85,4 @@ ENV PORT=5050
 #   --workers ${WEB_CONCURRENCY:-1}  override via env; 1 keeps memory low on the
 #                        cheap tier (the 325 MB model is the dominant cost)
 #   --timeout 90         the OCR path can take 30-60s on a Bugesera-scale PDF
-CMD ["sh", "-c", "gunicorn app_cadastral:app --preload --workers ${WEB_CONCURRENCY:-1} --timeout 90 --bind 0.0.0.0:${PORT:-5050} --access-logfile - --error-logfile -"]
+CMD ["sh", "-c", "gunicorn app_cadastral:app --preload --workers ${WEB_CONCURRENCY:-1} --timeout 180 --bind 0.0.0.0:${PORT:-5050} --access-logfile - --error-logfile -"]
