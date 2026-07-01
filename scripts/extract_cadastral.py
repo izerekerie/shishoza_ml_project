@@ -198,13 +198,14 @@ def extract_coords_from_pdf_image(pdf_path: Path, workdir: Path) -> dict:
     from PIL import Image
 
     doc = fitz.open(str(pdf_path))
-    pix = doc[0].get_pixmap(dpi=300)
+    pix = doc[0].get_pixmap(dpi=200)   # 200 DPI keeps labels legible at far less RAM/time than 300
     img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
 
     w, h = img.size
     # Cadastral diagram occupies the bottom ~50% of page 1. Crop tighter so
     # we don't accidentally OCR the lessee's name/ID into our text buffer.
     cad = img.crop((0, int(h * 0.55), w, h))
+    del img, pix   # release the full-page bitmap before the OCR passes
 
     # OCR pass 1 — horizontal (catches Easting labels at top/bottom of grid)
     p_h = workdir / "_cad_h.png"
@@ -508,9 +509,10 @@ def extract_polygon_from_pdf(pdf_path: Path, workdir: Path) -> dict:
     import fitz
     from PIL import Image
     doc = fitz.open(str(pdf_path))
-    pix = doc[0].get_pixmap(dpi=300)
+    pix = doc[0].get_pixmap(dpi=200)   # 200 DPI keeps labels legible at far less RAM/time than 300
     img = Image.frombytes("RGB", (pix.width, pix.height), pix.samples)
     crop = img.crop((0, int(img.size[1] * 0.55), img.size[0], img.size[1]))
+    del img, pix   # release the full-page bitmap before OpenCV processing
     return extract_polygon_from_pil_image(crop, workdir)
 
 
