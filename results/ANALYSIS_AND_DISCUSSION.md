@@ -101,11 +101,25 @@ parcel, not its 500 m context.
 
 ### RQ4 — How effectively does the system deliver risk at a GPS parcel?
 
-**Partially answered.** Delivery is demonstrated — the app returns a risk reading
-at a GPS-located parcel, with a live satellite pull for that exact parcel. The
-*effectiveness* dimension (speed, usability under poor connectivity) needs a
-short field/usability test to complete; the performance tests already planned
-feed directly into it.
+**Answered** (load + poor-connection tests, full detail in
+`results/performance/RQ4_delivery.md`).
+
+- **Manager delivery is highly effective.** Under gunicorn (production config),
+  the sector-risk endpoint holds **p95 = 39 ms at 50 users** and **p95 = 270 ms
+  at 200 users** — well under the 2 s target, with no breaking point at 200
+  concurrent users (far above the realistic pilot scale). Failures stayed below
+  0.4%.
+- **Poor connections are handled.** The map payload is 168 KB → ~3.4 s on Slow
+  3G, ~0.8 s on Fast 3G. Acceptable for a one-time rural load.
+- **Citizen live analysis is the bottleneck.** The live Earth Engine parcel pull
+  takes ~18 s warm and ~96 s cold — the cold call exceeds the 90 s worker
+  timeout. The nearest-sample fallback answers in under a second. This is a
+  documented limitation: keep the fast fallback as default and make the live pull
+  an explicit action, or cache/region-restrict the Earth Engine query.
+
+So the system delivers manager risk information very effectively and citizen
+information functionally, with a clear, measured fix for the citizen-path
+latency.
 
 ---
 

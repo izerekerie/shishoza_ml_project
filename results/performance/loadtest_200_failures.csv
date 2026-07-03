@@ -1,0 +1,4 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET /,"ConnectionResetError(54, 'Connection reset by peer')",4,2026-07-03T22:22:52Z,2026-07-03T22:23:18Z
+GET,GET /api/me,"ConnectionResetError(54, 'Connection reset by peer')",3,2026-07-03T22:23:10Z,2026-07-03T22:23:18Z
+GET,GET /api/sector-risk,"ConnectionResetError(54, 'Connection reset by peer')",9,2026-07-03T22:23:08Z,2026-07-03T22:23:19Z
