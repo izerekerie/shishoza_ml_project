@@ -1,0 +1,19 @@
+{
+  "method": "3000 sampled national parcels; 25-NN parcel prob + 500 m neighbourhood",
+  "n_parcels": 3000,
+  "parcel_only_distribution": {
+    "LOW": 1586,
+    "HIGH": 1414
+  },
+  "full_distribution": {
+    "HIGH": 1414,
+    "LOW": 1226,
+    "MEDIUM": 360
+  },
+  "n_escalated_by_neighbourhood": 360,
+  "pct_escalated_by_neighbourhood": 12.0,
+  "transitions": {
+    "LOW->MEDIUM": 360
+  },
+  "interpretation": "360 of 3000 parcels (12.0%) were raised to a higher risk level by the 500 m neighbourhood \u2014 clearings a parcel-only permit check would not flag."
+}
