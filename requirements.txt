@@ -1,6 +1,14 @@
+# ── Serialization-critical: PINNED to the exact versions the model was
+#    trained/pickled with. A saved scikit-learn model only unpickles safely
+#    under the same sklearn/numpy/scipy/joblib it was created with — loose
+#    bounds let the deploy install a different version and the model then
+#    either fails to load or loads silently broken. Bump these ONLY when you
+#    retrain and re-save the .pkl in a matching environment.
+numpy==2.4.6
+scipy==1.17.1
+scikit-learn==1.8.0
+joblib==1.5.3
 pandas>=1.5.0
-numpy>=1.23.0
-scikit-learn>=1.2.0
 matplotlib>=3.6.0
 seaborn>=0.12.0
 rasterio>=1.3.0
@@ -12,8 +20,6 @@ jupyter>=1.0.0
 notebook>=6.5.0
 ipykernel>=6.0.0
 tqdm>=4.64.0
-joblib>=1.2.0
-scipy>=1.9.0
 flask>=2.2.0
 flasgger>=0.9.7
 pyproj>=3.4.0
