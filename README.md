@@ -98,8 +98,8 @@ not yet *measured* — it will be re-checked once Hansen releases 2025/2026 loss
 |---|---|
 | **GitHub repo** | https://github.com/izerekerie/shishoza_ml_project |
 | **Demo video & deliverables (Google Drive)** | https://drive.google.com/drive/folders/1e_M-3ZgYuXzDoA0rYtnfsLZew7jWrzK3?usp=sharing |
-| **Live demo (Railway)** | `https://shishoza.up.railway.app` — *deployed, beta: slow first boot / cold start (see §5)* |
-| Swagger UI | `https://shishoza.up.railway.app/apidocs` — or `http://localhost:5050/apidocs` when running locally |
+| **Live demo (Hugging Face Spaces)** | https://kerie1-shishoza.hf.space/citizen — *deployed on a free 16 GB Docker Space (see §5)* |
+| Swagger UI | `https://kerie1-shishoza.hf.space/apidocs` — or `http://localhost:5050/apidocs` when running locally |
 | Dissertation prose | `results/experiments/rq1_writeup.md` |
 
 To clone:
@@ -186,8 +186,8 @@ shishoza/
 │   ├── patch_size_analysis/        RQ2 figure + CSV
 │   └── application/                Precomputed sector_risk.json
 ├── app_cadastral.py               Flask web app entry point
-├── Dockerfile                      Production container (Railway / Render)
-├── railway.json                    Railway deploy config (live platform)
+├── Dockerfile                      Production container (Hugging Face Docker Space)
+├── railway.json                    Legacy Railway config (unused — superseded by HF Spaces)
 ├── render.yaml                     Render blueprint (alternative platform)
 ├── requirements.txt
 ├── README.md                       This file
@@ -268,9 +268,11 @@ Screenshots:
 
 ## 5 · Deployment
 
-**Status: deployed (beta).** The app is live on **Railway** at `https://shishoza.up.railway.app`,
-built from the included `Dockerfile` + `railway.json`. It is honestly a *beta*
-deployment — see [Known limitations](#known-limitations) below.
+**Status: deployed.** The app is live on **Hugging Face Spaces** at
+https://kerie1-shishoza.hf.space, built from the included `Dockerfile` as a
+**Docker Space** (the YAML header at the top of this README *is* the Space config).
+Hugging Face's free CPU Space gives 16 GB RAM, which comfortably holds the model
+plus the OCR/extraction step.
 
 The app is a single Flask service that serves both the web pages and the REST API
 from one process, so it deploys as one web service — no separate frontend host is
@@ -283,10 +285,11 @@ dependencies** (Google Earth Engine and Hansen are only used offline at training
 | File | Role in deployment |
 |---|---|
 | `Dockerfile` | Builds the production image (Python 3.13-slim + tesseract + opencv + gunicorn) |
-| `railway.json` | Railway config: Dockerfile builder, `/api/me` healthcheck, 300 s healthcheck timeout, restart-on-failure |
+| README YAML header | Hugging Face Space config: `sdk: docker` + `app_port: 5050` — tells HF to build the Dockerfile and route traffic to port 5050 |
 | `.dockerignore` | Keeps the build context small (skips notebooks, drafts, `.venv`) |
-| `requirements.txt` | Pins Python deps, including `gunicorn` (production WSGI server) |
-| Hugging Face | The large national model is pulled at build time (kept out of Git) |
+| `requirements.txt` | Pins Python deps to the **exact** versions the model was saved with (sklearn 1.8.0, numpy 2.4.6, …), plus `gunicorn` |
+| `.gitattributes` | Tracks large binaries (`*.pkl`, `*.tif`, `*.geojson`, `*.png`, `*.pdf`) via Git LFS — HF requires binaries to be in LFS |
+| Hugging Face model repo | The large national model (`Kerie1/shishoza_model`) is pulled at build time (kept out of Git) |
 
 ### Environments
 
@@ -294,41 +297,41 @@ dependencies** (Google Earth Engine and Hansen are only used offline at training
 |---|---|---|
 | **Local dev** | `python app_cadastral.py` (Flask dev server) | `http://localhost:5050` |
 | **Local prod-parity** | `docker run` (gunicorn, same image as prod) | `http://localhost:5050` |
-| **Production (target)** | Railway service, auto-deploys on `git push` | `https://shishoza.up.railway.app` |
+| **Production** | Hugging Face Docker Space, rebuilds on `git push` to the Space remote | https://kerie1-shishoza.hf.space |
 
-### Deploy steps (Railway)
+### Deploy steps (Hugging Face Spaces)
 
-1. Push to GitHub (`main`).
-2. Railway → **New Project → Deploy from GitHub repo** → select this repo.
-3. Railway reads `railway.json` and builds from the `Dockerfile` (~6–8 min first build).
-4. Set the `SHISHOZA_SECRET` environment variable (Railway can generate one) before going public.
-5. Railway waits for the `/api/me` healthcheck (timeout raised to 300 s because the
-   model load makes the first boot slow), then routes traffic to the new build.
+1. Create a **Docker Space** at huggingface.co (owner `Kerie1`, name `shishoza`, free 16 GB CPU tier, public).
+2. Add it as a git remote: `git remote add space https://huggingface.co/spaces/Kerie1/shishoza`.
+3. Ensure large binaries are LFS-tracked (`.gitattributes` above); if any were committed before LFS, run
+   `git lfs migrate import --include="*.pkl,*.tif,*.geojson,*.png,*.pdf" --include-ref=refs/heads/main`.
+4. Push: `git push space main` — authenticate with a Hugging Face **write** token as the password.
+   HF reads the README YAML header, builds the `Dockerfile` (~6–8 min first build), pulls the national
+   model, seeds the database, then routes traffic.
 
 ### Verify it before pushing — local Docker (prod parity)
 
 ```bash
 docker build -t shishoza .
 docker run -p 5050:5050 -e PORT=5050 -e SHISHOZA_SECRET=dev shishoza
-# → open http://localhost:5050  (same image Railway runs)
+# → open http://localhost:5050  (same image the Space runs)
 ```
 
 ### Verification done in the target environment
 
-After each deploy, the following were checked on the live Railway URL:
+After each deploy, the following were checked on the live Hugging Face URL:
 
-- `GET /api/me` returns 200 (the healthcheck Railway gates on).
+- The Space **Logs** tab shows `[boot] model has 17 features, classes=[0, 1]` (the model unpickled cleanly).
+- `GET /api/me` returns 200.
 - Landing, `/login`, `/citizen`, `/manager`, `/admin` all render.
 - Login with the demo accounts (§3) succeeds and scopes each manager to their district.
 - `/apidocs` Swagger UI loads and a sample `/api/analyse` call returns a risk classification.
 
-### <a name="known-limitations"></a>Known limitations (why it's "beta")
+### <a name="known-limitations"></a>Known limitations
 
-- **Slow first boot / cold start.** Loading the ~47 MB model + 416 sector polygons
-  pushes boot to ~600 MB and tens of seconds, which is why the healthcheck timeout
-  is 300 s. The first request after an idle period can be slow.
-- **Free-credit ceiling.** Railway's free credit is consumed quickly by an always-on
-  service, so the demo may sleep or stop when credit runs low.
+- **Slow first boot / cold start.** Loading the model + 416 sector polygons takes
+  tens of seconds. On the free tier the Space **pauses after ~48 h of inactivity**
+  and takes a moment to wake on the next visit.
 - For an always-on production pilot, `DEPLOYMENT.md` compares paid options
   (Render Standard, Fly.io, a small VM) with a full cost breakdown.
 
@@ -355,7 +358,7 @@ three specific objectives, evaluated against the published baseline of **F1 > 0.
 | # | Proposal objective | Outcome | Evidence |
 |---|---|---|---|
 | **O1** | Review the literature (2019–26) and collect a balanced, labelled GEE dataset (Sentinel-2 + Sentinel-1 + SRTM + Hansen), province-stratified across all 5 provinces for 2020–2024, with the Nyungwe buffer as the validation case study. | **Met.** A national, province-stratified sample of ~23,300 labelled pixels with the 17-feature schema was exported from Earth Engine; the Nyungwe buffer is retained as the validation zone. | `notebooks/01_GEE_Export_National.js`, `data/processed/`, `results/eda/` |
-| **O2** | Train a Random Forest comparing **4 feature combinations** and integrate the best model into one responsive, Dockerised web app showing deforestation to managers and letting citizens locate their parcel and see tree-loss-since-2020, 500 m neighbourhood recovery, and a HIGH/MEDIUM/LOW risk class *before* a permit. | **Met, with one platform deviation.** Four feature sets (A–D) were compared; the best is **D (all 17 features)**. The Flask app delivers Citizen / Manager / Admin personas, per-parcel risk, the 500 m neighbourhood analysis, and a cut simulation. Deployed Dockerised — on **Railway, not Render** (cost/credit; see §5). | `notebooks/03_Train_Model.ipynb`, `models/rf_D*.pkl`, `app_cadastral.py` |
+| **O2** | Train a Random Forest comparing **4 feature combinations** and integrate the best model into one responsive, Dockerised web app showing deforestation to managers and letting citizens locate their parcel and see tree-loss-since-2020, 500 m neighbourhood recovery, and a HIGH/MEDIUM/LOW risk class *before* a permit. | **Met, with one platform deviation.** Four feature sets (A–D) were compared; the best is **D (all 17 features)**. The Flask app delivers Citizen / Manager / Admin personas, per-parcel risk, the 500 m neighbourhood analysis, and a cut simulation. Deployed Dockerised — on **Hugging Face Spaces, not Render** (free 16 GB tier holds the model; see §5). | `notebooks/03_Train_Model.ipynb`, `models/rf_D*.pkl`, `app_cadastral.py` |
 | **O3** | Evaluate whether the system closes the gap: model **F1 > 0.71**, and the app delivers satellite tree-cover + risk to citizens at their location. | **Met on accuracy; partially met on external validation.** Best model **F1 = 0.83 (5-fold CV) / 0.75 (spatial CV)** — both clear 0.71. The app delivers the information end-to-end. Cross-district out-of-sample validation (RQ4) is still pending. | `results/metrics/`, `RQ_FINDINGS_DRAFT.md` |
 
 ### How the headline result was achieved
@@ -386,8 +389,9 @@ research questions decompose *why* it works:
   publishes those labels (see §1).
 - **RQ4 (multi-district out-of-sample validation) is pending** — it needs a
   real-coordinate sample (e.g. from RNLA) outside the training footprint.
-- **Deployment platform changed** from the proposal's Render to **Railway** (cost /
-  free-credit reasons); the deviation and alternatives are documented in §5 and `DEPLOYMENT.md`.
+- **Deployment platform changed** from the proposal's Render to **Hugging Face Spaces**
+  (the free 16 GB Docker Space holds the ~1 GB in-memory model, where Railway's 512 MB
+  free tier could not); the deviation and alternatives are documented in §5 and `DEPLOYMENT.md`.
 - **Citizen parcel location** is implemented via land-certificate upload and manual
   coordinate entry rather than the pure browser-GPS flow described in the proposal.
 
