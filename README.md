@@ -55,7 +55,7 @@ The system answers four research questions:
 | RQ1 | Optimal combination of S2 / S1 / SRTM features? | Answered — `results/experiments/rq1_writeup.md` |
 | RQ2 | Accuracy degradation at smallholder patch sizes? | Answered — `results/patch_size_analysis/` |
 | RQ3 | Does 500 m neighbourhood improve over parcel-only analysis? | Answered — `RQ_FINDINGS_DRAFT.md` (implemented in app) |
-| RQ4 | Out-of-sample validation across districts? | Pending — needs RNLA real-coordinate sample |
+| RQ4 | Out-of-sample validation across districts? | In progress — validated on 10 citizen-collected parcels (RNLA data access not granted) |
 
 ### Training data vs live data — why they use different years
 
@@ -359,7 +359,7 @@ three specific objectives, evaluated against the published baseline of **F1 > 0.
 |---|---|---|---|
 | **O1** | Review the literature (2019–26) and collect a balanced, labelled GEE dataset (Sentinel-2 + Sentinel-1 + SRTM + Hansen), province-stratified across all 5 provinces for 2020–2024, with the Nyungwe buffer as the validation case study. | **Met.** A national, province-stratified sample of ~23,300 labelled pixels with the 17-feature schema was exported from Earth Engine; the Nyungwe buffer is retained as the validation zone. | `notebooks/01_GEE_Export_National.js`, `data/processed/`, `results/eda/` |
 | **O2** | Train a Random Forest comparing **4 feature combinations** and integrate the best model into one responsive, Dockerised web app showing deforestation to managers and letting citizens locate their parcel and see tree-loss-since-2020, 500 m neighbourhood recovery, and a HIGH/MEDIUM/LOW risk class *before* a permit. | **Met, with one platform deviation.** Four feature sets (A–D) were compared; the best is **D (all 17 features)**. The Flask app delivers Citizen / Manager / Admin personas, per-parcel risk, the 500 m neighbourhood analysis, and a cut simulation. Deployed Dockerised — on **Hugging Face Spaces, not Render** (free 16 GB tier holds the model; see §5). | `notebooks/03_Train_Model.ipynb`, `models/rf_D*.pkl`, `app_cadastral.py` |
-| **O3** | Evaluate whether the system closes the gap: model **F1 > 0.71**, and the app delivers satellite tree-cover + risk to citizens at their location. | **Met on accuracy; partially met on external validation.** Best model **F1 = 0.83 (5-fold CV) / 0.75 (spatial CV)** — both clear 0.71. The app delivers the information end-to-end. Cross-district out-of-sample validation (RQ4) is still pending. | `results/metrics/`, `RQ_FINDINGS_DRAFT.md` |
+| **O3** | Evaluate whether the system closes the gap: model **F1 > 0.71**, and the app delivers satellite tree-cover + risk to citizens at their location. | **Met on accuracy; partially met on external validation.** Best model **F1 = 0.83 (5-fold CV) / 0.75 (spatial CV)** — both clear 0.71. The app delivers the information end-to-end. Cross-district out-of-sample validation (RQ4) is in progress on a ten-parcel citizen-collected sample. | `results/metrics/`, `RQ_FINDINGS_DRAFT.md` |
 
 ### How the headline result was achieved
 
@@ -377,23 +377,44 @@ research questions decompose *why* it works:
   evidence, plus a forward cut-simulation with a ~6–8 year recovery estimate, that a
   single-parcel permit review cannot see.
 
-### Honest gaps — where results fall short of the proposal
+### Limitations
 
-- **Two F1 numbers, reported honestly.** Random / 5-fold CV gives ≈ 0.79–0.83;
-  **spatial CV** (train and test on geographically separate blocks) gives ≈ **0.75**.
-  Spatial CV is the defensible generalization figure and is the one to quote — it
-  still beats the 0.71 baseline, but the gap is smaller than a random split suggests.
-- **Live-scoring accuracy is assumed, not measured.** The model is validated on
-  2020–2024 Hansen labels and *applied* to current 2025–26 imagery; there is no
-  2025–26 ground truth yet, so live accuracy will only be confirmed when Hansen
-  publishes those labels (see §1).
-- **RQ4 (multi-district out-of-sample validation) is pending** — it needs a
-  real-coordinate sample (e.g. from RNLA) outside the training footprint.
-- **Deployment platform changed** from the proposal's Render to **Hugging Face Spaces**
-  (the free 16 GB Docker Space holds the ~1 GB in-memory model, where Railway's 512 MB
-  free tier could not); the deviation and alternatives are documented in §5 and `DEPLOYMENT.md`.
-- **Citizen parcel location** is implemented via land-certificate upload and manual
-  coordinate entry rather than the pure browser-GPS flow described in the proposal.
+**Accuracy is reported under two cross-validation schemes.** A random 5-fold split
+gives F1 of about 0.79 to 0.83; a spatial cross-validation, which trains and tests
+on geographically separate blocks, gives about 0.75. The spatial figure is the more
+conservative and defensible measure of real-world generalization, and is the one
+quoted throughout. It still exceeds the 0.71 baseline, though by a narrower margin
+than a random split implies.
+
+**Live-scoring accuracy is estimated rather than independently measured.** The live
+map and parcel lookup run the model on current 2025–2026 Sentinel imagery and return
+genuine model predictions. Their accuracy cannot yet be quantified, because computing
+an F1 requires ground-truth labels and Hansen Global Forest Change has not yet
+published 2025–2026 forest loss. The reported F1 (0.75 spatial, 0.83 cross-validation)
+is measured on 2020–2024 labels and stands as the best available estimate of live
+performance until those labels are released, at which point it will be re-verified
+(see §1).
+
+**External validation uses a small field sample.** Access to Rwanda National Land
+Authority (RNLA) parcel records was not granted within the project window. Out-of-sample
+validation is therefore carried out on ten real parcels collected directly from
+citizens in the study area, consistent with the ten-parcel validation plan in the
+proposal. This validation is in progress.
+
+### Deliberate design decisions that differ from the proposal
+
+**Deployment platform.** The proposal named Render; the system is deployed on Hugging
+Face Spaces. The free 16 GB Docker Space accommodates the roughly 1 GB in-memory model,
+whereas the 512 MB free tiers of Render and Railway could not. The rationale and
+alternatives are documented in §5 and `DEPLOYMENT.md`.
+
+**Parcel-location method.** The proposal described a browser-GPS flow; the delivered
+system centres on land-certificate upload and manual coordinate entry. This is a
+deliberate, context-driven choice. Rwandan landowners are frequently not physically
+present on the parcel they want to check, because plots are commonly located away from
+where a person lives, so on-site GPS is impractical as the primary method. Certificate
+upload and coordinate entry let a citizen assess any parcel from anywhere, and
+browser-GPS remains available as a convenience for users who are on their land.
 
 ### Linkage to project scope
 
