@@ -103,6 +103,16 @@ _EE_READY = False
 _EE_IMG   = None     # cached 17-band feature image
 _EE_TRIED = False     # only attempt init once unless it succeeds
 
+# The live Earth Engine pull composites Sentinel imagery on Google's servers and
+# can take 30-90s (or stall). We run it in a worker thread and abandon it after
+# LIVE_EE_TIMEOUT_S, so a slow/hung EE never stalls the request — it just drops to
+# the instant local nearest-sample path. Tune the cap on the Space with the
+# LIVE_EE_TIMEOUT_S env var (no redeploy needed to change it).
+from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import TimeoutError as _EETimeout
+LIVE_EE_TIMEOUT_S = float(os.environ.get("LIVE_EE_TIMEOUT_S", "8"))
+_EE_POOL = ThreadPoolExecutor(max_workers=4)
+
 
 def _ee_build_feature_image(ee):
     """Build the same 17-band feature image as 02b_GEE_Export_Sectors_Current.js."""
@@ -413,7 +423,7 @@ swagger = Swagger(app, template={
         "title": "Shishoza Rwanda — Deforestation Risk API",
         "description": (
             "Backend for the Shishoza MVP. Given a land parcel (from an uploaded "
-            "land-title PDF/photo, manual coordinates, or a lat/lng), it predicts "
+            "land-title PDF/photo, manual coordinates, or a lat/lng), it assesses "
             "deforestation risk with a tuned Random Forest (Experiment D, F1≈0.79), "
             "forward-simulates a proposed cut, and returns vetted alternatives. "
             "Final-year capstone — Shishoza Rwanda, ALU."
@@ -423,7 +433,7 @@ swagger = Swagger(app, template={
     },
     "tags": [
         {"name": "Parcel input", "description": "Turn a document or coordinates into a location"},
-        {"name": "Risk analysis", "description": "Predict and simulate deforestation risk"},
+        {"name": "Risk analysis", "description": "Assess and simulate deforestation risk"},
         {"name": "Guidance", "description": "Alternatives and sector-level dashboards"},
     ],
 })
@@ -1027,7 +1037,7 @@ def api_simulate():
 
 @app.post("/api/analyse")
 def api_analyse():
-    """Predict deforestation risk for a parcel at a given location.
+    """Assess deforestation risk for a parcel at a given location.
     Looks up the nearest trained pixel, runs the tuned Random Forest, applies
     the three-rule risk classifier, and returns the parcel + neighbourhood state.
     The returned analysis_id can then be passed to /api/simulate and /api/alternatives.
@@ -1082,7 +1092,13 @@ def api_analyse():
     result = None
     if _ensure_ee():
         try:
-            result = analyse_parcel_live(lat, lng, area_ha=area_ha)
+            # Cap the live pull: run it in a thread and give up after the timeout,
+            # so a slow/hung Earth Engine drops to the instant local path instead
+            # of stalling the request for 30-90s.
+            result = _EE_POOL.submit(analyse_parcel_live, lat, lng, area_ha).result(
+                timeout=LIVE_EE_TIMEOUT_S)
+        except _EETimeout:
+            print(f"[warn] live EE pull exceeded {LIVE_EE_TIMEOUT_S}s — using fast local fallback")
         except Exception as e:
             print(f"[warn] live parcel analysis failed, falling back ({e})")
     if result is None:
