@@ -124,12 +124,13 @@
 <div class="p-3 bg-white rounded-xl border border-outline-variant/30 text-center"><p class="font-label-sm text-label-sm text-outline mb-1.5" data-i18n="parcel_risk_lbl">Your parcel</p><span class="inline-block px-2.5 py-0.5 text-on-primary font-label-sm text-label-sm font-bold rounded-full" id="parcelRisk" style="background:#6b7280;">—</span></div>
 <div class="p-3 bg-white rounded-xl border border-outline-variant/30 text-center"><p class="font-label-sm text-label-sm text-outline mb-1.5" data-i18n="nbr_risk_lbl">Neighbourhood (500m)</p><span class="inline-block px-2.5 py-0.5 text-on-primary font-label-sm text-label-sm font-bold rounded-full" id="nbrRisk" style="background:#6b7280;">—</span></div>
 </div>
+<p id="riskVerdict" class="leading-relaxed px-1" style="font-size:13px;"></p>
 <div class="p-4 bg-white rounded-xl border border-outline-variant/30">
 <div class="flex justify-between items-end mb-2"><p class="font-label-sm text-label-sm text-outline" data-i18n="defo_prob">Chance of tree loss</p><p class="font-headline-md text-headline-md font-bold tabular-nums" id="defProb" style="color:#DC2626">—</p></div>
 <div class="w-full bg-outline-variant/20 h-1.5 rounded-full overflow-hidden"><div class="h-full" id="defProbBar" style="width:0%;background:#DC2626"></div></div>
 </div>
 <div class="grid grid-cols-2 gap-3">
-<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1" data-i18n="tree_cover">Tree cover</p><p class="font-title-lg text-title-lg text-primary tabular-nums font-bold" id="treeCover">—</p></div>
+<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1" data-i18n="tree_cover">Trees on your land</p><p class="font-title-lg text-title-lg text-primary tabular-nums font-bold" id="treeCover">—</p><p class="text-outline mt-1" style="font-size:10px;line-height:1.3" data-i18n="tree_cover_help">Share of your land shaded by tree canopy, seen from satellite</p></div>
 <div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1" data-i18n="tree_health">Tree health 2020→today</p><p class="font-title-lg text-title-lg tabular-nums font-bold" id="ndviTrend">—</p><p class="font-label-sm text-label-sm text-outline mt-0.5" id="ndviDir" style="font-size:11px;"></p></div>
 </div>
 <p class="font-label-sm text-label-sm text-outline" id="confNote"></p>
@@ -182,8 +183,12 @@ const STRINGS = {
     lbl_easting:'Easting', lbl_northing:'Northing', lbl_area:'Surface area m² (optional)',
     manual_submit:'Use these coordinates', inventory_title:'Land Data Inventory',
     lbl_surface:'Surface Area', lbl_location:'Location', lbl_latlng:'Lat / Lng',
-    defo_prob:'Chance of tree loss', tree_cover:'Tree cover', tree_health:'Tree cover 2020→today',
+    defo_prob:'Chance of tree loss', tree_cover:'Trees on your land', tree_health:'Tree cover 2020→today',
+    tree_cover_help:'Share of your land shaded by tree canopy, seen from satellite',
     parcel_risk_lbl:'Your parcel', nbr_risk_lbl:'Neighbourhood (500m)',
+    verdict_concern:'Trees are being cleared in your area too — cutting here adds to a wider problem.',
+    verdict_local:'Your land has tree cover worth protecting, but the surrounding area is stable — this is mainly a personal choice, not a sign of wider clearing.',
+    verdict_low:'Your land has little tree cover that a cut would remove.',
     ndvi_up:'Forest recovering', ndvi_down:'Forest declining', ndvi_flat:'Forest stable',
     conf_label:'Data accuracy',
     conf_high:'Good — results are reliable for this area',
@@ -191,7 +196,7 @@ const STRINGS = {
     conf_low:'Limited — use results with caution',
     disclaimer:'These results describe the area around your land — not your exact plot. Based on satellite data (2020–2024), not a live reading.',
     sim_title:'Simulate a Cut', target_area:'Area to clear', run_sim:'Run Simulation',
-    risk_after:'Risk if you cut', cover_after:'Tree cover after cut',
+    risk_after:'Impact if you cut', cover_after:'Trees left after cutting',
     alt_title:'Why are you considering cutting?',
     reason_fw:'Firewood', reason_tm:'Timber', reason_fa:'Farming', reason_in:'Income',
     no_sugg:'No suggestions found for that reason.',
@@ -208,7 +213,11 @@ const STRINGS = {
     lbl_easting:'Ubuso bw\'Ubumanuko', lbl_northing:'Ubuso bw\'Amajyaruguru', lbl_area:'Ubuso mu m² (bisabwa)',
     manual_submit:'Koresha izi ntego', inventory_title:'Amakuru y\'Ubutaka',
     lbl_surface:'Ubuso bw\'Ubutaka', lbl_location:'Aho biherereye', lbl_latlng:'Lat / Lng',
-    defo_prob:'Amahirwe yo kubura ibiti', tree_cover:'Ibiti bihari ubu', tree_health:'Ubuzima bw\'ibiti 2020→ubu',
+    defo_prob:'Amahirwe yo kubura ibiti', tree_cover:'Ibiti biri ku butaka bwawe', tree_health:'Ubuzima bw\'ibiti 2020→ubu',
+    tree_cover_help:'Igice cy\'ubutaka bwawe gitwikiriwe n\'ibiti, kigaragara kuri satelite',
+    verdict_concern:'Hari n\'ibindi biti biri gutemwa mu karere kawe — gukata aha byongera ikibazo.',
+    verdict_local:'Ubutaka bwawe bufite ibiti bikwiye kurindwa, ariko akarere gakikije karahamye — iki ni icyemezo cyawe bwite, si ikimenyetso cyo gutema kwinshi.',
+    verdict_low:'Ubutaka bwawe bufite ibiti bike byakurwaho no gukata.',
     ndvi_up:'Ishyamba rireba', ndvi_down:'Ishyamba rigabanuka', ndvi_flat:'Ishyamba ntirigenda ryaragera',
     conf_label:'Ubukanwe bw\'amakuru',
     conf_high:'Buhagije — ibisubizo ni ukuri kuri aka karere',
@@ -216,7 +225,7 @@ const STRINGS = {
     conf_low:'Bukeya — fata ibisubizo witewe',
     disclaimer:'Ibisubizo biri aha bisobanura akarere kandi k\'ubutaka bwawe — si parcelle nyayo. Bivuye kuri satelite (2020–2024), si isoma ry\'igihe.',
     sim_title:'Gerageza Gukata', target_area:'Ubuso bw\'ugukata', run_sim:'Kora Gerageza',
-    risk_after:'Inzara nyuma yo gukata', cover_after:'Ibiti nyuma yo gukata',
+    risk_after:'Ingaruka yo gukata', cover_after:'Ibiti bisigara nyuma yo gukata',
     alt_title:'Kuki witeguye gukata?',
     reason_fw:'Inkwi', reason_tm:'Ibiti by\'imbaho', reason_fa:'Ubuhinzi', reason_in:'Umusaruro',
     no_sugg:'Nta makuru yo gusubiza kuri iyo mpamvu.',
@@ -233,7 +242,11 @@ const STRINGS = {
     lbl_easting:'Coordonnée Est', lbl_northing:'Coordonnée Nord', lbl_area:'Surface m² (facultatif)',
     manual_submit:'Utiliser ces coordonnées', inventory_title:'Données du Terrain',
     lbl_surface:'Surface du terrain', lbl_location:'Localisation', lbl_latlng:'Lat / Lng',
-    defo_prob:'Risque de perte d\'arbres', tree_cover:'Couverture arborée', tree_health:'Santé des arbres 2020→auj.',
+    defo_prob:'Risque de perte d\'arbres', tree_cover:'Arbres sur votre terrain', tree_health:'Santé des arbres 2020→auj.',
+    tree_cover_help:'Part de votre terrain couverte par la canopée, vue par satellite',
+    verdict_concern:'Des arbres sont aussi abattus dans votre zone — couper ici aggrave un problème plus large.',
+    verdict_local:'Votre terrain a une couverture arborée à protéger, mais la zone environnante est stable — c\'est surtout un choix personnel, pas un signe de déboisement plus large.',
+    verdict_low:'Votre terrain a peu de couverture arborée qu\'une coupe supprimerait.',
     ndvi_up:'Forêt en récupération', ndvi_down:'Forêt en déclin', ndvi_flat:'Forêt stable',
     conf_label:'Fiabilité des données',
     conf_high:'Bonne — les résultats sont fiables pour cette zone',
@@ -241,7 +254,7 @@ const STRINGS = {
     conf_low:'Limitée — utilisez les résultats avec précaution',
     disclaimer:'Ces résultats décrivent la zone autour de votre terrain — pas exactement votre parcelle. Basé sur des données satellites (2020–2024), pas une lecture en direct.',
     sim_title:'Simuler une Coupe', target_area:'Surface à déboiser', run_sim:'Lancer la Simulation',
-    risk_after:'Risque si vous coupez', cover_after:'Couverture après coupe',
+    risk_after:'Impact si vous coupez', cover_after:'Arbres restants après la coupe',
     alt_title:'Pourquoi envisagez-vous de couper?',
     reason_fw:'Bois de chauffe', reason_tm:'Bois d\'œuvre', reason_fa:'Agriculture', reason_in:'Revenus',
     no_sugg:'Aucune suggestion trouvée pour cette raison.',
@@ -267,6 +280,7 @@ function setLang(code){
   });
   if(lastAnalysis){
     document.getElementById('confNote').textContent=confNoteText(lastAnalysis);
+    renderVerdict(lastAnalysis);
     // disclaimer kept in dissertation, not shown in UI
   }
   document.documentElement.lang=code;
@@ -421,6 +435,19 @@ async function analyse(){
   } catch(e){ analyseError('Could not reach the server — please try again.'); }
 }
 
+// Plain-language combined verdict. Fixes the "red HIGH parcel next to green LOW
+// neighbourhood" false alarm: only sounds real concern when the wider area is
+// also being cleared; otherwise it reassures the user this is a local choice.
+function renderVerdict(r){
+  const vEl=document.getElementById('riskVerdict'); if(!vEl) return;
+  const P=r.parcel_risk, N=r.neighbourhood_risk;
+  let key, col;
+  if(N==='HIGH'){ key='verdict_concern'; col='#b45309'; }
+  else if(P==='HIGH'||P==='MEDIUM'){ key='verdict_local'; col='#4b5563'; }
+  else { key='verdict_low'; col='#15803d'; }
+  vEl.textContent=t(key); vEl.style.color=col;
+}
+
 function renderRisk(r){
   lastAnalysis=r;
   const c=rc(r.risk_level);
@@ -431,6 +458,7 @@ function renderRisk(r){
   const badge=document.getElementById('riskBadge'); badge.textContent=r.risk_level+' RISK'; badge.style.background=c;
   setSubBadge('parcelRisk', r.parcel_risk);
   setSubBadge('nbrRisk', r.neighbourhood_risk);
+  renderVerdict(r);
   const dp=document.getElementById('defProb'); dp.textContent=(r.deforestation_prob*100).toFixed(1)+'%'; dp.style.color=c;
   const bar=document.getElementById('defProbBar'); bar.style.width=(r.deforestation_prob*100).toFixed(1)+'%'; bar.style.background=c;
   document.getElementById('treeCover').textContent=r.tree_cover_pct.toFixed(0)+'%';
