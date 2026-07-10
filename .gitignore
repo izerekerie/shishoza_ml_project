@@ -117,3 +117,6 @@ models/rf_D_tuned.pkl
 
 # Local deploy notes — personal step-by-step, kept out of the public repo
 DEPLOY_HUGGINGFACE.md
+
+# Personal research data-collection form (kept local, not published)
+DATA_COLLECTION_FORM.md
