@@ -1,34 +1,22 @@
 {
-  "model_version": "rf_D_tuned_v1.0.0",
-  "trained_at": "2026-06-10",
-  "search_seconds": 403.2,
   "search_combinations": 96,
   "cv_folds": 5,
-  "total_fits": 480,
   "best_params": {
     "max_depth": 25,
     "max_features": "sqrt",
     "min_samples_leaf": 1,
     "n_estimators": 800
   },
-  "best_cv_f1": 0.7832850283444202,
-  "best_cv_f1_std": 0.013292127863510254,
+  "best_cv_f1": 0.8394,
   "test_metrics_baseline": {
-    "f1": 0.7935891209324915,
-    "precision": 0.7714825306893296,
-    "recall": 0.817,
-    "auc": 0.8660479999999999
+    "f1": 0.8326,
+    "precision": 0.8244,
+    "recall": 0.8409
   },
   "test_metrics_tuned": {
-    "f1": 0.790583619421285,
-    "precision": 0.7757459095283927,
-    "recall": 0.806,
-    "auc": 0.8680194999999999
+    "f1": 0.8363,
+    "precision": 0.8331,
+    "recall": 0.8397
   },
-  "delta_vs_baseline": {
-    "f1": -0.0030055015112064876,
-    "precision": 0.004263378839063137,
-    "recall": -0.010999999999999899,
-    "auc": 0.001971500000000015
-  }
+  "f1_delta_tuned_minus_baseline": 0.0038
 }

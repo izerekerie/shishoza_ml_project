@@ -12,6 +12,8 @@
 .venv/
 venv/
 env/
+# local secrets (SMTP etc.); .env.example stays committed
+.env
 .vscode/
 .claude/
 .idea/
@@ -56,6 +58,9 @@ scripts/apply_proposal_fixes.py
 scripts/gen_diagram_descriptions.py
 scripts/revert8_and_ethics.py
 scripts/rewrite_descriptions.py
+# supervisor-doc generators (not reproducible-pipeline steps)
+scripts/make_supervisor_doc.py
+scripts/make_supervisor_ppt.py
 
 # ── Derivative bundle (regenerable from results/) ──────────────────
 ml_deliverables/

@@ -1,0 +1,57 @@
+{
+  "n_samples": 23319,
+  "n_features": 17,
+  "feature_set": "Experiment D (all 17)",
+  "class_balance_loss_pct": 51.5,
+  "random_cv": "StratifiedKFold(5)",
+  "spatial_cv": "KMeans(10 blocks on lat/lng) + GroupKFold(5)",
+  "n_estimators": 400,
+  "results": {
+    "Random Forest": {
+      "random_cv": {
+        "f1": 0.8360097378680835,
+        "f1_std": 0.004257406976152222,
+        "precision": 0.8357746451385552,
+        "recall": 0.8362914063584619
+      },
+      "spatial_cv": {
+        "f1": 0.7523854755748663,
+        "f1_std": 0.07778600308959127,
+        "precision": 0.7713961878566555,
+        "recall": 0.7426801259707864
+      },
+      "size_mb": 32.75
+    },
+    "XGBoost": {
+      "random_cv": {
+        "f1": 0.8457054184989792,
+        "f1_std": 0.0034365109828754293,
+        "precision": 0.8432412856061848,
+        "recall": 0.848204394002499
+      },
+      "spatial_cv": {
+        "f1": 0.7666051208350704,
+        "f1_std": 0.06766045989365553,
+        "precision": 0.786323040488309,
+        "recall": 0.7555975892321743
+      },
+      "size_mb": 0.58
+    },
+    "LightGBM": {
+      "random_cv": {
+        "f1": 0.8430106378158111,
+        "f1_std": 0.0034368876726091754,
+        "precision": 0.840526716918982,
+        "recall": 0.8455383867832846
+      },
+      "spatial_cv": {
+        "f1": 0.7571176342962158,
+        "f1_std": 0.07217398474492553,
+        "precision": 0.7802181801199244,
+        "recall": 0.7424266148249721
+      },
+      "size_mb": 1.22
+    }
+  },
+  "best_by_spatial_f1": "XGBoost"
+}
