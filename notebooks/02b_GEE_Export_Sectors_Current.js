@@ -101,14 +101,14 @@ print('Sampled forest pixels (current features):', allPts.size());
 // ── EXPORT ──────────────────────────────────────────────────
 Export.table.toDrive({
   collection: allPts,
-  description: 'TreeSight_Sector_Features_Current',
-  folder: 'TreeSight_Rwanda',
+  description: 'Shishoza_Sector_Features_Current',
+  folder: 'Shishoza_Rwanda',
   fileNamePrefix: 'sector_features_current',
   fileFormat: 'CSV'
 });
 print('==============================================');
 print('Queued. Open Tasks (top right) and RUN');
-print('  TreeSight_Sector_Features_Current.');
+print('  Shishoza_Sector_Features_Current.');
 print('Then: data/raw/sector_features_current.csv  →');
 print('  .venv/bin/python scripts/precompute_sector_current.py');
 print('==============================================');

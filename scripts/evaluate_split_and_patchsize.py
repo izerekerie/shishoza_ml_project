@@ -68,7 +68,7 @@ print(f"   train: {len(train_idx):,}   test: {len(test_idx):,}")
 #  is a valid partition.)
 overlap = set(train_idx) & set(test_idx)
 print(f"   train ∩ test (must be 0): {len(overlap)} pixels   "
-      f"{'✅ no leakage' if len(overlap) == 0 else '❌ LEAKAGE'}")
+      f"{'no leakage' if len(overlap) == 0 else 'LEAKAGE'}")
 
 # Class balance preserved by stratification?
 def class_dist(idx):
@@ -225,4 +225,4 @@ audit = {
 (HERE / "results" / "metrics" / "evaluation_split_audit.json").write_text(json.dumps(audit, indent=2))
 print(f"   → data/evaluation_audit.json")
 
-print("\n✓ Done. Two RESEARCH_TODO items closed (#1 split honesty, #2 RQ2 patch-size).")
+print("\nDone. Two RESEARCH_TODO items closed (#1 split honesty, #2 RQ2 patch-size).")

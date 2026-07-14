@@ -1,5 +1,5 @@
 -- ============================================================
--- TreeSight — seed_users.sql
+-- Shishoza — seed_users.sql
 -- USERS table per the ERD design (Chapter 3, Figure 3.5).
 -- bcrypt password hashes for production-grade security.
 -- Run via the scripts/seed_users.py helper because bcrypt hashes

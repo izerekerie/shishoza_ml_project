@@ -18,7 +18,7 @@
 //   2. Paste this entire script, press RUN
 //   3. Read the per-province counts printed in the Console
 //   4. Open Tasks panel (top right) — click RUN on the CSV task
-//   5. Download from Google Drive: TreeSight_Rwanda/training_data_national.csv
+//   5. Download from Google Drive: Shishoza_Rwanda/training_data_national.csv
 //   6. Put it in data/raw/  and retrain (notebook 03)
 //
 // TARGET: ~3,000 deforested + ~3,000 stable per province
@@ -194,8 +194,8 @@ print('Training rows with features:', training_data.size());
 // ── EXPORT: the national training CSV (the file you need) ────
 Export.table.toDrive({
   collection: training_data,
-  description: 'TreeSight_Training_Data_National',
-  folder: 'TreeSight_Rwanda',
+  description: 'Shishoza_Training_Data_National',
+  folder: 'Shishoza_Rwanda',
   fileNamePrefix: 'training_data_national',
   fileFormat: 'CSV'
 });
@@ -203,14 +203,14 @@ Export.table.toDrive({
 // ── OPTIONAL national imagery (large; delete tasks if not needed) ──
 // Export.image.toDrive({
 //   image: s2_train.select(['B4','B3','B2']),
-//   description: 'TreeSight_RGB_National', folder: 'TreeSight_Rwanda',
+//   description: 'Shishoza_RGB_National', folder: 'Shishoza_Rwanda',
 //   fileNamePrefix: 'rwanda_s2_rgb', region: rwanda, scale: 30,
 //   crs: 'EPSG:4326', maxPixels: 1e9
 // });
 
 print('==============================================');
 print('National export queued. Open Tasks (top right) and RUN');
-print('  TreeSight_Training_Data_National.');
+print('  Shishoza_Training_Data_National.');
 print('If a province returns < ~1000 deforested points, raise');
 print('DEFOR_OVERSAMPLE (e.g. to 1e6) and re-run.');
 print('==============================================');

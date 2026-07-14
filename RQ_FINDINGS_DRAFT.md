@@ -64,7 +64,7 @@ below 0.09 ha is sub-pixel at 30 m and not assessed (true of every 30 m product,
 **Answer: It situates a parcel in its surroundings, adding cumulative-pressure and
 recovery-trajectory evidence that a single-parcel permit review cannot see.**
 
-A standard clearing permit assesses one parcel in isolation. TreeSight additionally computes, for
+A standard clearing permit assesses one parcel in isolation. Shishoza additionally computes, for
 the ~500 m neighbourhood around the parcel (via the K-nearest sampled pixels — see D-001):
 
 - **`deforested_pct_500m`** — the share of the surrounding area already classified as deforested,

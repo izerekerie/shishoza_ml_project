@@ -23,8 +23,7 @@ license: mit
 
 ## 1 · Description
 
-Shishoza (Kinyarwanda for *guardian / protector*) is a BSc Software
-Engineering capstone (African Leadership University) that addresses the
+**Shishoza** (Kinyarwanda for *guardian / protector*) addresses the
 core gap in Rwanda's smallholder deforestation: most clearings are below
 the 1-hectare detection threshold of published global forest monitoring,
 so they're invisible until after the trees are gone.
@@ -83,12 +82,31 @@ is no 2025/2026 ground truth yet, so the model is *trained and validated* on
 standard practice: learn from the labeled past, predict on the unlabeled present,
 re-validate when new labels are published.
 
-**Honest caveat:** F1 = 0.83 is measured on 2023–24 labels. Applying the model to
-2025–26 is slightly beyond the validated window, so live accuracy is *assumed*,
-not yet *measured* — it will be re-checked once Hansen releases 2025/2026 loss.
+**Limitation on live-scoring accuracy.** The reported F1 of 0.83 is measured on
+2023–2024 Hansen labels. Applying the model to 2025–2026 imagery lies just beyond the
+validated window, so live-period accuracy is estimated rather than measured; it will
+be re-evaluated once Hansen publishes 2025–2026 forest-loss labels.
 
 > Refresh the live sector map by running `notebooks/02b_GEE_Export_Sectors_Current.js`
 > in Earth Engine, then `scripts/precompute_sector_current.py`.
+
+### Cut simulation (forward projection)
+
+Before committing to a clearing, a citizen can simulate its effect on their parcel.
+Given the fraction of the parcel to be cut, the post-cut NDVI is projected as a linear
+mix of the current vegetation and a literature-based cleared-land value:
+
+```
+f                = cut_area_ha / parcel_area_ha            # fraction of the parcel cleared
+NDVI_after       = (1 − f) · NDVI_current + f · NDVI_cleared     # NDVI_cleared = 0.20
+tree_cover_after = 100 · NDVI_after
+```
+
+The three-rule risk classifier is then re-run on the projected values to show the
+risk level *after* the proposed cut, together with an indicative recovery time of
+about 6–8 years derived from the 2020–2022 to 2024 Hansen recovery trend. The
+cleared-land reference (NDVI ≈ 0.20) follows Pettorelli (2013) and Mugabowindekwe et
+al. (2024) for freshly cleared tropical land.
 
 ---
 
@@ -330,11 +348,13 @@ After each deploy, the following were checked on the live Hugging Face URL:
 
 ### <a name="known-limitations"></a>Known limitations
 
-- **Slow first boot / cold start.** Loading the model + 416 sector polygons takes
-  tens of seconds. On the free tier the Space **pauses after ~48 h of inactivity**
-  and takes a moment to wake on the next visit.
-- For an always-on production pilot, `DEPLOYMENT.md` compares paid options
-  (Render Standard, Fly.io, a small VM) with a full cost breakdown.
+- **Cold-start latency.** On the first request the application loads the model and
+  the 416 sector polygons into memory, which takes on the order of tens of seconds.
+  On the free tier the Space also suspends after approximately 48 hours of inactivity
+  and restarts on the next request.
+- An always-on production pilot would run on a paid tier; `DEPLOYMENT.md` compares the
+  options (Render Standard, Fly.io, a small virtual machine) with an indicative cost
+  breakdown.
 
 ### Run locally without Docker (plain Python — see §3 for prerequisites)
 
@@ -351,7 +371,7 @@ python app_cadastral.py
 
 ## 6 · Results & analysis against proposal objectives
 
-This section maps each **specific objective** from the capstone proposal to what
+This section maps each **specific objective** from the project proposal to what
 was actually delivered, with honest notes where results deviate. The proposal set
 three specific objectives, evaluated against the published baseline of **F1 > 0.71**
 (Ygorra et al. 2024, the best international result for small-scale deforestation).
@@ -430,8 +450,6 @@ no existing Rwandan tool offers before a clearing decision is made.
 
 ## License
 
-This project is part of an undergraduate research deliverable at
-African Leadership University. All third-party tools used are
-open-source (MIT, BSD, or Apache 2.0). Satellite imagery is provided
-under the European Space Agency, USGS, and University of Maryland open
-data licences for academic use.
+All third-party tools used are open-source (MIT, BSD, or Apache 2.0).
+Satellite imagery is provided under the European Space Agency, USGS, and
+University of Maryland open data licences.

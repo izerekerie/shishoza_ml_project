@@ -153,4 +153,4 @@ A noteworthy by-finding for the literature is that **terrain features contribute
 (HERE / "results" / "experiments" / "rq1_writeup.md").write_text(writeup)
 print(f"→ {HERE / 'data' / 'rq1_writeup.md'}")
 
-print("\n✓ RQ1 closed. Drop the writeup file into Chapter 4.")
+print("\nRQ1 closed. Drop the writeup file into Chapter 4.")

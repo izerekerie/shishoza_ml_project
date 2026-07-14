@@ -1,5 +1,5 @@
 -- ============================================================
--- TreeSight — seed_alternatives.sql
+-- Shishoza — seed_alternatives.sql
 -- Populates the ALTERNATIVES lookup table with verified content
 -- All URLs HTTP-checked and returning 200 as of 2026-06-02.
 --

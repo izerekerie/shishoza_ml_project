@@ -116,7 +116,7 @@ def monitoring_report():
     drift = ooz_pct > OUT_OF_ZONE_THRESHOLD
 
     print("\n" + "=" * 54)
-    print("   TreeSight — MODEL MONITORING REPORT")
+    print("   Shishoza — MODEL MONITORING REPORT")
     print("=" * 54)
     print(f"   Total predictions logged : {n}")
     print(f"   Risk distribution        : {dict(risk)}")
@@ -168,7 +168,7 @@ def monitoring_report():
     ax2.set_ylabel("predictions")
     ax2.set_title("Predicted risk distribution")
 
-    fig.suptitle("TreeSight — MLOps Monitoring Dashboard", fontweight="bold")
+    fig.suptitle("Shishoza — MLOps Monitoring Dashboard", fontweight="bold")
     fig.tight_layout()
     fig.savefig(CHART, dpi=150, bbox_inches="tight")
     print(f"Saved: {LOG.relative_to(ROOT)}")

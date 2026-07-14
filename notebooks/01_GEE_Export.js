@@ -7,7 +7,7 @@
 //   3. Press RUN
 //   4. Open Tasks panel (top right) — click RUN on each task
 //   5. Wait 10-20 minutes
-//   6. Download from Google Drive folder: TreeSight_Rwanda
+//   6. Download from Google Drive folder: Shishoza_Rwanda
 // ============================================================
 
 // ── STUDY AREA: Nyungwe Buffer Zone, Rwanda ─────────────────
@@ -308,8 +308,8 @@ print('Class breakdown:', training_data.aggregate_histogram('label'));
 // Export 1: Training CSV (main file you need)
 Export.table.toDrive({
   collection: training_data,
-  description: 'TreeSight_Training_Data',
-  folder: 'TreeSight_Rwanda',
+  description: 'Shishoza_Training_Data',
+  folder: 'Shishoza_Rwanda',
   fileNamePrefix: 'training_data',
   fileFormat: 'CSV'
 });
@@ -317,8 +317,8 @@ Export.table.toDrive({
 // Export 2: Sentinel-2 GeoTIFF (for visual map display)
 Export.image.toDrive({
   image: s2_train.select(['B4','B3','B2']),
-  description: 'TreeSight_Sentinel2_RGB',
-  folder: 'TreeSight_Rwanda',
+  description: 'Shishoza_Sentinel2_RGB',
+  folder: 'Shishoza_Rwanda',
   fileNamePrefix: 'nyungwe_s2_rgb',
   region: studyArea,
   scale: 30,
@@ -329,8 +329,8 @@ Export.image.toDrive({
 // Export 3: NDVI change map (shows where forest was lost)
 Export.image.toDrive({
   image: ndvi_change,
-  description: 'TreeSight_NDVI_Change',
-  folder: 'TreeSight_Rwanda',
+  description: 'Shishoza_NDVI_Change',
+  folder: 'Shishoza_Rwanda',
   fileNamePrefix: 'nyungwe_ndvi_change',
   region: studyArea,
   scale: 30,
@@ -341,8 +341,8 @@ Export.image.toDrive({
 // Export 4: Hansen loss labels (ground truth)
 Export.image.toDrive({
   image: loss_train.byte(),
-  description: 'TreeSight_Hansen_Labels',
-  folder: 'TreeSight_Rwanda',
+  description: 'Shishoza_Hansen_Labels',
+  folder: 'Shishoza_Rwanda',
   fileNamePrefix: 'nyungwe_labels',
   region: studyArea,
   scale: 30,
@@ -353,5 +353,5 @@ Export.image.toDrive({
 print('==============================================');
 print('All exports queued!');
 print('Go to Tasks panel (top right) and click RUN on each task.');
-print('Files udpated will appear in Google Drive: TreeSight_Rwanda folder');
+print('Files udpated will appear in Google Drive: Shishoza_Rwanda folder');
 print('==============================================');

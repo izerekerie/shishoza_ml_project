@@ -19,7 +19,7 @@ SCHEMA = HERE / "data" / "database" / "seed_users.sql"
 DEMO_USERS = [
     # (email, plain_password, full_name, role, organisation, district_scope, language)
     ("admin@treesight.rw",                 "admin",
-     "TreeSight Admin",                "admin",          "TreeSight Project",  None,         "en"),
+     "Shishoza Admin",                "admin",          "Shishoza Project",  None,         "en"),
     ("manager.nyamasheke@treesight.rw",    "nyamasheke",
      "Nyamasheke Forest Manager",      "forest_manager", "Rwanda Forestry Authority", "Nyamasheke", "rw"),
     ("manager.rusizi@treesight.rw",        "rusizi",
@@ -35,7 +35,7 @@ def hash_pwd(pwd: str) -> str:
 
 def main():
     if not DB.exists():
-        print(f"⚠ {DB} not found — run seed_alternatives.sql first")
+        print(f"{DB} not found — run seed_alternatives.sql first")
         return
 
     schema_sql = SCHEMA.read_text()
@@ -60,7 +60,7 @@ def main():
             "VALUES (?, ?, ?, ?, ?, ?, ?)",
             (email, hash_pwd(pwd), name, role, org, scope, lang),
         )
-        print(f"  ✓ inserted: {email}  role={role}  scope={scope or 'ALL'}")
+        print(f"  inserted: {email}  role={role}  scope={scope or 'ALL'}")
     con.commit()
 
     # Verify and report
