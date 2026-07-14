@@ -8,10 +8,14 @@ Upload a Rwanda land-title PDF or photo, see the extracted location on a map.
 
 from __future__ import annotations
 
+import csv
+import datetime
 import json
 import os
+import smtplib
 import sqlite3
 import tempfile
+from email.message import EmailMessage
 from functools import wraps
 from pathlib import Path
 
@@ -29,6 +33,22 @@ import pickle
 import numpy as np
 import pandas as pd
 from scipy.spatial import cKDTree
+
+
+# Load a local .env (KEY=VALUE lines) if present, so email/SMTP settings live in
+# one gitignored file instead of being exported by hand. Real environment
+# variables always win; the file is entirely optional.
+def _load_dotenv():
+    envp = Path(__file__).resolve().parent / ".env"
+    if not envp.exists():
+        return
+    for line in envp.read_text().splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        k, v = line.split("=", 1)
+        os.environ.setdefault(k.strip(), v.strip().strip('"').strip("'"))
+_load_dotenv()
 
 FEATURE_COLS = ['EVI_train', 'NBR_train', 'NDVI_change', 'NDVI_test', 'NDVI_train',
                 'NIR_train', 'RED_train', 'SWIR_test', 'SWIR_train', 'VH_VV_ratio',
@@ -112,6 +132,70 @@ from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as _EETimeout
 LIVE_EE_TIMEOUT_S = float(os.environ.get("LIVE_EE_TIMEOUT_S", "8"))
 _EE_POOL = ThreadPoolExecutor(max_workers=4)
+
+# ── Email notifications (optional; free via Gmail SMTP + an app password) ──
+# Configured entirely by env vars so no secret lives in the repo. If SMTP_USER /
+# SMTP_PASS are unset, notifications are skipped silently and the citizen still
+# sees the outcome in the "My requests" panel — nothing breaks either way.
+SMTP_HOST  = os.environ.get("SMTP_HOST", "smtp.gmail.com")
+SMTP_PORT  = int(os.environ.get("SMTP_PORT", "587"))
+SMTP_USER  = os.environ.get("SMTP_USER")            # e.g. your Gmail address
+SMTP_PASS  = os.environ.get("SMTP_PASS")            # a Gmail App Password
+SMTP_FROM  = os.environ.get("SMTP_FROM", SMTP_USER or "no-reply@shishoza.rw")
+PUBLIC_URL = os.environ.get("PUBLIC_URL", "https://kerie1-shishoza.hf.space")
+
+
+def _send_email(to, subject, body):
+    if not (SMTP_USER and SMTP_PASS and to):
+        print(f"[email] skipped (SMTP not configured or no recipient): '{subject}'", flush=True)
+        return
+    try:
+        msg = EmailMessage()
+        msg["Subject"], msg["From"], msg["To"] = subject, SMTP_FROM, to
+        msg.set_content(body)
+        with smtplib.SMTP(SMTP_HOST, SMTP_PORT, timeout=15) as s:
+            s.starttls(); s.login(SMTP_USER, SMTP_PASS); s.send_message(msg)
+        print(f"[email] sent to {to}: {subject}", flush=True)
+    except Exception as e:
+        print(f"[email] failed to {to}: {e}", flush=True)
+
+
+def _notify_decision(email, req_id, status, note, sector):
+    """Email the citizen the manager's decision, off the request thread."""
+    if not email:
+        return
+    verdict = "approved" if status == "approved" else "flagged for a site visit"
+    subject = f"Shishoza — review request #{req_id} {verdict}"
+    body = (f"Hello,\n\nYour technical-review request #{req_id}"
+            f"{' for ' + sector if sector else ''} has been {verdict} "
+            f"by the district forest manager."
+            + (f"\n\nManager's note: {note}" if note else "")
+            + f"\n\nSee the full details in your account:\n{PUBLIC_URL}/citizen\n\n— Shishoza")
+    _EE_POOL.submit(_send_email, email, subject, body)
+
+
+# ── Production prediction log (feeds scripts/mlops_monitor.py) ──────────────
+# Every /api/analyse is appended here so we can track real usage and detect
+# drift (queries outside the trained zone). Same CSV schema the monitor reads.
+_PRED_LOG    = Path(__file__).parent / "results" / "monitoring" / "predictions_log.csv"
+_PRED_FIELDS = ["lat", "lng", "risk_level", "confidence", "km_from_training", "deforestation_prob"]
+
+
+def _log_prediction(lat, lng, result):
+    try:
+        _PRED_LOG.parent.mkdir(parents=True, exist_ok=True)
+        new = not _PRED_LOG.exists()
+        with open(_PRED_LOG, "a", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=_PRED_FIELDS)
+            if new:
+                w.writeheader()
+            w.writerow({"lat": lat, "lng": lng,
+                        "risk_level": result.get("risk_level"),
+                        "confidence": result.get("confidence"),
+                        "km_from_training": round(result.get("km_from_training", 0) or 0, 1),
+                        "deforestation_prob": result.get("deforestation_prob")})
+    except Exception as e:
+        print(f"[monitor] prediction log skipped: {e}")
 
 
 def _ee_build_feature_image(ee):
@@ -235,6 +319,8 @@ def _classify_and_build(*, prob, ndvi_current, ndvi_2020, ndvi_change,
     result = {
         'risk_level':           risk_level,
         'rule_fired':           fired_rule,
+        'lat':                  round(lat, 6),
+        'lng':                  round(lng, 6),
         'deforestation_prob':   round(prob, 3),
         'ndvi_current':         round(ndvi_current, 3),
         'ndvi_2020':            round(ndvi_2020, 3),
@@ -442,6 +528,12 @@ swagger = Swagger(app, template={
 @app.get("/")
 def landing():
     return render_template("landing.html")
+
+
+@app.get("/account")
+def citizen_account_page():
+    """Dedicated citizen sign-up / log-in page (kept off the crowded sidebar)."""
+    return render_template("citizen_auth.html")
 
 
 @app.get("/citizen")
@@ -655,6 +747,13 @@ def manager():
 
 
 
+@app.get("/reviews")
+@login_required
+def reviews_page():
+    """Full-page, filterable table of review requests (scoped by role)."""
+    return render_template("reviews.html")
+
+
 @app.post("/api/analyse-sector")
 @login_required
 def api_analyse_sector():
@@ -756,7 +855,7 @@ _CUT_RECENT = {}   # analysis_id → last full analyse result (in-process fast p
 # workers) and keep _CUT_RECENT only as a fast in-process cache.
 _DB_PATH = Path(__file__).parent / "data" / "database" / "treesight.db"
 if not _DB_PATH.exists():
-    print(f"[boot]   ⚠ {_DB_PATH} not found — alternatives + analysis cache disabled")
+    print(f"[boot]   {_DB_PATH} not found — alternatives + analysis cache disabled")
 else:
     print(f"[boot]   lookup DB: {_DB_PATH}")
     try:
@@ -767,8 +866,39 @@ else:
                 "  payload     TEXT NOT NULL,"
                 "  created_at  TEXT DEFAULT CURRENT_TIMESTAMP)"
             )
+            # Citizen → manager review requests (Phase 1 workflow). Doubles as the
+            # RQ4 validation log: who submitted, the parcel, and the model's output.
+            _con.execute(
+                "CREATE TABLE IF NOT EXISTS REQUESTS ("
+                "  request_id        INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "  created_at        TEXT NOT NULL,"
+                "  citizen_name      TEXT, citizen_phone TEXT, upi TEXT,"
+                "  district          TEXT, sector TEXT, sector_id TEXT,"
+                "  lat REAL, lng REAL, area_ha REAL,"
+                "  risk_level        TEXT, parcel_risk TEXT, neighbourhood_risk TEXT,"
+                "  tree_cover_pct    REAL, deforestation_prob REAL, data_source TEXT,"
+                "  analysis_id       TEXT,"
+                "  status            TEXT NOT NULL DEFAULT 'pending',"
+                "  reviewed_by TEXT, reviewed_at TEXT, review_note TEXT)"
+            )
+            # Citizen accounts (kept separate from the staff USERS table so the
+            # USERS role CHECK constraint is untouched). Email + bcrypt password.
+            _con.execute(
+                "CREATE TABLE IF NOT EXISTS CITIZENS ("
+                "  citizen_id    INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "  email         VARCHAR(255) NOT NULL UNIQUE,"
+                "  password_hash VARCHAR(60)  NOT NULL,"
+                "  full_name     VARCHAR(100), phone VARCHAR(30),"
+                "  created_at    TEXT DEFAULT CURRENT_TIMESTAMP, last_login TEXT)"
+            )
+            # Tie each request to the submitting citizen's email. ADD COLUMN is a
+            # no-op guard for databases created before this column existed.
+            try:
+                _con.execute("ALTER TABLE REQUESTS ADD COLUMN citizen_email TEXT")
+            except sqlite3.OperationalError:
+                pass  # column already present
     except sqlite3.Error as e:
-        print(f"[boot]   ⚠ could not create ANALYSIS_CACHE table: {e}")
+        print(f"[boot]   could not create ANALYSIS_CACHE table: {e}")
 
 
 def _remember_analysis(result):
@@ -808,6 +938,238 @@ def _recall_analysis(aid):
     result = json.loads(row[0])
     _CUT_RECENT[aid] = result                        # warm the in-process cache
     return result
+
+
+# ── Citizen accounts (separate from staff USERS) ───────────────────────────
+def lookup_citizen(email):
+    """Find a CITIZENS row by email (case-insensitive), or None."""
+    if not email or not _DB_PATH.exists():
+        return None
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            con.row_factory = sqlite3.Row
+            r = con.execute("SELECT * FROM CITIZENS WHERE LOWER(email) = LOWER(?)",
+                            (email.strip(),)).fetchone()
+            return dict(r) if r else None
+    except sqlite3.Error:
+        return None
+
+
+def current_citizen():
+    """The signed-in citizen (session key separate from staff logins)."""
+    email = session.get("citizen_email")
+    return lookup_citizen(email) if email else None
+
+
+@app.post("/api/citizen/signup")
+def api_citizen_signup():
+    data = request.get_json() or {}
+    email = (data.get("email") or "").strip().lower()
+    pwd   = data.get("password") or ""
+    if "@" not in email or "." not in email.rsplit("@", 1)[-1]:
+        return jsonify({"error": "Please enter a valid email address"}), 400
+    if len(pwd) < 6:
+        return jsonify({"error": "Password must be at least 6 characters"}), 400
+    if lookup_citizen(email):
+        return jsonify({"error": "An account with this email already exists — please log in"}), 409
+    h = bcrypt.hashpw(pwd.encode(), bcrypt.gensalt()).decode()
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            con.execute(
+                "INSERT INTO CITIZENS (email, password_hash, full_name, phone, created_at) "
+                "VALUES (?,?,?,?,?)",
+                (email, h, (data.get("full_name") or None), (data.get("phone") or None), now))
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Could not create account: {e}"}), 500
+    session["citizen_email"] = email
+    return jsonify({"ok": True, "email": email})
+
+
+@app.post("/api/citizen/login")
+def api_citizen_login():
+    data = request.get_json() or {}
+    email = (data.get("email") or "").strip().lower()
+    c = lookup_citizen(email)
+    if not c or not verify_password(data.get("password") or "", c["password_hash"]):
+        return jsonify({"error": "Invalid email or password"}), 401
+    session["citizen_email"] = email
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            con.execute("UPDATE CITIZENS SET last_login=? WHERE LOWER(email)=LOWER(?)",
+                        (datetime.datetime.now().isoformat(timespec="seconds"), email))
+    except sqlite3.Error:
+        pass
+    return jsonify({"ok": True, "email": email})
+
+
+@app.post("/api/citizen/logout")
+def api_citizen_logout():
+    session.pop("citizen_email", None)
+    return jsonify({"ok": True})
+
+
+@app.get("/api/citizen/me")
+def api_citizen_me():
+    c = current_citizen()
+    if not c:
+        return jsonify({"authenticated": False})
+    return jsonify({"authenticated": True, "email": c["email"],
+                    "full_name": c.get("full_name"), "phone": c.get("phone")})
+
+
+# ── Citizen → Manager review requests ──────────────────────────────────────
+# A signed-in citizen submits an analysed parcel for their district forest
+# manager to review. Each row ties to the citizen's account (email) so the
+# outcome can be tracked and notified, and doubles as an RQ4 validation record.
+def _sector_for_point(lat, lng):
+    """Resolve (lat,lng) → the sector polygon that contains it, or None."""
+    try:
+        from shapely.geometry import Point
+        mask = _SECTORS.geometry.contains(Point(float(lng), float(lat)))
+        hit = _SECTORS[mask]
+        if hit.empty:
+            return None
+        s = hit.iloc[0]
+        return {"sector_id": str(s["sector_id"]), "sector": str(s["sector"]),
+                "district": str(s["district"]), "province": str(s["province"])}
+    except Exception as e:
+        print(f"[warn] sector lookup failed for {lat},{lng}: {e}")
+        return None
+
+
+@app.get("/api/districts")
+def api_districts():
+    """Sorted unique district names — lets a citizen route their request to the
+    right district forest manager (auto-detected value can be confirmed/changed)."""
+    try:
+        ds = sorted(str(d) for d in _SECTORS["district"].dropna().unique())
+    except Exception:
+        ds = []
+    return jsonify({"districts": ds})
+
+
+@app.post("/api/requests")
+def api_create_request():
+    """A signed-in citizen submits an analysed parcel for manager review."""
+    if not _DB_PATH.exists():
+        return jsonify({"error": "Request store unavailable"}), 503
+    citizen = current_citizen()
+    if not citizen:
+        return jsonify({"error": "Please sign up or log in to request a review"}), 401
+    data = request.get_json() or {}
+    analysis = _recall_analysis(data.get("analysis_id"))
+    if not analysis:
+        return jsonify({"error": "Please run an analysis before requesting a review"}), 400
+    lat, lng = analysis.get("lat"), analysis.get("lng")
+    sec = _sector_for_point(lat, lng) or {}
+    # District routes the request to a manager. Auto-detected from the parcel
+    # location, but the citizen can confirm/override it (their choice wins).
+    district = (data.get("district") or sec.get("district"))
+    sector   = (data.get("sector") or sec.get("sector"))
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            cur = con.execute(
+                "INSERT INTO REQUESTS (created_at, citizen_name, citizen_phone, citizen_email, upi, "
+                "district, sector, sector_id, lat, lng, area_ha, risk_level, parcel_risk, "
+                "neighbourhood_risk, tree_cover_pct, deforestation_prob, data_source, analysis_id) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (now, citizen.get("full_name"), citizen.get("phone"), citizen["email"],
+                 (data.get("upi") or analysis.get("upi")), district, sector,
+                 sec.get("sector_id"), lat, lng, analysis.get("parcel_area_ha"),
+                 analysis.get("risk_level"), analysis.get("parcel_risk"),
+                 analysis.get("neighbourhood_risk"), analysis.get("tree_cover_pct"),
+                 analysis.get("deforestation_prob"), analysis.get("data_source"),
+                 str(data.get("analysis_id"))),
+            )
+            rid = cur.lastrowid
+    except sqlite3.Error as e:
+        return jsonify({"error": f"Could not save request: {e}"}), 500
+    return jsonify({"ok": True, "request_id": rid,
+                    "district": district, "sector": sector})
+
+
+@app.get("/api/requests")
+@login_required
+def api_list_requests():
+    """Manager/admin: list review requests, scoped to the manager's district."""
+    user = current_user()
+    status = (request.args.get("status") or "").strip()
+    q = "SELECT * FROM REQUESTS"
+    conds, params = [], []
+    if user.get("district_scope"):
+        conds.append("district = ?"); params.append(user["district_scope"])
+    if status in ("pending", "approved", "rejected"):
+        conds.append("status = ?"); params.append(status)
+    if conds:
+        q += " WHERE " + " AND ".join(conds)
+    q += " ORDER BY (status='pending') DESC, created_at DESC"
+    counts = {"pending": 0, "approved": 0, "rejected": 0}
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            con.row_factory = sqlite3.Row
+            rows = [dict(r) for r in con.execute(q, params).fetchall()]
+            cq, cp = "SELECT status, COUNT(*) FROM REQUESTS", []
+            if user.get("district_scope"):
+                cq += " WHERE district = ?"; cp.append(user["district_scope"])
+            cq += " GROUP BY status"
+            for st, n in con.execute(cq, cp).fetchall():
+                if st in counts:
+                    counts[st] = n
+    except sqlite3.Error as e:
+        return jsonify({"error": str(e)}), 500
+    return jsonify({"requests": rows, "counts": counts})
+
+
+@app.post("/api/requests/<int:req_id>/decision")
+@login_required
+def api_decide_request(req_id):
+    """Manager/admin: approve or reject a request (district-scoped)."""
+    user = current_user()
+    data = request.get_json() or {}
+    status = (data.get("status") or "").strip()
+    if status not in ("approved", "rejected"):
+        return jsonify({"error": "status must be 'approved' or 'rejected'"}), 400
+    now = datetime.datetime.now().isoformat(timespec="seconds")
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            con.row_factory = sqlite3.Row
+            row = con.execute(
+                "SELECT district, citizen_email, sector FROM REQUESTS WHERE request_id = ?",
+                (req_id,)).fetchone()
+            if not row:
+                return jsonify({"error": "Request not found"}), 404
+            if user.get("district_scope") and row["district"] != user["district_scope"]:
+                return jsonify({"error": "Request outside your district scope"}), 403
+            con.execute(
+                "UPDATE REQUESTS SET status=?, reviewed_by=?, reviewed_at=?, review_note=? "
+                "WHERE request_id = ?",
+                (status, session.get("user_email"), now, (data.get("note") or None), req_id))
+    except sqlite3.Error as e:
+        return jsonify({"error": str(e)}), 500
+    # Best-effort email to the citizen (skipped silently if SMTP is not configured).
+    _notify_decision(row["citizen_email"], req_id, status, data.get("note"), row["sector"])
+    return jsonify({"ok": True})
+
+
+@app.get("/api/my-requests")
+def api_my_requests():
+    """The signed-in citizen's own requests, newest first (with the decision)."""
+    citizen = current_citizen()
+    if not citizen:
+        return jsonify({"error": "Please log in"}), 401
+    try:
+        with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
+            con.row_factory = sqlite3.Row
+            rows = [dict(r) for r in con.execute(
+                "SELECT request_id, created_at, sector, district, risk_level, parcel_risk, "
+                "neighbourhood_risk, tree_cover_pct, status, reviewed_at, review_note "
+                "FROM REQUESTS WHERE LOWER(citizen_email) = LOWER(?) ORDER BY created_at DESC",
+                (citizen["email"],)).fetchall()]
+    except sqlite3.Error as e:
+        return jsonify({"error": str(e)}), 500
+    return jsonify({"requests": rows})
 
 
 @app.post("/api/alternatives")
@@ -1103,9 +1465,17 @@ def api_analyse():
             print(f"[warn] live parcel analysis failed, falling back ({e})")
     if result is None:
         result = analyse_parcel(lat, lng, area_ha=area_ha)
+    # Attach the containing sector/district so a cutting-permission request can be
+    # routed to the right district manager (and pre-fill the citizen's dropdown).
+    _sec = _sector_for_point(result.get("lat"), result.get("lng"))
+    if _sec:
+        result.setdefault("sector_id", _sec["sector_id"])
+        result.setdefault("sector_name", _sec["sector"])
+        result.setdefault("district", _sec["district"])
     # Persist so /api/simulate and /api/alternatives can reference it from ANY
     # gunicorn worker, not just the one that ran this request.
     _remember_analysis(result)
+    _log_prediction(lat, lng, result)   # production usage + drift log
     return jsonify(result)
 
 
@@ -1262,8 +1632,89 @@ def api_extract():
     return jsonify(result)
 
 
+# ── USSD gateway (Africa's Talking sandbox / future live deployment) ────────
+# Africa's Talking sends a POST with: sessionId, serviceCode, phoneNumber, text
+# text accumulates all user inputs separated by *.
+# Responses: "CON <msg>" = keep session open, "END <msg>" = close session.
+# Max ~182 chars per page on most handsets — keep messages short.
+#
+# Flow:
+#   *384*xxxx#      → welcome, prompt for UPI
+#   <UPI entered>   → look up ANALYSIS_CACHE by UPI → return risk summary
+#
+# Test at: https://sandbox.africastalking.com/ussd/simulate
+# Set callback URL to:  https://<your-ngrok>.ngrok.io/ussd
+@app.post("/ussd")
+def ussd_gateway():
+    session_id   = request.form.get("sessionId", "")
+    phone        = request.form.get("phoneNumber", "")
+    text         = request.form.get("text", "").strip()
+
+    # text is empty on first dial, then accumulates inputs separated by *
+    steps = [s.strip() for s in text.split("*")] if text else []
+
+    if not steps or steps == [""]:
+        # First interaction — welcome screen
+        return _ussd("CON",
+            "TreeSight / Umurinzi\n"
+            "Deforestation risk checker\n"
+            "--------------------------------\n"
+            "Enter your UPI number:\n"
+            "(e.g. 1/01/03/05/4924)")
+
+    upi = steps[0].upper().strip()
+
+    # Look up the most recent cached analysis for this UPI
+    result = None
+    if _DB_PATH.exists():
+        try:
+            con = sqlite3.connect(str(_DB_PATH), timeout=5)
+            con.row_factory = sqlite3.Row
+            row = con.execute(
+                "SELECT payload FROM ANALYSIS_CACHE "
+                "WHERE json_extract(payload, '$.upi') = ? "
+                "ORDER BY analysis_id DESC LIMIT 1",
+                (upi,)
+            ).fetchone()
+            con.close()
+            if row:
+                result = json.loads(row["payload"])
+        except Exception:
+            pass
+
+    if result is None:
+        return _ussd("END",
+            f"UPI {upi} has not been analysed yet.\n\n"
+            "Visit the TreeSight web app to\n"
+            "analyse your parcel first, then\n"
+            "dial again for the USSD summary.")
+
+    risk    = result.get("risk_level", "UNKNOWN")
+    prob    = result.get("deforestation_prob", 0)
+    cover   = result.get("tree_cover_pct", 0)
+    ndvi_t  = result.get("ndvi_2020", 0)
+    ndvi_c  = result.get("ndvi_current", 0)
+    trend   = "recovering" if ndvi_c > ndvi_t else ("declining" if ndvi_c < ndvi_t else "stable")
+
+    risk_rw = {"HIGH": "INKURIKIZI IKABIJE", "MEDIUM": "INKURIKIZI HAGATI", "LOW": "INKURIKIZI NKEYA"}.get(risk, risk)
+
+    return _ussd("END",
+        f"UPI: {upi}\n"
+        f"Risk: {risk} ({prob:.0%})\n"
+        f"Tree cover: {cover:.0f}%\n"
+        f"Forest: {trend}\n"
+        f"({risk_rw})\n\n"
+        "Full report: visit TreeSight web app")
+
+
+def _ussd(action, message):
+    """Return a plain-text USSD response (Africa's Talking format)."""
+    from flask import Response
+    return Response(f"{action} {message}", mimetype="text/plain")
+
+
 if __name__ == "__main__":
-    print("\n🛡️  Shishoza running")
+    print("\n  Shishoza running")
     print("   Landing:   http://localhost:5050/")
     print("   Citizen:   http://localhost:5050/citizen")
     print("   Manager:   http://localhost:5050/manager")

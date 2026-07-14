@@ -1,0 +1,76 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8"/>
+<title>Shishoza — Citizen Account</title>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{font-family:'Inter',sans-serif}.err{color:#b91c1c;background:#fef2f2;border:1px solid #fecaca;padding:8px 10px;border-radius:8px;font-size:13px}</style>
+</head>
+<body class="min-h-screen flex flex-col" style="background:linear-gradient(135deg,#f0fdf4,#ecfeff)">
+
+<header class="flex items-center justify-between px-6 h-16">
+  <a href="/" class="text-2xl font-extrabold" style="color:#14532D">Shishoza</a>
+  <a href="/" class="text-sm font-semibold text-gray-500 hover:text-gray-800">Home</a>
+</header>
+
+<main class="flex-1 flex items-center justify-center px-4 pb-16">
+  <div class="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-100 p-8">
+    <h1 class="text-xl font-bold text-gray-900" id="title">Create your account</h1>
+    <p class="text-sm text-gray-500 mt-1" id="subtitle">Sign up to send a parcel for a technical review and track the manager's decision.</p>
+
+    <!-- tabs -->
+    <div class="mt-5 grid grid-cols-2 gap-1 bg-gray-100 rounded-xl p-1">
+      <button id="tabSignup" class="py-2 rounded-lg text-sm font-bold text-white" style="background:#14532D">Sign up</button>
+      <button id="tabLogin"  class="py-2 rounded-lg text-sm font-bold text-gray-600">Log in</button>
+    </div>
+
+    <div class="mt-5 space-y-3">
+      <input id="email" type="email" placeholder="Email" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-700/30">
+      <input id="password" type="password" placeholder="Password (min 6 characters)" class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-700/30">
+      <input id="fullName" type="text" placeholder="Your name (optional)" class="signup-only w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-700/30">
+      <input id="phone" type="tel" placeholder="Phone (optional)" class="signup-only w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-700/30">
+      <button id="submitBtn" class="w-full py-3 rounded-lg text-sm font-bold text-white hover:opacity-90 transition" style="background:#14532D">Create account</button>
+      <div id="result"></div>
+    </div>
+  </div>
+</main>
+
+<script>
+let mode = 'signup';
+const $ = id => document.getElementById(id);
+function setMode(m){
+  mode = m;
+  const signup = m === 'signup';
+  $('tabSignup').style.background = signup ? '#14532D' : 'transparent';
+  $('tabSignup').classList.toggle('text-white', signup); $('tabSignup').classList.toggle('text-gray-600', !signup);
+  $('tabLogin').style.background = signup ? 'transparent' : '#14532D';
+  $('tabLogin').classList.toggle('text-white', !signup); $('tabLogin').classList.toggle('text-gray-600', signup);
+  $('title').textContent = signup ? 'Create your account' : 'Welcome back';
+  $('subtitle').textContent = signup
+    ? "Sign up to send a parcel for a technical review and track the manager's decision."
+    : 'Log in to request a review and see your past requests.';
+  $('submitBtn').textContent = signup ? 'Create account' : 'Log in';
+  document.querySelectorAll('.signup-only').forEach(el => el.style.display = signup ? 'block' : 'none');
+  $('result').innerHTML = '';
+}
+$('tabSignup').addEventListener('click', () => setMode('signup'));
+$('tabLogin').addEventListener('click', () => setMode('login'));
+
+$('submitBtn').addEventListener('click', async () => {
+  const body = { email: $('email').value.trim(), password: $('password').value };
+  if (mode === 'signup') { body.full_name = $('fullName').value.trim(); body.phone = $('phone').value.trim(); }
+  $('submitBtn').disabled = true;
+  try {
+    const r = await (await fetch('/api/citizen/' + mode, {
+      method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify(body)
+    })).json();
+    if (r.error) { $('result').innerHTML = `<div class="err">${r.error}</div>`; }
+    else { window.location.href = '/citizen'; }   // signed in -> back to the map
+  } catch (e) { $('result').innerHTML = `<div class="err">Something went wrong. Please try again.</div>`; }
+  finally { $('submitBtn').disabled = false; }
+});
+
+// open in login mode if asked (?mode=login)
+if (new URLSearchParams(location.search).get('mode') === 'login') setMode('login'); else setMode('signup');
+</script>
+</body></html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Shishoza | Review Requests</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{font-family:'Inter',sans-serif}.material-symbols-outlined{font-size:20px;line-height:1;vertical-align:middle}</style>
+</head>
+<body class="flex h-screen overflow-hidden bg-[#f8faf9] text-[#191c1c]">
+
+<!-- Sidebar -->
+<aside class="w-[280px] shrink-0 bg-white border-r border-gray-200 flex flex-col p-4">
+  <div class="mb-6 px-1">
+    <a href="/" class="text-2xl font-extrabold tracking-tight" style="color:#14532D">Shishoza</a>
+    <p class="text-xs text-gray-400 mt-0.5">Forest Risk Control</p>
+  </div>
+  <nav class="flex flex-col gap-0.5">
+    <a href="/manager" class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"><span class="material-symbols-outlined">map</span>Risk Map</a>
+    <a href="/reviews" class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-semibold text-white" style="background:#14532D"><span class="material-symbols-outlined">fact_check</span>Reviews<span id="navCount" class="ml-auto text-[10px] bg-white/25 px-1.5 rounded-full"></span></a>
+    <a href="/citizen" class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"><span class="material-symbols-outlined">person</span>Citizen view</a>
+    <a id="adminLink" href="/admin" class="hidden items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"><span class="material-symbols-outlined">manage_accounts</span>User management</a>
+    <a id="apiDocsLink" href="/apidocs/" target="_blank" class="hidden items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-gray-600 hover:bg-gray-100 transition-colors"><span class="material-symbols-outlined">api</span>API docs</a>
+  </nav>
+  <div class="mt-auto pt-4 border-t border-gray-100 px-1">
+    <div class="text-sm font-bold" id="userLabel">…</div>
+    <div class="text-xs text-gray-400 mb-2" id="userRole"></div>
+    <a id="logoutLink" href="#" class="flex items-center gap-2 text-sm font-semibold text-red-600 hover:underline"><span class="material-symbols-outlined text-base">logout</span>Sign out</a>
+  </div>
+</aside>
+
+<!-- Main -->
+<main class="flex-1 flex flex-col overflow-hidden">
+  <header class="h-16 shrink-0 border-b border-gray-200 flex items-center px-6">
+    <div>
+      <h1 class="text-lg font-bold text-gray-900">Review requests</h1>
+      <p class="text-xs text-gray-500" id="scopeLabel">…</p>
+    </div>
+  </header>
+  <div class="px-6 py-3 flex flex-wrap gap-5 items-center border-b border-gray-100 bg-white">
+    <label class="text-[11px] font-bold text-gray-500 flex items-center gap-1.5 uppercase tracking-wide">Status
+      <select id="fltStatus" class="border border-gray-300 rounded-md px-2 py-1 text-sm font-normal normal-case text-gray-800"><option value="">All</option><option value="pending">Pending</option><option value="approved">Approved</option><option value="rejected">Flagged</option></select></label>
+    <label class="text-[11px] font-bold text-gray-500 flex items-center gap-1.5 uppercase tracking-wide">Risk
+      <select id="fltRisk" class="border border-gray-300 rounded-md px-2 py-1 text-sm font-normal normal-case text-gray-800"><option value="">All</option><option value="HIGH">High</option><option value="MEDIUM">Medium</option><option value="LOW">Low</option></select></label>
+    <span id="fltCount" class="ml-auto text-xs text-gray-500"></span>
+  </div>
+  <div class="flex-1 overflow-auto">
+    <table class="w-full text-sm border-collapse">
+      <thead class="sticky top-0 bg-gray-50 z-10"><tr class="text-left text-[11px] uppercase tracking-wide text-gray-500">
+        <th class="px-6 py-3 font-semibold">#</th><th class="px-6 py-3 font-semibold">Date</th><th class="px-6 py-3 font-semibold">Citizen</th><th class="px-6 py-3 font-semibold">Sector</th><th class="px-6 py-3 font-semibold">Parcel</th><th class="px-6 py-3 font-semibold">Neighbourhood</th><th class="px-6 py-3 font-semibold">Status</th><th class="px-6 py-3 font-semibold">Action</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+(async () => {
+  const d = await (await fetch('/api/me')).json();
+  if (!d.authenticated) { location.href = '/login'; return; }
+  const u = d.user;
+  $('userLabel').textContent = u.full_name;
+  $('userRole').textContent = u.role === 'admin' ? 'Administrator' : 'Forest Manager';
+  $('scopeLabel').textContent = u.district_scope ? ('District: ' + u.district_scope) : 'National — all districts';
+  if (u.role === 'admin') ['adminLink','apiDocsLink'].forEach(id=>{ const e=$(id); if(e){ e.classList.remove('hidden'); e.classList.add('flex'); } });
+})();
+$('logoutLink').addEventListener('click', async e => { e.preventDefault(); await fetch('/api/logout', {method:'POST'}); location.href = '/login'; });
+
+const RC = {HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a'};
+const SL = {pending:'Pending', approved:'Approved', rejected:'Flagged'};
+const SC = {pending:'#b45309', approved:'#15803d', rejected:'#b91c1c'};
+let all = [];
+
+async function load(){
+  try { all = (await (await fetch('/api/requests')).json()).requests || []; } catch(e) { all = []; }
+  render();
+}
+function render(){
+  const st = $('fltStatus').value, rk = $('fltRisk').value;
+  const rows = all.filter(r => (!st || r.status === st) && (!rk || r.parcel_risk === rk));
+  $('fltCount').textContent = rows.length + ' request(s)';
+  $('navCount').textContent = all.filter(r => r.status === 'pending').length || '';
+  $('tbody').innerHTML = rows.length ? rows.map(r => `
+    <tr class="border-t border-gray-100 hover:bg-gray-50">
+      <td class="px-6 py-3 font-bold text-gray-700">${r.request_id}</td>
+      <td class="px-6 py-3 text-xs text-gray-500">${(r.created_at||'').replace('T',' ')}</td>
+      <td class="px-6 py-3 text-xs">${r.citizen_email||r.citizen_name||'—'}${r.citizen_phone?'<br><span class="text-gray-400">'+r.citizen_phone+'</span>':''}</td>
+      <td class="px-6 py-3 text-xs">${r.sector||'—'}</td>
+      <td class="px-6 py-3"><span class="text-xs font-bold" style="color:${RC[r.parcel_risk]||'#9ca3af'}">${r.parcel_risk||'—'}</span></td>
+      <td class="px-6 py-3"><span class="text-xs font-bold" style="color:${RC[r.neighbourhood_risk]||'#9ca3af'}">${r.neighbourhood_risk||'—'}</span></td>
+      <td class="px-6 py-3 text-xs font-bold" style="color:${SC[r.status]||'#6b7280'}">${SL[r.status]||r.status}</td>
+      <td class="px-6 py-3 whitespace-nowrap">${r.status === 'pending'
+        ? `<button data-id="${r.request_id}" data-s="approved" class="act" style="background:#16a34a;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer">Approve</button> <button data-id="${r.request_id}" data-s="rejected" class="act" style="background:#dc2626;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer">Flag</button>`
+        : `<span class="text-xs text-gray-400">${r.review_note||'—'}</span>`}</td>
+    </tr>`).join('') : '<tr><td colspan="8" class="px-6 py-16 text-center text-gray-400">No requests match these filters.</td></tr>';
+  document.querySelectorAll('.act').forEach(b => b.addEventListener('click', () => decide(b.dataset.id, b.dataset.s)));
+}
+async function decide(id, s){
+  try {
+    const r = await (await fetch('/api/requests/' + id + '/decision', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status: s})})).json();
+    if (r.error) { alert(r.error); return; }
+    load();
+  } catch(e) { alert('Network error'); }
+}
+$('fltStatus').addEventListener('change', render);
+$('fltRisk').addEventListener('change', render);
+load();
+</script>
+</body></html>

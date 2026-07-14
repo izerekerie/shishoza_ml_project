@@ -60,8 +60,6 @@
   <button onclick="setLang('fr')" id="btn-lang-fr" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">FR</button>
 </div>
 </div>
-<a href="/" class="flex items-center gap-2 px-4 py-2 text-on-surface-variant hover:text-primary font-label-md text-label-md transition-colors">
-<span class="material-symbols-outlined text-[18px]">west</span> Landing</a>
 </header>
 
 <main class="flex-1 flex overflow-hidden">
@@ -161,6 +159,38 @@
 </div>
 <div id="altCards"></div>
 </div>
+
+<!-- Request a technical review (requires a citizen account) -->
+<div id="requestPanel" class="hidden bg-white p-5 rounded-xl border border-outline-variant/50 space-y-3" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">how_to_reg</span>
+<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline" data-i18n="req_title">Request a technical review</h3></div>
+<p class="text-outline" style="font-size:12px;line-height:1.4" data-i18n="req_sub">Send this parcel to your district forest manager for a technical review of the tree-loss impact. This supports the official permit decision — it does not replace it.</p>
+
+<!-- signed OUT: send to the dedicated account page (keeps the sidebar uncluttered) -->
+<div id="reqAuth" class="space-y-2">
+<p class="text-outline" style="font-size:11px" data-i18n="auth_prompt">Create a free account (or log in) to send this for review and track the decision.</p>
+<div class="flex gap-2">
+<a href="/account" class="flex-1 text-center text-on-primary py-2.5 rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-all" style="background-color:#14532D;" data-i18n="auth_signup">Create account</a>
+<a href="/account?mode=login" class="flex-1 text-center py-2.5 rounded-lg font-label-md text-label-md font-bold border border-primary/40 text-primary hover:bg-primary/5 transition-all" data-i18n="auth_login">Log in</a>
+</div>
+</div>
+
+<!-- signed IN: request form -->
+<div id="reqForm" class="hidden space-y-3">
+<p class="text-outline" style="font-size:11px"><span data-i18n="req_as">Requesting as</span> <b id="reqAsEmail" class="text-on-surface"></b> · <a id="reqLogout" class="text-primary cursor-pointer hover:underline" data-i18n="auth_logout">log out</a></p>
+<label class="block text-outline" style="font-size:11px" data-i18n="req_district">District — routes to that manager</label>
+<select id="reqDistrict" class="w-full px-3 py-2 border border-outline-variant/50 rounded-lg text-label-md bg-white"></select>
+<button id="reqSubmit" class="w-full text-on-primary py-3 rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-all" style="background-color:#14532D;" data-i18n="req_send">Send for review</button>
+<div id="reqResult" class="space-y-1"></div>
+</div>
+</div>
+
+<!-- My review requests -->
+<div id="myReqPanel" class="hidden bg-white p-5 rounded-xl border border-outline-variant/50 space-y-2" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">fact_check</span>
+<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline" data-i18n="my_req_title">My review requests</h3></div>
+<div id="myReqList" class="space-y-2"></div>
+</div>
 </div>
 </section>
 
@@ -201,6 +231,19 @@ const STRINGS = {
     reason_fw:'Firewood', reason_tm:'Timber', reason_fa:'Farming', reason_in:'Income',
     no_sugg:'No suggestions found for that reason.',
     learn_more:'Learn more →',
+    req_title:'Request a technical review',
+    req_sub:'Send this parcel to your district forest manager for a technical review of the tree-loss impact. This supports the official permit decision — it does not replace it.',
+    req_name_ph:'Your name (optional)', req_phone_ph:'Phone (optional)',
+    req_district:'District — routes to that manager', req_pick:'Select district…',
+    req_send:'Send for review', req_err:'Could not send your request. Please try again.',
+    auth_prompt:'Create a free account (or log in) to send this for review and track the decision.',
+    auth_email_ph:'Email', auth_pass_ph:'Password (min 6 characters)',
+    auth_name_ph:'Your name (optional)', auth_phone_ph:'Phone (optional)',
+    auth_signup:'Create account', auth_login:'Log in', auth_logout:'log out',
+    auth_err:'Could not sign in. Check your details and try again.',
+    req_as:'Requesting as', my_req_title:'My review requests', my_req_empty:'You have no requests yet.',
+    st_pending:'Pending', st_approved:'Approved', st_rejected:'Flagged',
+    req_ok:(id,d)=>`Review #${id} sent to the ${d||'district'} forest manager. Keep this number to check the outcome.`,
     sim_same:(cb,ca,nb,na)=>`If you clear this area, your tree cover drops from ${cb}% to ${ca}%. The surrounding 500m area has ${na}% cleared land — the risk level stays the same.`,
     sim_worse:(cb,ca,nb,na)=>`If you clear this area, your tree cover drops from ${cb}% to ${ca}% and the risk increases. The 500m neighbourhood goes from ${nb}% to ${na}% cleared.`,
     sim_better:(cb,ca,nb,na)=>`After clearing, tree cover would be ${ca}% — the risk actually improves.`,
@@ -230,6 +273,19 @@ const STRINGS = {
     reason_fw:'Inkwi', reason_tm:'Ibiti by\'imbaho', reason_fa:'Ubuhinzi', reason_in:'Umusaruro',
     no_sugg:'Nta makuru yo gusubiza kuri iyo mpamvu.',
     learn_more:'Menya byinshi →',
+    req_title:'Saba isuzuma rya tekiniki',
+    req_sub:'Ohereza ubu butaka ku muyobozi w\'amashyamba w\'akarere kawe asuzume ingaruka zo gutema ibiti. Ibi bifasha icyemezo cy\'uruhushya — ntibisimbura.',
+    req_name_ph:'Amazina yawe (ku bushake)', req_phone_ph:'Telefone (ku bushake)',
+    req_district:'Akarere — bijya kuri uwo muyobozi', req_pick:'Hitamo akarere…',
+    req_send:'Ohereza isuzumwe', req_err:'Ntibyashobotse kohereza. Ongera ugerageze.',
+    auth_prompt:'Fungura konti ku buntu (cyangwa winjire) kugira ngo wohereze isuzuma unakurikirane igisubizo.',
+    auth_email_ph:'Imeyili', auth_pass_ph:'Ijambobanga (nibura inyuguti 6)',
+    auth_name_ph:'Amazina yawe (ku bushake)', auth_phone_ph:'Telefone (ku bushake)',
+    auth_signup:'Fungura konti', auth_login:'Injira', auth_logout:'sohoka',
+    auth_err:'Ntibyashobotse. Reba amakuru yawe wongere ugerageze.',
+    req_as:'Urasaba nka', my_req_title:'Ibyifuzo byanjye by\'isuzuma', my_req_empty:'Nta byifuzo ufite.',
+    st_pending:'Bitegereje', st_approved:'Byemejwe', st_rejected:'Byashyizweho ikimenyetso',
+    req_ok:(id,d)=>`Isuzuma #${id} ryoherejwe ku muyobozi wa ${d||'akarere'}. Bika iyi nomero kugira ngo urebe igisubizo.`,
     sim_same:(cb,ca,nb,na)=>`Gukata aho, ibiti biri ${cb}% biramanuka kugera ${ca}%. Akarere ka 500m hafi yawe gifite ${na}% yahagaritswe — inzara iguma ingana.`,
     sim_worse:(cb,ca,nb,na)=>`Gukata aho, ibiti biramanuka ${cb}% → ${ca}%, kandi inzara iriyongera. Akarere ka 500m kijya ${nb}% → ${na}% yahagaritswe.`,
     sim_better:(cb,ca,nb,na)=>`Nyuma yo gukata, ibiti bizaba ${ca}% — inzara irageuka nziza.`,
@@ -259,6 +315,19 @@ const STRINGS = {
     reason_fw:'Bois de chauffe', reason_tm:'Bois d\'œuvre', reason_fa:'Agriculture', reason_in:'Revenus',
     no_sugg:'Aucune suggestion trouvée pour cette raison.',
     learn_more:'En savoir plus →',
+    req_title:'Demander un examen technique',
+    req_sub:'Envoyez cette parcelle au gestionnaire forestier de votre district pour un examen technique de l\'impact sur les arbres. Ceci appuie la décision officielle de permis — sans la remplacer.',
+    req_name_ph:'Votre nom (facultatif)', req_phone_ph:'Téléphone (facultatif)',
+    req_district:'District — dirige vers ce gestionnaire', req_pick:'Choisir un district…',
+    req_send:'Envoyer pour examen', req_err:'Échec de l\'envoi. Veuillez réessayer.',
+    auth_prompt:'Créez un compte gratuit (ou connectez-vous) pour envoyer cette demande et suivre la décision.',
+    auth_email_ph:'E-mail', auth_pass_ph:'Mot de passe (6 caractères min)',
+    auth_name_ph:'Votre nom (facultatif)', auth_phone_ph:'Téléphone (facultatif)',
+    auth_signup:'Créer un compte', auth_login:'Se connecter', auth_logout:'se déconnecter',
+    auth_err:'Échec de la connexion. Vérifiez vos informations et réessayez.',
+    req_as:'Demande au nom de', my_req_title:'Mes demandes d\'examen', my_req_empty:'Vous n\'avez encore aucune demande.',
+    st_pending:'En attente', st_approved:'Approuvée', st_rejected:'Signalée',
+    req_ok:(id,d)=>`Examen #${id} envoyé au gestionnaire forestier de ${d||'district'}. Gardez ce numéro pour le résultat.`,
     sim_same:(cb,ca,nb,na)=>`Si vous déboisez, la couverture arborée passe de ${cb}% à ${ca}%. La zone de 500m autour a ${na}% de terres déboisées — le risque reste le même.`,
     sim_worse:(cb,ca,nb,na)=>`Si vous déboisez, la couverture passe de ${cb}% à ${ca}% et le risque augmente. Le voisinage 500m passe de ${nb}% à ${na}% déboisé.`,
     sim_better:(cb,ca,nb,na)=>`Après déforestation, la couverture serait de ${ca}% — le risque s\'améliore.`,
@@ -277,6 +346,10 @@ function setLang(code){
   document.querySelectorAll('[data-i18n]').forEach(el=>{
     const v=t(el.getAttribute('data-i18n'));
     if(typeof v==='string') el.textContent=v;
+  });
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{
+    const v=t(el.getAttribute('data-i18n-ph'));
+    if(typeof v==='string') el.placeholder=v;
   });
   if(lastAnalysis){
     document.getElementById('confNote').textContent=confNoteText(lastAnalysis);
@@ -481,7 +554,74 @@ function renderRisk(r){
   else { dir.textContent = '→ ' + t('ndvi_flat'); dir.style.color='#6b7280'; }
   // alternatives — always show so citizen can explore options at any risk level
   document.getElementById('altPanel').classList.remove('hidden');
+  // cutting-permission request panel — pre-fill the detected district
+  const rp=document.getElementById('requestPanel');
+  if(rp){
+    rp.classList.remove('hidden');
+    const sel=document.getElementById('reqDistrict');
+    if(sel && r.district) sel.value=r.district;
+    document.getElementById('reqResult').innerHTML='';
+    refreshCitizen();
+  }
 }
+
+// ── Citizen account + review request ──────────────────────────────────
+async function loadDistricts(){
+  try{
+    const r=await (await fetch('/api/districts')).json();
+    const sel=document.getElementById('reqDistrict');
+    if(sel) sel.innerHTML=`<option value="">${t('req_pick')}</option>`+
+      (r.districts||[]).map(d=>`<option value="${d}">${d}</option>`).join('');
+  }catch(e){}
+}
+loadDistricts();
+
+let _citizen=null;
+async function refreshCitizen(){
+  try{ _citizen=await (await fetch('/api/citizen/me')).json(); }catch(e){ _citizen={authenticated:false}; }
+  const authed=!!(_citizen&&_citizen.authenticated);
+  const a=document.getElementById('reqAuth'), f=document.getElementById('reqForm');
+  if(a) a.classList.toggle('hidden', authed);
+  if(f) f.classList.toggle('hidden', !authed);
+  if(authed){ const e=document.getElementById('reqAsEmail'); if(e) e.textContent=_citizen.email; }
+  loadMyRequests();
+}
+
+const ST_COLOUR={pending:'#b45309',approved:'#15803d',rejected:'#b91c1c'};
+async function loadMyRequests(){
+  const panel=document.getElementById('myReqPanel'), list=document.getElementById('myReqList');
+  if(!panel||!list) return;
+  if(!(_citizen&&_citizen.authenticated)){ panel.classList.add('hidden'); return; }
+  let data; try{ data=await (await fetch('/api/my-requests')).json(); }catch(e){ return; }
+  const rows=data.requests||[];
+  panel.classList.remove('hidden');
+  list.innerHTML = rows.length ? rows.map(r=>`
+    <div class="p-2.5 rounded-lg border border-outline-variant/30" style="border-left:3px solid ${ST_COLOUR[r.status]||'#9ca3af'}">
+      <div class="flex justify-between items-center">
+        <span class="text-label-md font-bold text-on-surface">#${r.request_id} · ${r.sector||r.district||'—'}</span>
+        <span class="text-label-sm font-bold" style="color:${ST_COLOUR[r.status]||'#6b7280'}">${t('st_'+r.status)||r.status}</span>
+      </div>
+      <div class="text-outline" style="font-size:11px">${(r.created_at||'').replace('T',' ')}${r.review_note?' · '+r.review_note:''}</div>
+    </div>`).join('') : `<p class="text-outline" style="font-size:12px">${t('my_req_empty')}</p>`;
+}
+
+document.getElementById('reqLogout').addEventListener('click', async ()=>{ await fetch('/api/citizen/logout',{method:'POST'}); refreshCitizen(); });
+
+document.getElementById('reqSubmit').addEventListener('click', async ()=>{
+  if(!lastAnalysis) return;
+  const btn=document.getElementById('reqSubmit'), res=document.getElementById('reqResult');
+  const district=document.getElementById('reqDistrict').value||lastAnalysis.district||'';
+  btn.disabled=true;
+  try{
+    const r=await (await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id, district})})).json();
+    if(r.error){ res.innerHTML=`<div class="err">${r.error}</div>`; }
+    else{ res.innerHTML=`<div style="color:#15803d;font-size:13px;font-weight:600;line-height:1.4">${t('req_ok')(r.request_id, r.district||district)}</div>`; loadMyRequests(); }
+  }catch(e){ res.innerHTML=`<div class="err">${t('req_err')}</div>`; }
+  finally{ btn.disabled=false; }
+});
+
+// show My Requests immediately for a returning, already-logged-in citizen
+refreshCitizen();
 
 // ── Simulation ──
 const cutSlider=document.getElementById('cutSlider'), cutVal=document.getElementById('cutVal'), simResult=document.getElementById('simResult');

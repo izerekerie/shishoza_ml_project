@@ -53,15 +53,17 @@
 <a href="/" title="Back to home" class="font-headline-lg text-headline-lg font-black tracking-tighter text-[#14532D] hover:opacity-70 transition-opacity cursor-pointer">Shishoza</a>
 <p class="font-body-sm text-body-sm text-on-surface-variant opacity-70">Forest Risk Control</p>
 </div>
-<nav class="flex flex-col gap-2 mb-auto">
-<a class="flex items-center gap-3 p-3 bg-[#14532D] text-white rounded-lg font-bold transition-all hover:translate-x-1" href="/manager">
-<span class="material-symbols-outlined">map</span><span class="font-title-md text-title-md">Risk Map</span></a>
-<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/citizen">
-<span class="material-symbols-outlined">person</span><span class="font-title-md text-title-md">Citizen view</span></a>
-<a id="adminLink" class="hidden items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/admin">
-<span class="material-symbols-outlined">manage_accounts</span><span class="font-title-md text-title-md">User management</span></a>
-<a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-surface-container-highest rounded-lg transition-all hover:translate-x-1" href="/apidocs/" target="_blank">
-<span class="material-symbols-outlined">api</span><span class="font-title-md text-title-md">API docs</span></a>
+<nav class="flex flex-col gap-0.5 mb-auto">
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-semibold text-white" style="background:#14532D" href="/manager">
+<span class="material-symbols-outlined text-[20px]">map</span>Risk Map</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-on-surface-variant hover:bg-black/5 transition-colors" href="/reviews">
+<span class="material-symbols-outlined text-[20px]">fact_check</span>Reviews<span id="navReviewsCount" class="ml-auto text-[10px] text-white px-1.5 rounded-full font-bold" style="background:#14532D"></span></a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-on-surface-variant hover:bg-black/5 transition-colors" href="/citizen">
+<span class="material-symbols-outlined text-[20px]">person</span>Citizen view</a>
+<a id="adminLink" class="hidden items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-on-surface-variant hover:bg-black/5 transition-colors" href="/admin">
+<span class="material-symbols-outlined text-[20px]">manage_accounts</span>User management</a>
+<a id="apiDocsLink" class="hidden items-center gap-2.5 px-3 py-2 rounded-md text-sm font-medium text-on-surface-variant hover:bg-black/5 transition-colors" href="/apidocs/" target="_blank">
+<span class="material-symbols-outlined text-[20px]">api</span>API docs</a>
 </nav>
 <div class="mt-8 pt-6 border-t border-outline-variant/20 flex flex-col gap-1">
 <div class="px-2 text-sm font-bold text-on-surface" id="userLabel">loading…</div>
@@ -69,7 +71,7 @@
 <a class="flex items-center gap-3 p-2 text-error hover:bg-surface-container-highest rounded-lg transition-all text-sm font-semibold cursor-pointer" id="logoutLink" href="#">
 <span class="material-symbols-outlined text-base">logout</span><span>Sign out</span></a>
 </div>
-<div class="mt-auto pt-4 border-t border-[#E5E7EB]"><p class="text-[10px] text-on-surface-variant text-center opacity-60">© 2026 Shishoza · ALU</p></div>
+<div class="mt-auto pt-4 border-t border-[#E5E7EB]"><p class="text-[10px] text-on-surface-variant text-center opacity-60">© 2026 Shishoza</p></div>
 </aside>
 
 <!-- Main: map + overlays -->
@@ -88,7 +90,7 @@
 <div class="flex items-center gap-4">
 <div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container rounded-full border border-outline-variant/20">
 <span class="w-2 h-2 rounded-full bg-status-live ping-animate"></span>
-<span class="text-xs font-bold">CURRENT MODEL RISK · SENTINEL 2025–26</span>
+<span class="text-xs font-bold">Live data</span>
 </div>
 </div>
 </header>
@@ -107,6 +109,15 @@
 <div class="bg-orange-100/30 p-4 rounded-lg border border-orange-500/20"><p class="text-xs text-orange-600 font-bold mb-1">MEDIUM RISK</p><p class="text-2xl font-bold text-orange-700" id="stat-med">—</p></div>
 <div class="bg-secondary-container/10 p-4 rounded-lg border border-secondary/20"><p class="text-xs text-secondary font-bold mb-1">LOW RISK</p><p class="text-2xl font-bold text-secondary" id="stat-low">—</p></div>
 </div>
+</section>
+<!-- Review requests (citizen technical-review submissions) -->
+<section class="glass-card p-5 rounded-lg pointer-events-auto flex flex-col" id="reviewPanel">
+<header class="flex justify-between items-center mb-3">
+<div class="flex items-center gap-2"><span class="material-symbols-outlined text-on-surface-variant text-sm">how_to_reg</span><h2 class="font-label-caps text-label-caps text-on-surface-variant">REVIEW REQUESTS</h2></div>
+<span class="text-[10px] text-white px-2 py-0.5 rounded-full font-bold" style="background:#14532D" id="reqCount">0</span>
+</header>
+<button id="bulkApprove" class="w-full mb-2 text-[11px] px-2 py-1.5 rounded font-bold border transition-all disabled:opacity-40" style="color:#15803d;border-color:#15803d33;background:#15803d0d">Approve low-impact</button>
+<div class="space-y-0 overflow-y-auto pr-1 custom-scrollbar max-h-[38vh]" id="reqList"><p class="text-xs text-on-surface-variant">Loading…</p></div>
 </section>
 <!-- Sector detail -->
 <section class="glass-card p-5 rounded-lg pointer-events-auto" id="sectorDetail">
@@ -150,7 +161,7 @@
     document.getElementById('userLabel').textContent = u.full_name;
     document.getElementById('userRole').textContent = u.role === 'admin' ? 'Administrator' : 'Forest Manager';
     document.getElementById('scopeLabel').textContent = u.district_scope || 'National (admin)';
-    if (u.role === 'admin') document.getElementById('adminLink').classList.remove('hidden');
+    if (u.role === 'admin') ['adminLink','apiDocsLink'].forEach(id=>{ const e=document.getElementById(id); if(e){ e.classList.remove('hidden'); e.classList.add('flex'); } });
   } catch (e) {}
 })();
 document.getElementById('logoutLink').addEventListener('click', async (e) => {
@@ -270,5 +281,72 @@ async function renderSectorDetail(props) {
     const box = document.getElementById('liveBox'); if (box) box.innerHTML = `<p class="text-xs text-error">Network error: ${e.message}</p>`;
   }
 }
+
+// ---- Review requests: queue panel + risk-coloured map pins ----
+let _reqMarkers = [];
+function _rc(l){ return RISK_COLOUR[l] || '#9ca3af'; }
+function reqCard(r){
+  return `<div class="p-2.5 bg-white rounded border border-[#E5E7EB] border-l-4 mb-2" style="border-left-color:${_rc(r.parcel_risk)}">
+    <div class="flex justify-between items-start gap-2">
+      <div><div class="text-xs font-bold">#${r.request_id} · ${r.citizen_name||r.citizen_email||'—'}</div>
+        <div class="text-[10px] text-on-surface-variant">${r.citizen_email||''}${r.citizen_phone?' · '+r.citizen_phone:''}</div>
+        <div class="text-[10px] text-on-surface-variant">${r.sector||'—'} · ${r.upi||'no UPI'}</div></div>
+      <span class="text-[9px] px-1.5 py-0.5 rounded-full text-white font-bold shrink-0" style="background:${_rc(r.parcel_risk)}">${r.parcel_risk||'—'}</span>
+    </div>
+    <div class="text-[10px] text-on-surface-variant mt-1">Neighbourhood ${r.neighbourhood_risk||'—'} · Trees ${r.tree_cover_pct!=null?Math.round(r.tree_cover_pct)+'%':'—'}</div>
+    <div class="flex gap-1.5 mt-2">
+      <button data-focus="${r.request_id}" class="text-[10px] px-2 py-1 rounded border border-outline-variant/40 hover:bg-surface-container">Map</button>
+      <button data-id="${r.request_id}" data-decide="approved" class="flex-1 text-[10px] px-2 py-1 rounded text-white font-bold" style="background:#16a34a">Approve</button>
+      <button data-id="${r.request_id}" data-decide="rejected" class="flex-1 text-[10px] px-2 py-1 rounded text-white font-bold" style="background:#dc2626">Flag</button>
+    </div></div>`;
+}
+function reqPopup(r){
+  return `<div style="min-width:180px">
+    <div style="font-weight:700;font-size:13px">#${r.request_id} · ${r.citizen_name||r.citizen_email||'—'}</div>
+    <div style="font-size:11px;color:#666">${r.sector||''} · ${r.district||''}</div>
+    <div style="font-size:11px;color:#333">${r.citizen_email||''}${r.citizen_phone?' · '+r.citizen_phone:''}</div>
+    <div style="font-size:11px;margin:5px 0">Parcel <b style="color:${_rc(r.parcel_risk)}">${r.parcel_risk}</b> · Neighbourhood <b style="color:${_rc(r.neighbourhood_risk)}">${r.neighbourhood_risk}</b> · Trees ${r.tree_cover_pct!=null?Math.round(r.tree_cover_pct)+'%':'—'}</div>
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <button data-id="${r.request_id}" data-decide="approved" style="flex:1;background:#16a34a;color:#fff;border:none;padding:5px;border-radius:4px;font-weight:700;font-size:11px;cursor:pointer">Approve</button>
+      <button data-id="${r.request_id}" data-decide="rejected" style="flex:1;background:#dc2626;color:#fff;border:none;padding:5px;border-radius:4px;font-weight:700;font-size:11px;cursor:pointer">Flag</button>
+    </div></div>`;
+}
+async function decideReq(id, status){
+  try{
+    const r = await (await fetch(`/api/requests/${id}/decision`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})})).json();
+    if(r.error){ alert(r.error); return; }
+    map.closePopup(); loadRequests();
+  }catch(e){ alert('Network error'); }
+}
+function wireDecide(root){
+  root.querySelectorAll('[data-decide]').forEach(b=>b.addEventListener('click',()=>decideReq(b.getAttribute('data-id'),b.getAttribute('data-decide'))));
+  root.querySelectorAll('[data-focus]').forEach(b=>b.addEventListener('click',()=>{ const m=_reqMarkers.find(x=>x._rid==b.getAttribute('data-focus')); if(m){ map.setView(m.getLatLng(),13); m.openPopup(); }}));
+}
+map.on('popupopen', e=>{ const el=e.popup.getElement(); if(el) wireDecide(el); });
+async function loadRequests(){
+  let data; try{ data = await (await fetch('/api/requests?status=pending')).json(); }catch(e){ return; }
+  if(data.error) return;
+  const list = data.requests||[], counts = data.counts||{};
+  const cEl=document.getElementById('reqCount'); if(cEl) cEl.textContent = counts.pending||0;
+  const nc=document.getElementById('navReviewsCount'); if(nc) nc.textContent = counts.pending||'';
+  const box=document.getElementById('reqList');
+  if(box){ box.innerHTML = list.length ? list.map(reqCard).join('') : '<p class="text-xs text-on-surface-variant">No pending review requests in your district.</p>'; wireDecide(box); }
+  const low = list.filter(r=>r.parcel_risk==='LOW' && r.neighbourhood_risk==='LOW');
+  const bulk=document.getElementById('bulkApprove');
+  if(bulk){ bulk.textContent = `Approve ${low.length} low-impact`; bulk.disabled = low.length===0; bulk.dataset.ids = JSON.stringify(low.map(r=>r.request_id)); }
+  _reqMarkers.forEach(m=>map.removeLayer(m)); _reqMarkers=[];
+  list.forEach(r=>{ if(r.lat==null||r.lng==null) return;
+    const m=L.circleMarker([r.lat,r.lng],{radius:8,color:'#fff',weight:2,fillColor:_rc(r.parcel_risk),fillOpacity:0.95}).addTo(map);
+    m._rid=r.request_id; m.bindPopup(reqPopup(r)); _reqMarkers.push(m); });
+}
+const _bulkBtn=document.getElementById('bulkApprove');
+if(_bulkBtn) _bulkBtn.addEventListener('click', async e=>{
+  const ids=JSON.parse(e.currentTarget.dataset.ids||'[]'); if(!ids.length) return;
+  if(!confirm(`Approve ${ids.length} low-impact request(s)?`)) return;
+  for(const id of ids){ await fetch(`/api/requests/${id}/decision`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'approved',note:'Bulk: low impact'})}); }
+  loadRequests();
+});
+loadRequests();
+setInterval(loadRequests, 30000);
 </script>
 </body></html>
