@@ -255,7 +255,8 @@ manager, admin) is in the **[demo video](https://drive.google.com/drive/folders/
 
 Screenshots:
 
-<img width="1512" height="824" alt="Screenshot 2026-06-12 at 20 49 47" src="https://github.com/user-attachments/assets/09987a0a-ac6f-42ad-9f56-c89a53809d7e" />
+<img width="1512" height="825" alt="image" src="https://github.com/user-attachments/assets/0dc204d8-2140-41dd-955d-55b637ddabc3" />
+
 <img width="1512" height="824" alt="Screenshot 2026-06-12 at 20 53 27" src="https://github.com/user-attachments/assets/1f696abb-0e76-472c-ae82-f055e2c62bef" />
 <img width="1512" height="824" alt="Screenshot 2026-06-12 at 20 53 33" src="https://github.com/user-attachments/assets/0bba2a6d-a566-4934-8df0-8288f27bbccb" />
 <img width="1512" height="824" alt="Screenshot 2026-06-12 at 20 53 49" src="https://github.com/user-attachments/assets/af883271-8fc1-4486-b995-a38ef8f8beb3" />
