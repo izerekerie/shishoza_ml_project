@@ -62,6 +62,24 @@ scripts/rewrite_descriptions.py
 scripts/make_supervisor_doc.py
 scripts/make_supervisor_ppt.py
 
+# ── Not part of the deliverable / kept local ────────────────────────────────
+# AI-tool config, not a project artifact
+CLAUDE.md
+.claude/
+# running feature log — local reference only
+FEATURES.md
+# one-off notebook builders (not runtime, not the reproducible pipeline)
+scripts/append_national_sections.py
+scripts/build_national_notebook.py
+# stray backup artifact
+results/application/sector_risk_labelavg_backup.json
+# dissertation writing + its one-off Word/figure generators (kept local)
+Chapter4_System_Implementation_and_Testing.md
+REPORT_UPDATES_new_features.md
+scripts/build_chapter4_docx.py
+scripts/build_chapters_5_6_docx.py
+scripts/make_clearance_map.py
+
 # ── Derivative bundle (regenerable from results/) ──────────────────
 ml_deliverables/
 
