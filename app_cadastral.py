@@ -160,17 +160,44 @@ def _send_email(to, subject, body):
         print(f"[email] failed to {to}: {e}", flush=True)
 
 
-def _notify_decision(email, req_id, status, note, sector):
+# Short alternative-to-cutting hints keyed by the citizen's stated reason, added
+# to the "flagged" email so a refusal always comes with a constructive next step.
+_ALT_HINTS = {
+    "firewood": "- Fast-growing woodlots, or an improved (rocket) cookstove that needs far less wood.",
+    "timber":   "- Harvest selectively, or plant a eucalyptus woodlot instead of clearing natural forest.",
+    "farming":  "- Agroforestry: grow crops between retained trees so the land keeps its tree cover.",
+    "income":   "- Beekeeping, fruit trees or eco-tourism can earn income without clearing the forest.",
+}
+
+
+def _alternatives_text(reason):
+    return _ALT_HINTS.get((reason or "").lower(),
+        "- Agroforestry, managed woodlots and improved cookstoves reduce the need to clear natural forest.")
+
+
+def _notify_decision(email, req_id, status, note, sector, reason=None):
     """Email the citizen the manager's decision, off the request thread."""
     if not email:
         return
-    verdict = "approved" if status == "approved" else "flagged for a site visit"
-    subject = f"Shishoza — review request #{req_id} {verdict}"
-    body = (f"Hello,\n\nYour technical-review request #{req_id}"
-            f"{' for ' + sector if sector else ''} has been {verdict} "
-            f"by the district forest manager."
-            + (f"\n\nManager's note: {note}" if note else "")
-            + f"\n\nSee the full details in your account:\n{PUBLIC_URL}/citizen\n\n— Shishoza")
+    where = f" for {sector}" if sector else ""
+    if status == "approved":
+        subject = f"Shishoza - review #{req_id} approved"
+        body = (f"Hello,\n\nYour technical-review request #{req_id}{where} has been APPROVED "
+                "by the district forest manager.\n\n"
+                "The tree-loss impact was assessed as acceptable. You may now proceed with the "
+                "official cutting-permit application through your district land office. Keep this "
+                f"review number (#{req_id}) as your reference."
+                + (f"\n\nManager's note: {note}" if note else "")
+                + f"\n\nTrack it any time in your account:\n{PUBLIC_URL}/my-reviews\n\n- Shishoza")
+    else:  # rejected / flagged
+        subject = f"Shishoza - review #{req_id} flagged"
+        body = (f"Hello,\n\nYour technical-review request #{req_id}{where} has been FLAGGED "
+                "by the district forest manager, so it is not recommended as submitted.\n\n"
+                f"Reason: {note or 'significant tree-loss impact'}\n\n"
+                "Before cutting, please consider these alternatives:\n"
+                f"{_alternatives_text(reason)}\n\n"
+                "You can discuss this with your district forest office. Track it here:\n"
+                f"{PUBLIC_URL}/my-reviews\n\n- Shishoza")
     _EE_POOL.submit(_send_email, email, subject, body)
 
 
@@ -536,6 +563,14 @@ def citizen_account_page():
     return render_template("citizen_auth.html")
 
 
+@app.get("/my-reviews")
+def my_reviews_page():
+    """A citizen's own review requests as a full table (their tracking view)."""
+    if not current_citizen():
+        return redirect("/account?mode=login")
+    return render_template("my_reviews.html")
+
+
 @app.get("/citizen")
 def citizen():
     return render_template("citizen.html")
@@ -638,12 +673,21 @@ def api_users_create():
     missing = [f for f in required if not data.get(f)]
     if missing:
         return jsonify({"error": f"missing fields: {', '.join(missing)}"}), 400
+    email = (data["email"] or "").strip().lower()
+    if "@" not in email or "." not in email.rsplit("@", 1)[-1]:
+        return jsonify({"error": "Please enter a valid email address"}), 400
+    if len(data["password"]) < 8:
+        return jsonify({"error": "Password must be at least 8 characters"}), 400
     if data["role"] not in ("admin", "forest_manager"):
         return jsonify({"error": "role must be admin or forest_manager"}), 400
     if data["role"] == "forest_manager" and not data.get("district_scope"):
         return jsonify({"error": "forest_manager requires district_scope"}), 400
     if data.get("language") and data["language"] not in ("rw", "en", "fr"):
         return jsonify({"error": "language must be rw, en, or fr"}), 400
+    # One email across the whole system: block staff/citizen collisions so a
+    # citizen account can never be mistaken for a manager or admin.
+    if lookup_citizen(email):
+        return jsonify({"error": "That email is already registered as a citizen account"}), 409
 
     pw_hash = bcrypt.hashpw(data["password"].encode(), bcrypt.gensalt(rounds=10)).decode()
     try:
@@ -652,7 +696,7 @@ def api_users_create():
                 "INSERT INTO USERS (email, password_hash, full_name, role, "
                 "organisation, district_scope, language) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (data["email"].lower().strip(), pw_hash, data["full_name"],
+                (email, pw_hash, data["full_name"],
                  data["role"], data.get("organisation"),
                  data.get("district_scope") if data["role"] == "forest_manager" else None,
                  data.get("language", "en"))
@@ -897,6 +941,10 @@ else:
                 _con.execute("ALTER TABLE REQUESTS ADD COLUMN citizen_email TEXT")
             except sqlite3.OperationalError:
                 pass  # column already present
+            try:
+                _con.execute("ALTER TABLE REQUESTS ADD COLUMN reason TEXT")
+            except sqlite3.OperationalError:
+                pass  # the citizen's stated reason for cutting
     except sqlite3.Error as e:
         print(f"[boot]   could not create ANALYSIS_CACHE table: {e}")
 
@@ -972,6 +1020,8 @@ def api_citizen_signup():
         return jsonify({"error": "Password must be at least 6 characters"}), 400
     if lookup_citizen(email):
         return jsonify({"error": "An account with this email already exists — please log in"}), 409
+    if lookup_user(email):
+        return jsonify({"error": "This email belongs to a staff account. Please use a different email."}), 409
     h = bcrypt.hashpw(pwd.encode(), bcrypt.gensalt()).decode()
     now = datetime.datetime.now().isoformat(timespec="seconds")
     try:
@@ -1073,15 +1123,15 @@ def api_create_request():
             cur = con.execute(
                 "INSERT INTO REQUESTS (created_at, citizen_name, citizen_phone, citizen_email, upi, "
                 "district, sector, sector_id, lat, lng, area_ha, risk_level, parcel_risk, "
-                "neighbourhood_risk, tree_cover_pct, deforestation_prob, data_source, analysis_id) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "neighbourhood_risk, tree_cover_pct, deforestation_prob, data_source, analysis_id, reason) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (now, citizen.get("full_name"), citizen.get("phone"), citizen["email"],
                  (data.get("upi") or analysis.get("upi")), district, sector,
                  sec.get("sector_id"), lat, lng, analysis.get("parcel_area_ha"),
                  analysis.get("risk_level"), analysis.get("parcel_risk"),
                  analysis.get("neighbourhood_risk"), analysis.get("tree_cover_pct"),
                  analysis.get("deforestation_prob"), analysis.get("data_source"),
-                 str(data.get("analysis_id"))),
+                 str(data.get("analysis_id")), (data.get("reason") or None)),
             )
             rid = cur.lastrowid
     except sqlite3.Error as e:
@@ -1129,27 +1179,37 @@ def api_decide_request(req_id):
     user = current_user()
     data = request.get_json() or {}
     status = (data.get("status") or "").strip()
-    if status not in ("approved", "rejected"):
-        return jsonify({"error": "status must be 'approved' or 'rejected'"}), 400
+    # 'pending' re-opens a decision made by mistake (no email sent on re-open).
+    if status not in ("approved", "rejected", "pending"):
+        return jsonify({"error": "status must be 'approved', 'rejected' or 'pending'"}), 400
+    note = (data.get("note") or "").strip()
+    # A flag/decline must carry a reason — the citizen is shown it.
+    if status == "rejected" and not note:
+        return jsonify({"error": "Please give a reason when you flag a request — the citizen will see it"}), 400
     now = datetime.datetime.now().isoformat(timespec="seconds")
     try:
         with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
             con.row_factory = sqlite3.Row
             row = con.execute(
-                "SELECT district, citizen_email, sector FROM REQUESTS WHERE request_id = ?",
+                "SELECT district, citizen_email, sector, reason FROM REQUESTS WHERE request_id = ?",
                 (req_id,)).fetchone()
             if not row:
                 return jsonify({"error": "Request not found"}), 404
             if user.get("district_scope") and row["district"] != user["district_scope"]:
                 return jsonify({"error": "Request outside your district scope"}), 403
+            if status == "pending":          # re-open: clear the decision
+                reviewer, reviewed_at, note_val = None, None, None
+            else:
+                reviewer, reviewed_at, note_val = session.get("user_email"), now, (note or None)
             con.execute(
                 "UPDATE REQUESTS SET status=?, reviewed_by=?, reviewed_at=?, review_note=? "
                 "WHERE request_id = ?",
-                (status, session.get("user_email"), now, (data.get("note") or None), req_id))
+                (status, reviewer, reviewed_at, note_val, req_id))
     except sqlite3.Error as e:
         return jsonify({"error": str(e)}), 500
-    # Best-effort email to the citizen (skipped silently if SMTP is not configured).
-    _notify_decision(row["citizen_email"], req_id, status, data.get("note"), row["sector"])
+    # Best-effort email on a real decision (skipped on re-open, or if SMTP unset).
+    if status != "pending":
+        _notify_decision(row["citizen_email"], req_id, status, note, row["sector"], row["reason"])
     return jsonify({"ok": True})
 
 
@@ -1164,7 +1224,7 @@ def api_my_requests():
             con.row_factory = sqlite3.Row
             rows = [dict(r) for r in con.execute(
                 "SELECT request_id, created_at, sector, district, risk_level, parcel_risk, "
-                "neighbourhood_risk, tree_cover_pct, status, reviewed_at, review_note "
+                "neighbourhood_risk, tree_cover_pct, status, reviewed_at, review_note, reason "
                 "FROM REQUESTS WHERE LOWER(citizen_email) = LOWER(?) ORDER BY created_at DESC",
                 (citizen["email"],)).fetchall()]
     except sqlite3.Error as e:

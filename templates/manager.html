@@ -312,8 +312,10 @@ function reqPopup(r){
     </div></div>`;
 }
 async function decideReq(id, status){
+  let note=null;
+  if(status==='rejected'){ note=prompt('Reason for flagging (the citizen will be emailed this):'); if(note===null) return; if(!note.trim()){ alert('A reason is required to flag a request.'); return; } }
   try{
-    const r = await (await fetch(`/api/requests/${id}/decision`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})})).json();
+    const r = await (await fetch(`/api/requests/${id}/decision`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status, note})})).json();
     if(r.error){ alert(r.error); return; }
     map.closePopup(); loadRequests();
   }catch(e){ alert('Network error'); }

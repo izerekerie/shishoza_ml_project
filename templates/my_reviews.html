@@ -1,0 +1,60 @@
+<!DOCTYPE html><html lang="en"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Shishoza | My Review Requests</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=block" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>body{font-family:'Inter',sans-serif}</style>
+</head>
+<body class="min-h-screen bg-[#f8faf9] text-gray-800">
+
+<header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+  <div class="flex items-center gap-6">
+    <a href="/" class="text-xl font-extrabold tracking-tight" style="color:#14532D">Shishoza</a>
+    <a href="/citizen" class="text-sm font-semibold text-gray-500 hover:text-gray-800">← Back to map</a>
+  </div>
+  <div class="text-sm text-gray-500"><span id="who" class="font-semibold text-gray-700"></span> · <a id="logout" href="#" class="text-red-600 font-semibold hover:underline">log out</a></div>
+</header>
+
+<main class="max-w-4xl mx-auto p-6">
+  <h1 class="text-lg font-bold text-gray-900">My review requests</h1>
+  <p class="text-xs text-gray-500 mb-4">Track the technical reviews you have submitted and the district manager's decision.</p>
+  <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-left text-[11px] uppercase tracking-wide text-gray-500"><tr>
+        <th class="px-4 py-3 font-semibold">#</th><th class="px-4 py-3 font-semibold">Date</th><th class="px-4 py-3 font-semibold">Location</th><th class="px-4 py-3 font-semibold">Your parcel</th><th class="px-4 py-3 font-semibold">Neighbourhood</th><th class="px-4 py-3 font-semibold">Status</th><th class="px-4 py-3 font-semibold">Manager note</th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+(async () => {
+  const d = await (await fetch('/api/citizen/me')).json();
+  if (!d.authenticated) { location.href = '/account?mode=login'; return; }
+  $('who').textContent = d.email;
+})();
+$('logout').addEventListener('click', async e => { e.preventDefault(); await fetch('/api/citizen/logout', {method:'POST'}); location.href = '/citizen'; });
+
+const RC = {HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a'};
+const SL = {pending:'Pending', approved:'Approved', rejected:'Flagged'};
+const SC = {pending:'#b45309', approved:'#15803d', rejected:'#b91c1c'};
+(async () => {
+  let rows = [];
+  try { rows = (await (await fetch('/api/my-requests')).json()).requests || []; } catch(e) {}
+  $('tbody').innerHTML = rows.length ? rows.map(r => `
+    <tr class="border-t border-gray-100">
+      <td class="px-4 py-3 font-bold text-gray-700">${r.request_id}</td>
+      <td class="px-4 py-3 text-xs text-gray-500">${(r.created_at||'').replace('T',' ')}</td>
+      <td class="px-4 py-3 text-xs">${r.sector||'—'}${r.district ? ', ' + r.district : ''}</td>
+      <td class="px-4 py-3"><span class="text-xs font-bold" style="color:${RC[r.parcel_risk]||'#9ca3af'}">${r.parcel_risk||'—'}</span></td>
+      <td class="px-4 py-3"><span class="text-xs font-bold" style="color:${RC[r.neighbourhood_risk]||'#9ca3af'}">${r.neighbourhood_risk||'—'}</span></td>
+      <td class="px-4 py-3 text-xs font-bold" style="color:${SC[r.status]||'#6b7280'}">${SL[r.status]||r.status}</td>
+      <td class="px-4 py-3 text-xs text-gray-500">${r.review_note||'—'}</td>
+    </tr>`).join('') : '<tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">You have no review requests yet.</td></tr>';
+})();
+</script>
+</body></html>

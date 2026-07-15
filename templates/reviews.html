@@ -47,7 +47,7 @@
   <div class="flex-1 overflow-auto">
     <table class="w-full text-sm border-collapse">
       <thead class="sticky top-0 bg-gray-50 z-10"><tr class="text-left text-[11px] uppercase tracking-wide text-gray-500">
-        <th class="px-6 py-3 font-semibold">#</th><th class="px-6 py-3 font-semibold">Date</th><th class="px-6 py-3 font-semibold">Citizen</th><th class="px-6 py-3 font-semibold">Sector</th><th class="px-6 py-3 font-semibold">Parcel</th><th class="px-6 py-3 font-semibold">Neighbourhood</th><th class="px-6 py-3 font-semibold">Status</th><th class="px-6 py-3 font-semibold">Action</th>
+        <th class="px-6 py-3 font-semibold">#</th><th class="px-6 py-3 font-semibold">Date</th><th class="px-6 py-3 font-semibold">Citizen</th><th class="px-6 py-3 font-semibold">Sector</th><th class="px-6 py-3 font-semibold">Reason</th><th class="px-6 py-3 font-semibold">Parcel</th><th class="px-6 py-3 font-semibold">Neighbourhood</th><th class="px-6 py-3 font-semibold">Status</th><th class="px-6 py-3 font-semibold">Action</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -87,18 +87,25 @@ function render(){
       <td class="px-6 py-3 text-xs text-gray-500">${(r.created_at||'').replace('T',' ')}</td>
       <td class="px-6 py-3 text-xs">${r.citizen_email||r.citizen_name||'—'}${r.citizen_phone?'<br><span class="text-gray-400">'+r.citizen_phone+'</span>':''}</td>
       <td class="px-6 py-3 text-xs">${r.sector||'—'}</td>
+      <td class="px-6 py-3 text-xs capitalize text-gray-600">${r.reason||'—'}</td>
       <td class="px-6 py-3"><span class="text-xs font-bold" style="color:${RC[r.parcel_risk]||'#9ca3af'}">${r.parcel_risk||'—'}</span></td>
       <td class="px-6 py-3"><span class="text-xs font-bold" style="color:${RC[r.neighbourhood_risk]||'#9ca3af'}">${r.neighbourhood_risk||'—'}</span></td>
       <td class="px-6 py-3 text-xs font-bold" style="color:${SC[r.status]||'#6b7280'}">${SL[r.status]||r.status}</td>
       <td class="px-6 py-3 whitespace-nowrap">${r.status === 'pending'
         ? `<button data-id="${r.request_id}" data-s="approved" class="act" style="background:#16a34a;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer">Approve</button> <button data-id="${r.request_id}" data-s="rejected" class="act" style="background:#dc2626;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-size:12px;font-weight:700;cursor:pointer">Flag</button>`
-        : `<span class="text-xs text-gray-400">${r.review_note||'—'}</span>`}</td>
-    </tr>`).join('') : '<tr><td colspan="8" class="px-6 py-16 text-center text-gray-400">No requests match these filters.</td></tr>';
+        : `<div class="text-xs text-gray-500 mb-1 max-w-[220px]">${r.review_note||'—'}</div><button data-id="${r.request_id}" data-s="pending" class="act" style="background:#6b7280;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer">Re-open</button>`}</td>
+    </tr>`).join('') : '<tr><td colspan="9" class="px-6 py-16 text-center text-gray-400">No requests match these filters.</td></tr>';
   document.querySelectorAll('.act').forEach(b => b.addEventListener('click', () => decide(b.dataset.id, b.dataset.s)));
 }
 async function decide(id, s){
+  let note = null;
+  if (s === 'rejected') {
+    note = prompt('Reason for flagging (the citizen will be emailed this):');
+    if (note === null) return;                       // cancelled
+    if (!note.trim()) { alert('A reason is required to flag a request.'); return; }
+  }
   try {
-    const r = await (await fetch('/api/requests/' + id + '/decision', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status: s})})).json();
+    const r = await (await fetch('/api/requests/' + id + '/decision', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status: s, note})})).json();
     if (r.error) { alert(r.error); return; }
     load();
   } catch(e) { alert('Network error'); }

@@ -46,19 +46,20 @@
 </head>
 <body class="bg-background text-on-surface overflow-hidden h-screen flex flex-col" style="background-color:#f8fafc;">
 <!-- Top nav -->
-<header class="bg-surface-bright shadow-sm flex justify-between items-center h-16 px-container-margin w-full border-b border-outline-variant z-50 shrink-0">
-<div class="flex items-center gap-4">
-<a href="/" title="Back to home" class="font-headline-md text-headline-md font-bold text-primary hover:opacity-70 transition-opacity cursor-pointer">Shishoza</a>
-<nav class="hidden md:flex gap-4">
-<a class="text-primary border-b-2 border-primary font-bold font-label-md text-label-md px-1 py-1" href="/citizen">Citizen</a>
-<a class="text-on-surface-variant font-medium font-label-md text-label-md px-1 py-1 hover:text-primary transition-colors" href="/manager">Manager</a>
+<header class="bg-white flex justify-between items-center h-14 px-6 w-full border-b border-outline-variant/40 z-50 shrink-0">
+<div class="flex items-center gap-5">
+<a href="/" class="text-xl font-extrabold tracking-tight text-primary hover:opacity-70 transition-opacity">Shishoza</a>
+<nav class="hidden md:flex items-center gap-4 text-sm">
+<a class="text-on-surface-variant font-medium hover:text-primary transition-colors" href="/">Home</a>
+<a class="text-primary font-semibold border-b-2 border-primary pb-0.5" href="/citizen">Citizen</a>
+<a id="myReviewsNav" class="text-on-surface-variant font-medium hover:text-primary transition-colors" href="/my-reviews">My Reviews</a>
 </nav>
+</div>
 <!-- Language selector -->
 <div class="flex items-center gap-0.5 bg-surface-container border border-outline-variant/40 rounded-lg p-0.5">
   <button onclick="setLang('en')" id="btn-lang-en" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all bg-primary text-on-primary">EN</button>
   <button onclick="setLang('rw')" id="btn-lang-rw" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">RW</button>
   <button onclick="setLang('fr')" id="btn-lang-fr" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">FR</button>
-</div>
 </div>
 </header>
 
@@ -180,6 +181,14 @@
 <p class="text-outline" style="font-size:11px"><span data-i18n="req_as">Requesting as</span> <b id="reqAsEmail" class="text-on-surface"></b> · <a id="reqLogout" class="text-primary cursor-pointer hover:underline" data-i18n="auth_logout">log out</a></p>
 <label class="block text-outline" style="font-size:11px" data-i18n="req_district">District — routes to that manager</label>
 <select id="reqDistrict" class="w-full px-3 py-2 border border-outline-variant/50 rounded-lg text-label-md bg-white"></select>
+<label class="block text-outline" style="font-size:11px" data-i18n="req_reason_lbl">Reason for cutting</label>
+<select id="reqReason" class="w-full px-3 py-2 border border-outline-variant/50 rounded-lg text-label-md bg-white">
+<option value="" data-i18n="req_reason_pick">Select a reason…</option>
+<option value="firewood" data-i18n="reason_fw">Firewood</option>
+<option value="timber" data-i18n="reason_tm">Timber</option>
+<option value="farming" data-i18n="reason_fa">Farming</option>
+<option value="income" data-i18n="reason_in">Income</option>
+</select>
 <button id="reqSubmit" class="w-full text-on-primary py-3 rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-all" style="background-color:#14532D;" data-i18n="req_send">Send for review</button>
 <div id="reqResult" class="space-y-1"></div>
 </div>
@@ -235,6 +244,7 @@ const STRINGS = {
     req_sub:'Send this parcel to your district forest manager for a technical review of the tree-loss impact. This supports the official permit decision — it does not replace it.',
     req_name_ph:'Your name (optional)', req_phone_ph:'Phone (optional)',
     req_district:'District — routes to that manager', req_pick:'Select district…',
+    req_reason_lbl:'Reason for cutting', req_reason_pick:'Select a reason…',
     req_send:'Send for review', req_err:'Could not send your request. Please try again.',
     auth_prompt:'Create a free account (or log in) to send this for review and track the decision.',
     auth_email_ph:'Email', auth_pass_ph:'Password (min 6 characters)',
@@ -277,6 +287,7 @@ const STRINGS = {
     req_sub:'Ohereza ubu butaka ku muyobozi w\'amashyamba w\'akarere kawe asuzume ingaruka zo gutema ibiti. Ibi bifasha icyemezo cy\'uruhushya — ntibisimbura.',
     req_name_ph:'Amazina yawe (ku bushake)', req_phone_ph:'Telefone (ku bushake)',
     req_district:'Akarere — bijya kuri uwo muyobozi', req_pick:'Hitamo akarere…',
+    req_reason_lbl:'Impamvu yo gutema', req_reason_pick:'Hitamo impamvu…',
     req_send:'Ohereza isuzumwe', req_err:'Ntibyashobotse kohereza. Ongera ugerageze.',
     auth_prompt:'Fungura konti ku buntu (cyangwa winjire) kugira ngo wohereze isuzuma unakurikirane igisubizo.',
     auth_email_ph:'Imeyili', auth_pass_ph:'Ijambobanga (nibura inyuguti 6)',
@@ -319,6 +330,7 @@ const STRINGS = {
     req_sub:'Envoyez cette parcelle au gestionnaire forestier de votre district pour un examen technique de l\'impact sur les arbres. Ceci appuie la décision officielle de permis — sans la remplacer.',
     req_name_ph:'Votre nom (facultatif)', req_phone_ph:'Téléphone (facultatif)',
     req_district:'District — dirige vers ce gestionnaire', req_pick:'Choisir un district…',
+    req_reason_lbl:'Raison de la coupe', req_reason_pick:'Choisir une raison…',
     req_send:'Envoyer pour examen', req_err:'Échec de l\'envoi. Veuillez réessayer.',
     auth_prompt:'Créez un compte gratuit (ou connectez-vous) pour envoyer cette demande et suivre la décision.',
     auth_email_ph:'E-mail', auth_pass_ph:'Mot de passe (6 caractères min)',
@@ -463,7 +475,13 @@ function render(d){
     circle500=L.circle([d.lat,d.lng],{radius:500,color:'#f59e0b',fillColor:'#f59e0b',fillOpacity:0.10,weight:4,dashArray:'8,5'}).addTo(map);
     circle500.bindTooltip('500m analysis area',{permanent:false,direction:'top',className:'text-xs'});
     if (d.polygon_wgs84 && d.polygon_wgs84.length>=4){
-      const ring=d.polygon_wgs84.map(([lng,lat])=>[lat,lng]).slice(0,-1);
+      let ring=d.polygon_wgs84.map(([lng,lat])=>[lat,lng]).slice(0,-1);
+      // Re-anchor the outline on the trusted coordinate centroid (the pin). The
+      // pixel→grid fit recovers the parcel's shape and size well but its absolute
+      // position can drift, so shift the whole ring so its centre sits on the pin.
+      const cLat=ring.reduce((s,p)=>s+p[0],0)/ring.length, cLng=ring.reduce((s,p)=>s+p[1],0)/ring.length;
+      const dLat=d.lat-cLat, dLng=d.lng-cLng;
+      ring=ring.map(([la,ln])=>[la+dLat, ln+dLng]);
       parcelPolygon=L.polygon(ring,{color:'#facc15',weight:4,fillColor:'#facc15',fillOpacity:0.22});
       drawnItems.addLayer(parcelPolygon); map.fitBounds(parcelPolygon.getBounds().pad(0.4));
     } else { map.setView([d.lat,d.lng],18); }
@@ -611,9 +629,10 @@ document.getElementById('reqSubmit').addEventListener('click', async ()=>{
   if(!lastAnalysis) return;
   const btn=document.getElementById('reqSubmit'), res=document.getElementById('reqResult');
   const district=document.getElementById('reqDistrict').value||lastAnalysis.district||'';
+  const reason=document.getElementById('reqReason').value||'';
   btn.disabled=true;
   try{
-    const r=await (await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id, district})})).json();
+    const r=await (await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id, district, reason})})).json();
     if(r.error){ res.innerHTML=`<div class="err">${r.error}</div>`; }
     else{ res.innerHTML=`<div style="color:#15803d;font-size:13px;font-weight:600;line-height:1.4">${t('req_ok')(r.request_id, r.district||district)}</div>`; loadMyRequests(); }
   }catch(e){ res.innerHTML=`<div class="err">${t('req_err')}</div>`; }
