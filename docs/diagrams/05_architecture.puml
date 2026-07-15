@@ -1,0 +1,27 @@
+' Shishoza — UPDATED Architecture (adds email service + monitoring log to serving pipeline)
+@startuml Shishoza_Architecture
+skinparam componentStyle rectangle
+
+package "Offline training pipeline" {
+  [GEE export] --> [Feature build]
+  [Feature build] --> [Train Random Forest]
+  [Train Random Forest] --> [rf_D.pkl]
+}
+
+package "Online serving pipeline" {
+  [Browser\n(Citizen / Manager)] --> [Flask API]
+  [Flask API] --> [Risk / Neighbourhood / Simulation services]
+  [Flask API] --> [Review Controller]
+  [Review Controller] --> DB
+  [Review Controller] ..> [Email / SMTP service] : async notify
+  [Flask API] ..> [predictions_log.csv] : monitoring log
+  [Risk / Neighbourhood / Simulation services] --> [rf_D.pkl]
+  [Risk / Neighbourhood / Simulation services] --> [Google Earth Engine]
+  database "SQLite\n(USERS, CITIZENS, REQUESTS,\nSIMULATION_RUNS, ALTERNATIVES,\nANALYSIS_CACHE)" as DB
+}
+
+note bottom of [Email / SMTP service]
+  NEW vs report: +Email/SMTP notification service (async, off request thread)
+  and +predictions_log.csv monitoring store; +auth & review endpoints.
+end note
+@enduml

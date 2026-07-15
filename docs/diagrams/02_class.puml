@@ -1,0 +1,38 @@
+' Shishoza — UPDATED Class Diagram (adds review + notification + logging classes)
+@startuml Shishoza_Class
+skinparam classAttributeIconSize 0
+
+class FlaskAPI              <<boundary>>
+class GeometryResolver      <<service>>
+class CutSimulator          <<service>>
+class DeforestationModel    <<entity>>
+class NeighbourhoodAnalyser <<entity>>
+class AlternativesSuggester <<entity>>
+class SectorAnalyser        <<entity>>
+class RiskClassifier        <<control>>
+
+' ---- NEW classes for the added features ----
+class ReviewController      <<control>>
+class ReviewRequest         <<entity>>
+class Citizen               <<entity>>
+class NotificationService   <<service>>
+class PredictionLogger      <<service>>
+
+FlaskAPI ..> GeometryResolver
+FlaskAPI ..> RiskClassifier
+FlaskAPI ..> CutSimulator
+FlaskAPI ..> SectorAnalyser
+FlaskAPI ..> PredictionLogger
+FlaskAPI ..> ReviewController
+RiskClassifier ..> DeforestationModel
+RiskClassifier ..> NeighbourhoodAnalyser
+RiskClassifier ..> AlternativesSuggester
+ReviewController ..> ReviewRequest
+ReviewController ..> Citizen
+ReviewController ..> NotificationService
+
+note bottom of ReviewController
+  NEW vs report (was "8 classes"): +ReviewController, +ReviewRequest,
+  +Citizen, +NotificationService, +PredictionLogger  -> 13 classes.
+end note
+@enduml
