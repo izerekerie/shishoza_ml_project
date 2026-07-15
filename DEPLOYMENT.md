@@ -1,14 +1,15 @@
 # Shishoza — Deployment plan
 
-**Current status:** the app is **deployed (beta) on Railway** with **Docker** —
+**Current status:** the app is **deployed on Hugging Face Spaces** (Docker) —
 see §5 of the README for the live URL, deploy steps, and verification checklist.
 
 This document is the deeper deployment reference: the architecture, the runtime
-properties, and a **platform cost comparison**. It was originally written around
-**Render**; Render is now kept here as a costed *alternative* for an always-on
-production pilot, while Railway is the platform the demo actually runs on. The
-architecture, Dockerfile, and "zero runtime external dependencies" property below
-apply identically to both.
+properties, and a **platform cost comparison**. Hugging Face Spaces' **free 16 GB
+Docker tier** is the live host — it comfortably holds the ~1 GB in-memory model.
+**Render and Railway** are kept below only as *costed, always-on alternatives* for a
+production pilot; their 512 MB free tiers OOM while loading the model, which is why
+the demo runs on Hugging Face. The architecture, Dockerfile, and "zero runtime
+external dependencies" property below apply identically to all three.
 
 ---
 
@@ -21,7 +22,7 @@ apply identically to both.
                  │ HTTPS
                  ▼
 ┌─────────────────────────────────┐
-│  Render web service (Docker)    │
+│  Hugging Face Space (Docker)    │
 │  ├── gunicorn workers           │
 │  │   └── app_cadastral.py       │
 │  │       ├── /citizen flow      │
