@@ -14,6 +14,7 @@ Two layers are exercised, matching the report's Chapter 4 testing sections:
 Run from the project root:
     python -m pytest tests/test_treesight.py -v
 """
+import sqlite3
 import sys
 from pathlib import Path
 
@@ -222,3 +223,89 @@ class TestApiIntegration:
         body = resp.get_json()
         assert "sectors" in body
         assert body["scope"]["view"] == "national"      # admin sees all districts
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# 4.3.5  INTEGRATION TESTS — citizen→manager review workflow (the new feature)
+# ─────────────────────────────────────────────────────────────────────────────
+TEST_CITIZEN_EMAIL = "pytest_review@treesight.test"
+
+
+def _cleanup_review(request_ids=(), citizen_email=None):
+    """Remove any rows a workflow test created, so the real database stays clean."""
+    try:
+        with sqlite3.connect(str(app_cadastral._DB_PATH), timeout=10) as con:
+            for rid in request_ids:
+                if rid is not None:
+                    con.execute("DELETE FROM REQUESTS WHERE request_id = ?", (rid,))
+            if citizen_email:
+                con.execute("DELETE FROM CITIZENS WHERE LOWER(email) = LOWER(?)",
+                            (citizen_email,))
+    except sqlite3.Error:
+        pass
+
+
+class TestReviewWorkflow:
+
+    def test_create_request_requires_citizen_login(self, client):
+        # A parcel cannot be submitted for review without a signed-in citizen.
+        anon = app_cadastral.app.test_client()
+        resp = anon.post("/api/requests", json={"analysis_id": 12345})
+        assert resp.status_code == 401
+
+    def test_review_workflow_end_to_end(self, client, monkeypatch):
+        # Full chain: citizen signs up -> analyses a parcel -> submits it for
+        # review -> manager lists and decides -> citizen tracks the decision.
+        # Separate clients model the two users (distinct sessions); the shared
+        # database is what ties their actions together.
+        # Neutralise email so the approval step never sends a real message
+        # through the configured SMTP account during testing.
+        monkeypatch.setattr(app_cadastral, "_send_email", lambda *a, **k: None)
+        citizen = app_cadastral.app.test_client()
+        manager = app_cadastral.app.test_client()
+        _cleanup_review(citizen_email=TEST_CITIZEN_EMAIL)   # start from a clean slate
+        req_id = None
+        try:
+            # 1. Citizen creates an account (opens a citizen session).
+            signup = citizen.post("/api/citizen/signup", json={
+                "email": TEST_CITIZEN_EMAIL, "password": "testpass123",
+                "full_name": "PyTest Citizen"})
+            assert signup.status_code == 200, signup.get_json()
+
+            # 2. Citizen analyses a parcel to obtain an analysis_id.
+            analysed = citizen.post("/api/analyse",
+                                    json={"lat": -2.4521, "lng": 29.1043, "area_ha": 0.05})
+            assert analysed.status_code == 200
+            aid = analysed.get_json()["analysis_id"]
+
+            # 3. Citizen submits the analysed parcel for manager review.
+            submitted = citizen.post("/api/requests",
+                                     json={"analysis_id": aid, "reason": "Firewood"})
+            assert submitted.status_code == 200, submitted.get_json()
+            req_id = submitted.get_json()["request_id"]
+
+            # 4. Manager (admin sees every district) lists requests and finds it.
+            with manager.session_transaction() as sess:
+                sess["user_email"] = "admin@treesight.rw"
+            listed = manager.get("/api/requests")
+            assert listed.status_code == 200
+            ids = [r["request_id"] for r in listed.get_json()["requests"]]
+            assert req_id in ids
+
+            # 4b. A rejection must carry a reason — the citizen is shown it.
+            no_reason = manager.post(f"/api/requests/{req_id}/decision",
+                                     json={"status": "rejected"})
+            assert no_reason.status_code == 400
+
+            # 5. Manager approves the request.
+            decided = manager.post(f"/api/requests/{req_id}/decision",
+                                   json={"status": "approved", "note": "Within limits"})
+            assert decided.status_code == 200
+
+            # 6. Citizen tracks their request and sees the approved decision.
+            mine = citizen.get("/api/my-requests")
+            assert mine.status_code == 200
+            match = [r for r in mine.get_json()["requests"] if r["request_id"] == req_id]
+            assert match and match[0]["status"] == "approved"
+        finally:
+            _cleanup_review(request_ids=[req_id], citizen_email=TEST_CITIZEN_EMAIL)

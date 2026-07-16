@@ -143,3 +143,15 @@ DEPLOY_HUGGINGFACE.md
 
 # Personal research data-collection form (kept local, not published)
 DATA_COLLECTION_FORM.md
+
+# Dissertation / report writing, feature notes & AI instructions — kept local, not published
+CLAUDE.md
+FEATURES.md
+RQ_FINDINGS_DRAFT.md
+REPORT_UPDATES_new_features.md
+Chapter*.md
+Chapter*.docx
+results/ANALYSIS_AND_DISCUSSION.md
+docs/
+scripts/build_chapter4_docx.py
+scripts/build_chapters_5_6_docx.py

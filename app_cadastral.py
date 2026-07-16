@@ -1011,6 +1011,27 @@ def current_citizen():
 
 @app.post("/api/citizen/signup")
 def api_citizen_signup():
+    """Create a citizen account and start a citizen session.
+    ---
+    tags: [Citizen accounts]
+    consumes: [application/json]
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required: [email, password]
+          properties:
+            email:     {type: string, example: "uwase@example.com"}
+            password:  {type: string, description: "at least 6 characters", example: "secret12"}
+            full_name: {type: string, example: "Uwase M"}
+            phone:     {type: string, example: "0788111222"}
+    responses:
+      200: {description: "Account created; citizen signed in."}
+      400: {description: "Invalid email address or password too short."}
+      409: {description: "Email already registered (as a citizen or a staff account)."}
+    """
     data = request.get_json() or {}
     email = (data.get("email") or "").strip().lower()
     pwd   = data.get("password") or ""
@@ -1038,6 +1059,24 @@ def api_citizen_signup():
 
 @app.post("/api/citizen/login")
 def api_citizen_login():
+    """Log a citizen in (separate from the staff /api/login).
+    ---
+    tags: [Citizen accounts]
+    consumes: [application/json]
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required: [email, password]
+          properties:
+            email:    {type: string, example: "uwase@example.com"}
+            password: {type: string, example: "secret12"}
+    responses:
+      200: {description: "Logged in; citizen session started."}
+      401: {description: "Invalid email or password."}
+    """
     data = request.get_json() or {}
     email = (data.get("email") or "").strip().lower()
     c = lookup_citizen(email)
@@ -1055,12 +1094,24 @@ def api_citizen_login():
 
 @app.post("/api/citizen/logout")
 def api_citizen_logout():
+    """End the citizen session.
+    ---
+    tags: [Citizen accounts]
+    responses:
+      200: {description: "Citizen session cleared."}
+    """
     session.pop("citizen_email", None)
     return jsonify({"ok": True})
 
 
 @app.get("/api/citizen/me")
 def api_citizen_me():
+    """Return the signed-in citizen, or {authenticated: false}.
+    ---
+    tags: [Citizen accounts]
+    responses:
+      200: {description: "Current citizen (email, full_name, phone) or authenticated:false."}
+    """
     c = current_citizen()
     if not c:
         return jsonify({"authenticated": False})
@@ -1090,8 +1141,12 @@ def _sector_for_point(lat, lng):
 
 @app.get("/api/districts")
 def api_districts():
-    """Sorted unique district names — lets a citizen route their request to the
-    right district forest manager (auto-detected value can be confirmed/changed)."""
+    """Sorted unique district names, for routing a review request.
+    ---
+    tags: [Review workflow]
+    responses:
+      200: {description: "Sorted list of district names for routing a review request."}
+    """
     try:
         ds = sorted(str(d) for d in _SECTORS["district"].dropna().unique())
     except Exception:
@@ -1101,7 +1156,29 @@ def api_districts():
 
 @app.post("/api/requests")
 def api_create_request():
-    """A signed-in citizen submits an analysed parcel for manager review."""
+    """Citizen submits an analysed parcel for a manager's technical review.
+
+    Requires a citizen session; routes to the parcel's district manager and
+    stores the citizen's stated cutting reason.
+    ---
+    tags: [Review workflow]
+    consumes: [application/json]
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required: [analysis_id]
+          properties:
+            analysis_id: {type: integer, description: "ID from a prior /api/analyse", example: 1}
+            district:    {type: string, description: "override the auto-detected district", example: "Rusizi"}
+            reason:      {type: string, enum: [firewood, timber, farming, income], example: "firewood"}
+    responses:
+      200: {description: "Request created; returns request_id, district, sector."}
+      401: {description: "Not signed in as a citizen."}
+      400: {description: "No prior analysis found for analysis_id."}
+    """
     if not _DB_PATH.exists():
         return jsonify({"error": "Request store unavailable"}), 503
     citizen = current_citizen()
@@ -1143,7 +1220,19 @@ def api_create_request():
 @app.get("/api/requests")
 @login_required
 def api_list_requests():
-    """Manager/admin: list review requests, scoped to the manager's district."""
+    """Manager/admin: list review requests (scoped to the manager's district).
+    ---
+    tags: [Review workflow]
+    parameters:
+      - in: query
+        name: status
+        type: string
+        enum: [pending, approved, rejected]
+        description: Optional filter by decision status.
+    responses:
+      200: {description: "A requests array plus pending/approved/rejected counts."}
+      401: {description: "Staff login required."}
+    """
     user = current_user()
     status = (request.args.get("status") or "").strip()
     q = "SELECT * FROM REQUESTS"
@@ -1175,7 +1264,34 @@ def api_list_requests():
 @app.post("/api/requests/<int:req_id>/decision")
 @login_required
 def api_decide_request(req_id):
-    """Manager/admin: approve or reject a request (district-scoped)."""
+    """Manager/admin: approve, flag (reject) or re-open a request.
+
+    A flag requires a note (reason); the citizen is emailed the outcome — with the
+    reason + tailored alternatives on a flag, or next steps on approval. Re-opening
+    (status=pending) clears the decision. District-scoped.
+    ---
+    tags: [Review workflow]
+    consumes: [application/json]
+    parameters:
+      - in: path
+        name: req_id
+        required: true
+        type: integer
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required: [status]
+          properties:
+            status: {type: string, enum: [approved, rejected, pending], example: "approved"}
+            note:   {type: string, description: "required when status=rejected — shown to the citizen"}
+    responses:
+      200: {description: "Decision saved; citizen emailed if SMTP is configured."}
+      400: {description: "Invalid status, or a flag with no reason."}
+      403: {description: "Request outside the manager's district."}
+      404: {description: "Request not found."}
+    """
     user = current_user()
     data = request.get_json() or {}
     status = (data.get("status") or "").strip()
@@ -1215,7 +1331,13 @@ def api_decide_request(req_id):
 
 @app.get("/api/my-requests")
 def api_my_requests():
-    """The signed-in citizen's own requests, newest first (with the decision)."""
+    """The signed-in citizen's own review requests, newest first.
+    ---
+    tags: [Review workflow]
+    responses:
+      200: {description: "The citizen's requests, each with status, reason and the manager's note."}
+      401: {description: "Citizen login required."}
+    """
     citizen = current_citizen()
     if not citizen:
         return jsonify({"error": "Please log in"}), 401
