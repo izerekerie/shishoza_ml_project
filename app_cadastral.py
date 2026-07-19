@@ -130,7 +130,12 @@ _EE_TRIED = False     # only attempt init once unless it succeeds
 # LIVE_EE_TIMEOUT_S env var (no redeploy needed to change it).
 from concurrent.futures import ThreadPoolExecutor
 from concurrent.futures import TimeoutError as _EETimeout
-LIVE_EE_TIMEOUT_S = float(os.environ.get("LIVE_EE_TIMEOUT_S", "8"))
+LIVE_EE_TIMEOUT_S = float(os.environ.get("LIVE_EE_TIMEOUT_S", "15"))
+# Lazy geo-cache: a successful live pull is remembered per location and re-served
+# instantly until it ages past LIVE_CACHE_TTL_S, so a repeat lookup of the same
+# parcel skips Earth Engine entirely. This builds the "feature store" on demand —
+# no national pre-compute — and the TTL keeps it fresh on Sentinel's ~5-day cycle.
+LIVE_CACHE_TTL_S = float(os.environ.get("LIVE_CACHE_TTL_S", str(5 * 24 * 3600)))
 _EE_POOL = ThreadPoolExecutor(max_workers=4)
 
 # ── Email notifications (optional; free via Gmail SMTP + an app password) ──
@@ -207,8 +212,34 @@ def _notify_decision(email, req_id, status, note, sector, reason=None):
 _PRED_LOG    = Path(__file__).parent / "results" / "monitoring" / "predictions_log.csv"
 _PRED_FIELDS = ["lat", "lng", "risk_level", "confidence", "km_from_training", "deforestation_prob"]
 
+# Optional Google-Sheet webhook (a Google Apps Script Web App URL). When set, each
+# prediction is also appended to the sheet, so the monitoring log survives the
+# ephemeral container filesystem in deployment. If unset, only the local CSV is
+# written and nothing changes.
+MONITOR_WEBHOOK_URL = os.environ.get("MONITOR_WEBHOOK_URL")
+
+
+def _post_to_monitor_sheet(row):
+    """Best-effort append of one prediction to the Google-Sheet webhook. Runs off
+    the request thread; any failure is swallowed so it never affects the user."""
+    try:
+        import urllib.request
+        data = json.dumps(row).encode()
+        req = urllib.request.Request(
+            MONITOR_WEBHOOK_URL, data=data,
+            headers={"Content-Type": "application/json"})
+        urllib.request.urlopen(req, timeout=6)
+    except Exception as e:
+        print(f"[monitor] sheet webhook skipped: {e}")
+
 
 def _log_prediction(lat, lng, result):
+    row = {"lat": lat, "lng": lng,
+           "risk_level": result.get("risk_level"),
+           "confidence": result.get("confidence"),
+           "km_from_training": round(result.get("km_from_training", 0) or 0, 1),
+           "deforestation_prob": result.get("deforestation_prob")}
+    # 1. Local CSV — fast, but wiped on container restart in deployment.
     try:
         _PRED_LOG.parent.mkdir(parents=True, exist_ok=True)
         new = not _PRED_LOG.exists()
@@ -216,13 +247,13 @@ def _log_prediction(lat, lng, result):
             w = csv.DictWriter(f, fieldnames=_PRED_FIELDS)
             if new:
                 w.writeheader()
-            w.writerow({"lat": lat, "lng": lng,
-                        "risk_level": result.get("risk_level"),
-                        "confidence": result.get("confidence"),
-                        "km_from_training": round(result.get("km_from_training", 0) or 0, 1),
-                        "deforestation_prob": result.get("deforestation_prob")})
+            w.writerow(row)
     except Exception as e:
         print(f"[monitor] prediction log skipped: {e}")
+    # 2. Persistent Google Sheet — survives restarts; off-thread, best-effort.
+    if MONITOR_WEBHOOK_URL:
+        sheet_row = {"timestamp": datetime.datetime.now().isoformat(timespec="seconds"), **row}
+        _EE_POOL.submit(_post_to_monitor_sheet, sheet_row)
 
 
 def _ee_build_feature_image(ee):
@@ -1631,6 +1662,21 @@ def api_analyse():
     except (KeyError, ValueError, TypeError):
         return jsonify({"error": "lat and lng are required floats"}), 400
     area_ha = data.get("area_ha")
+    # Lazy geo-cache: analysis_id is a deterministic hash of the rounded location,
+    # so a prior LIVE pull for this exact parcel is already stored under it. If that
+    # cached result is a live pull and still fresh (within LIVE_CACHE_TTL_S), re-serve
+    # it and skip Earth Engine entirely — instant, and no national pre-compute needed.
+    aid = abs(hash((round(lat, 5), round(lng, 5)))) % 10_000_000
+    cached = _recall_analysis(aid)
+    if (cached
+            and cached.get("data_source") == "live_gee"
+            and round(cached.get("lat", 1e9), 5) == round(lat, 5)
+            and round(cached.get("lng", 1e9), 5) == round(lng, 5)
+            and (datetime.datetime.now().timestamp() - cached.get("cached_at", 0)) < LIVE_CACHE_TTL_S):
+        out = dict(cached)
+        out["cache_hit"] = True
+        _log_prediction(lat, lng, out)
+        return jsonify(out)
     # Prefer LIVE Earth Engine imagery for the exact parcel; fall back to the
     # nearest-sample path if EE is unavailable or the live pull fails.
     result = None
@@ -1647,6 +1693,10 @@ def api_analyse():
             print(f"[warn] live parcel analysis failed, falling back ({e})")
     if result is None:
         result = analyse_parcel(lat, lng, area_ha=area_ha)
+    # Stamp live pulls so the geo-cache above can age them out; the fast fallback is
+    # left unstamped so it is never cached in place of a real live reading.
+    if result.get("data_source") == "live_gee":
+        result["cached_at"] = datetime.datetime.now().timestamp()
     # Attach the containing sector/district so a cutting-permission request can be
     # routed to the right district manager (and pre-fill the citizen's dropdown).
     _sec = _sector_for_point(result.get("lat"), result.get("lng"))
