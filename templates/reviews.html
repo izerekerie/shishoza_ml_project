@@ -65,7 +65,7 @@ const $ = id => document.getElementById(id);
   $('scopeLabel').textContent = u.district_scope ? ('District: ' + u.district_scope) : 'National — all districts';
   if (u.role === 'admin') ['adminLink','apiDocsLink'].forEach(id=>{ const e=$(id); if(e){ e.classList.remove('hidden'); e.classList.add('flex'); } });
 })();
-$('logoutLink').addEventListener('click', async e => { e.preventDefault(); await fetch('/api/logout', {method:'POST'}); location.href = '/login'; });
+$('logoutLink').addEventListener('click', async e => { e.preventDefault(); if(!await askConfirm({title:'Sign out?', desc:'You will be returned to the login page.', confirmLabel:'Sign out', confirmColor:'#dc2626'})) return; await fetch('/api/logout', {method:'POST'}); location.href = '/login'; });
 
 const RC = {HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a'};
 const SL = {pending:'Pending', approved:'Approved', rejected:'Flagged'};
@@ -100,9 +100,8 @@ function render(){
 async function decide(id, s){
   let note = null;
   if (s === 'rejected') {
-    note = prompt('Reason for flagging (the citizen will be emailed this):');
+    note = await askText({title:'Flag this request', desc:'Give a reason for flagging. The citizen will be emailed this note.', placeholder:'e.g. This parcel sits in a protected buffer zone; a site visit is required before any cutting.', confirmLabel:'Flag & notify', confirmColor:'#dc2626', errText:'A reason is required to flag a request.'});
     if (note === null) return;                       // cancelled
-    if (!note.trim()) { alert('A reason is required to flag a request.'); return; }
   }
   try {
     const r = await (await fetch('/api/requests/' + id + '/decision', {method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({status: s, note})})).json();
@@ -113,5 +112,39 @@ async function decide(id, s){
 $('fltStatus').addEventListener('change', render);
 $('fltRisk').addEventListener('change', render);
 load();
+
+// ---- Reusable styled modal (replaces browser prompt/confirm) ----
+function _uiModal(opts){
+  return new Promise(resolve=>{
+    const m=$('uiModal'), ti=$('uiModalTitle'), de=$('uiModalDesc'), inp=$('uiModalInput'),
+          err=$('uiModalErr'), ok=$('uiModalOk'), ca=$('uiModalCancel');
+    ti.textContent=opts.title||''; de.textContent=opts.desc||'';
+    err.style.display='none'; err.textContent=opts.errText||'This field is required.';
+    inp.style.display=opts.input?'block':'none'; inp.value=''; inp.placeholder=opts.placeholder||'';
+    ok.textContent=opts.confirmLabel||'OK'; ok.style.background=opts.confirmColor||'#14532D';
+    m.style.display='flex'; (opts.input?inp:ok).focus();
+    function cleanup(){ ok.onclick=null; ca.onclick=null; document.removeEventListener('keydown',onKey); m.onmousedown=null; }
+    function close(v){ m.style.display='none'; cleanup(); resolve(v); }
+    function onOk(){ if(opts.input){ if(!inp.value.trim()){ err.style.display='block'; return; } close(inp.value.trim()); } else close(true); }
+    function onCancel(){ close(opts.input?null:false); }
+    function onKey(e){ if(e.key==='Escape') onCancel(); else if(e.key==='Enter'&&(!opts.input||e.metaKey||e.ctrlKey)) onOk(); }
+    ok.onclick=onOk; ca.onclick=onCancel; document.addEventListener('keydown',onKey);
+    m.onmousedown=e=>{ if(e.target===m) onCancel(); };
+  });
+}
+const askText    = o => _uiModal(Object.assign({input:true}, o));
+const askConfirm = o => _uiModal(Object.assign({input:false}, o)).then(v=>!!v);
 </script>
+<div id="uiModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(15,23,42,0.45);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;max-width:440px;width:92%;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.25)">
+    <h3 id="uiModalTitle" style="font-weight:700;font-size:16px;margin:0 0 4px;color:#111827"></h3>
+    <p id="uiModalDesc" style="font-size:13px;color:#6b7280;margin:0 0 12px"></p>
+    <textarea id="uiModalInput" rows="3" style="display:none;width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px;font-size:14px;resize:vertical;box-sizing:border-box;font-family:inherit"></textarea>
+    <p id="uiModalErr" style="display:none;color:#dc2626;font-size:12px;margin:6px 0 0"></p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+      <button id="uiModalCancel" style="background:#f3f4f6;color:#374151;border:none;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
+      <button id="uiModalOk" style="background:#14532D;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">OK</button>
+    </div>
+  </div>
+</div>
 </body></html>

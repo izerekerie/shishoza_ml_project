@@ -9,10 +9,14 @@
 </head>
 <body class="min-h-screen bg-[#f8faf9] text-gray-800">
 
-<header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6">
+<header class="bg-white border-b border-gray-200 flex items-center justify-between px-6 h-14 w-full shrink-0 z-50">
   <div class="flex items-center gap-6">
-    <a href="/" class="text-xl font-extrabold tracking-tight" style="color:#14532D">Shishoza</a>
-    <a href="/citizen" class="text-sm font-semibold text-gray-500 hover:text-gray-800">← Back to map</a>
+    <a href="/" class="text-xl font-extrabold tracking-tight hover:opacity-70 transition-opacity" style="color:#14532D">Shishoza</a>
+    <nav class="hidden md:flex items-center gap-5 text-sm">
+      <a href="/" class="font-medium text-gray-500 hover:text-gray-900 transition-colors">Home</a>
+      <a href="/citizen" class="font-medium text-gray-500 hover:text-gray-900 transition-colors">Citizen</a>
+      <a href="/my-reviews" class="font-semibold border-b-2 pb-0.5" style="color:#14532D;border-color:#14532D">My Reviews</a>
+    </nav>
   </div>
   <div class="text-sm text-gray-500"><span id="who" class="font-semibold text-gray-700"></span> · <a id="logout" href="#" class="text-red-600 font-semibold hover:underline">log out</a></div>
 </header>

@@ -265,7 +265,7 @@ document.getElementById('usersBody').addEventListener('click', async (e) => {
 });
 
 async function resetPassword(user) {
-  const pwd = prompt(`New password for ${user.email}:`);
+  const pwd = await askText({title:'Reset password', desc:`Set a new password for ${user.email}.`, placeholder:'New password', password:true, confirmLabel:'Set password', errText:'Enter a password.'});
   if (!pwd) return;
   const r = await fetch(`/api/users/${user.user_id}/password`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({password: pwd}) });
   const d = await r.json();
@@ -274,7 +274,7 @@ async function resetPassword(user) {
 
 async function toggleActive(user, newState) {
   const verb = newState ? 'enable' : 'disable';
-  if (!confirm(`Really ${verb} ${user.email}?`)) return;
+  if (!await askConfirm({title:`${verb[0].toUpperCase()+verb.slice(1)} user`, desc:`Really ${verb} ${user.email}?`, confirmLabel:verb[0].toUpperCase()+verb.slice(1), confirmColor:newState?'#16a34a':'#dc2626'})) return;
   const r = await fetch(`/api/users/${user.user_id}`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body: JSON.stringify({is_active: newState}) });
   const d = await r.json();
   if (d.ok) refresh(); else alert('Error: ' + (d.error || 'unknown'));
@@ -308,7 +308,45 @@ document.getElementById('userForm').addEventListener('submit', async (e) => {
 });
 
 document.getElementById('logoutLink').addEventListener('click', async (e) => {
-  e.preventDefault(); await fetch('/api/logout', { method:'POST' }); window.location.href = '/login';
+  e.preventDefault();
+  if(!await askConfirm({title:'Sign out?', desc:'You will be returned to the login page.', confirmLabel:'Sign out', confirmColor:'#dc2626'})) return;
+  await fetch('/api/logout', { method:'POST' }); window.location.href = '/login';
 });
+
+// ---- Reusable styled modal (replaces browser prompt/confirm) ----
+function _uiModal(opts){
+  return new Promise(resolve=>{
+    const m=document.getElementById('uiModal2'), ti=document.getElementById('uiModal2Title'),
+          de=document.getElementById('uiModal2Desc'), inp=document.getElementById('uiModal2Input'),
+          err=document.getElementById('uiModal2Err'), ok=document.getElementById('uiModal2Ok'),
+          ca=document.getElementById('uiModal2Cancel');
+    ti.textContent=opts.title||''; de.textContent=opts.desc||'';
+    err.style.display='none'; err.textContent=opts.errText||'This field is required.';
+    inp.style.display=opts.input?'block':'none'; inp.value=''; inp.type=opts.password?'password':'text'; inp.placeholder=opts.placeholder||'';
+    ok.textContent=opts.confirmLabel||'OK'; ok.style.background=opts.confirmColor||'#14532D';
+    m.style.display='flex'; (opts.input?inp:ok).focus();
+    function cleanup(){ ok.onclick=null; ca.onclick=null; document.removeEventListener('keydown',onKey); m.onmousedown=null; }
+    function close(v){ m.style.display='none'; cleanup(); resolve(v); }
+    function onOk(){ if(opts.input){ if(!inp.value.trim()){ err.style.display='block'; return; } close(inp.value.trim()); } else close(true); }
+    function onCancel(){ close(opts.input?null:false); }
+    function onKey(e){ if(e.key==='Escape') onCancel(); else if(e.key==='Enter') onOk(); }
+    ok.onclick=onOk; ca.onclick=onCancel; document.addEventListener('keydown',onKey);
+    m.onmousedown=e=>{ if(e.target===m) onCancel(); };
+  });
+}
+const askText    = o => _uiModal(Object.assign({input:true}, o));
+const askConfirm = o => _uiModal(Object.assign({input:false}, o)).then(v=>!!v);
 </script>
+<div id="uiModal2" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(15,23,42,0.45);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;max-width:440px;width:92%;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.25)">
+    <h3 id="uiModal2Title" style="font-weight:700;font-size:16px;margin:0 0 4px;color:#111827"></h3>
+    <p id="uiModal2Desc" style="font-size:13px;color:#6b7280;margin:0 0 12px"></p>
+    <input id="uiModal2Input" style="display:none;width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px;font-size:14px;box-sizing:border-box;font-family:inherit">
+    <p id="uiModal2Err" style="display:none;color:#dc2626;font-size:12px;margin:6px 0 0"></p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+      <button id="uiModal2Cancel" style="background:#f3f4f6;color:#374151;border:none;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
+      <button id="uiModal2Ok" style="background:#14532D;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">OK</button>
+    </div>
+  </div>
+</div>
 </body></html>

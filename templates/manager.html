@@ -165,7 +165,9 @@
   } catch (e) {}
 })();
 document.getElementById('logoutLink').addEventListener('click', async (e) => {
-  e.preventDefault(); await fetch('/api/logout', { method:'POST' }); window.location.href = '/login';
+  e.preventDefault();
+  if(!await askConfirm({title:'Sign out?', desc:'You will be returned to the login page.', confirmLabel:'Sign out', confirmColor:'#dc2626'})) return;
+  await fetch('/api/logout', { method:'POST' }); window.location.href = '/login';
 });
 
 const RISK_COLOUR = { HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a', UNKNOWN:'#9ca3af' };
@@ -313,7 +315,7 @@ function reqPopup(r){
 }
 async function decideReq(id, status){
   let note=null;
-  if(status==='rejected'){ note=prompt('Reason for flagging (the citizen will be emailed this):'); if(note===null) return; if(!note.trim()){ alert('A reason is required to flag a request.'); return; } }
+  if(status==='rejected'){ note=await askText({title:'Flag this request', desc:'Give a reason for flagging. The citizen will be emailed this note.', placeholder:'e.g. This parcel sits in a protected buffer zone; a site visit is required before any cutting.', confirmLabel:'Flag & notify', confirmColor:'#dc2626', errText:'A reason is required to flag a request.'}); if(note===null) return; }
   try{
     const r = await (await fetch(`/api/requests/${id}/decision`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status, note})})).json();
     if(r.error){ alert(r.error); return; }
@@ -344,11 +346,47 @@ async function loadRequests(){
 const _bulkBtn=document.getElementById('bulkApprove');
 if(_bulkBtn) _bulkBtn.addEventListener('click', async e=>{
   const ids=JSON.parse(e.currentTarget.dataset.ids||'[]'); if(!ids.length) return;
-  if(!confirm(`Approve ${ids.length} low-impact request(s)?`)) return;
+  if(!await askConfirm({title:'Approve low-impact requests', desc:`Approve ${ids.length} low-impact request(s)? Each citizen will be notified.`, confirmLabel:'Approve all', confirmColor:'#16a34a'})) return;
   for(const id of ids){ await fetch(`/api/requests/${id}/decision`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:'approved',note:'Bulk: low impact'})}); }
   loadRequests();
 });
 loadRequests();
 setInterval(loadRequests, 30000);
+
+// ---- Reusable styled modal (replaces browser prompt/confirm) ----
+function _uiModal(opts){
+  return new Promise(resolve=>{
+    const m=document.getElementById('uiModal'), ti=document.getElementById('uiModalTitle'),
+          de=document.getElementById('uiModalDesc'), inp=document.getElementById('uiModalInput'),
+          err=document.getElementById('uiModalErr'), ok=document.getElementById('uiModalOk'),
+          ca=document.getElementById('uiModalCancel');
+    ti.textContent=opts.title||''; de.textContent=opts.desc||'';
+    err.style.display='none'; err.textContent=opts.errText||'This field is required.';
+    inp.style.display=opts.input?'block':'none'; inp.value=''; inp.placeholder=opts.placeholder||'';
+    ok.textContent=opts.confirmLabel||'OK'; ok.style.background=opts.confirmColor||'#14532D';
+    m.style.display='flex'; (opts.input?inp:ok).focus();
+    function cleanup(){ ok.onclick=null; ca.onclick=null; document.removeEventListener('keydown',onKey); m.onmousedown=null; }
+    function close(v){ m.style.display='none'; cleanup(); resolve(v); }
+    function onOk(){ if(opts.input){ if(!inp.value.trim()){ err.style.display='block'; return; } close(inp.value.trim()); } else close(true); }
+    function onCancel(){ close(opts.input?null:false); }
+    function onKey(e){ if(e.key==='Escape') onCancel(); else if(e.key==='Enter'&&(!opts.input||e.metaKey||e.ctrlKey)) onOk(); }
+    ok.onclick=onOk; ca.onclick=onCancel; document.addEventListener('keydown',onKey);
+    m.onmousedown=e=>{ if(e.target===m) onCancel(); };
+  });
+}
+const askText    = o => _uiModal(Object.assign({input:true}, o));
+const askConfirm = o => _uiModal(Object.assign({input:false}, o)).then(v=>!!v);
 </script>
+<div id="uiModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(15,23,42,0.45);align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:14px;max-width:440px;width:92%;padding:22px;box-shadow:0 20px 50px rgba(0,0,0,.25)">
+    <h3 id="uiModalTitle" style="font-weight:700;font-size:16px;margin:0 0 4px;color:#111827"></h3>
+    <p id="uiModalDesc" style="font-size:13px;color:#6b7280;margin:0 0 12px"></p>
+    <textarea id="uiModalInput" rows="3" style="display:none;width:100%;border:1px solid #d1d5db;border-radius:8px;padding:10px;font-size:14px;resize:vertical;box-sizing:border-box;font-family:inherit"></textarea>
+    <p id="uiModalErr" style="display:none;color:#dc2626;font-size:12px;margin:6px 0 0"></p>
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:16px">
+      <button id="uiModalCancel" style="background:#f3f4f6;color:#374151;border:none;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer">Cancel</button>
+      <button id="uiModalOk" style="background:#14532D;color:#fff;border:none;padding:9px 16px;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer">OK</button>
+    </div>
+  </div>
+</div>
 </body></html>
