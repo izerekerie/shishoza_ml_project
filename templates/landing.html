@@ -143,21 +143,6 @@
 </div>
 </div>
 </section>
-<!-- Honest info cards -->
-<section class="w-full max-w-[1280px] px-container-margin mb-section-gap grid grid-cols-1 md:grid-cols-3 gap-base">
-<div class="p-base bg-surface-container-low rounded-lg border border-outline-variant/20">
-<div class="flex items-center gap-3 mb-2"><span class="material-symbols-outlined text-secondary">public</span><h3 class="font-title-md text-title-md text-primary" data-i18n="i1.h">Open data</h3></div>
-<p class="font-body-sm text-body-sm text-on-surface-variant" data-i18n="i1.p">Built entirely on public satellite datasets — Sentinel-2, Sentinel-1, SRTM and Hansen Global Forest Change — so results are independent and reproducible.</p>
-</div>
-<div class="p-base bg-surface-container-low rounded-lg border border-outline-variant/20">
-<div class="flex items-center gap-3 mb-2"><span class="material-symbols-outlined text-secondary">satellite_alt</span><h3 class="font-title-md text-title-md text-primary" data-i18n="i2.h">Precision</h3></div>
-<p class="font-body-sm text-body-sm text-on-surface-variant" data-i18n="i2.p">Combines optical, radar and terrain satellite data in a machine-learning model to detect forest change and simulate the impact of a cut.</p>
-</div>
-<div class="p-base bg-surface-container-low rounded-lg border border-outline-variant/20">
-<div class="flex items-center gap-3 mb-2"><span class="material-symbols-outlined text-secondary">lock</span><h3 class="font-title-md text-title-md text-primary" data-i18n="i3.h">Privacy</h3></div>
-<p class="font-body-sm text-body-sm text-on-surface-variant" data-i18n="i3.p">Used anonymously. Land certificates are processed in memory only; owner names and IDs are never stored.</p>
-</div>
-</section>
 </main>
 <!-- Footer -->
 <footer class="w-full py-section-gap bg-surface-container-low border-t border-outline-variant/50">
@@ -167,18 +152,10 @@
 <a href="/" class="font-headline-lg text-headline-lg font-black tracking-tighter text-primary hover:opacity-70 transition-opacity cursor-pointer">Shishoza</a>
 <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xs" data-i18n="hero.sub">Satellite monitoring and parcel-level risk assessment to support sustainable forest management in Rwanda.</p>
 </div>
-<div class="md:col-span-3 flex flex-col gap-4">
-<div class="font-label-caps text-label-caps uppercase tracking-widest text-secondary" data-i18n="f.resources">RESOURCES</div>
+<div class="md:col-span-6 flex flex-col gap-4 md:items-end">
+<div class="font-label-caps text-label-caps uppercase tracking-widest text-secondary" data-i18n="f.legal">LEGAL</div>
 <div class="flex flex-col gap-3">
-<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#" data-i18n="f.methodology">Methodology</a>
-<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#" data-i18n="f.datasources">Data sources</a>
-</div>
-</div>
-<div class="md:col-span-3 flex flex-col gap-4">
-<div class="font-label-caps text-label-caps uppercase tracking-widest text-secondary" data-i18n="f.support">SUPPORT</div>
-<div class="flex flex-col gap-3">
-<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#" data-i18n="f.contact">Contact</a>
-<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="#" data-i18n="f.guidelines">Guidelines</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-primary transition-colors" href="/privacy" data-i18n="f.privacy">Privacy policy</a>
 </div>
 </div>
 </div>
@@ -220,8 +197,7 @@ const I18N = {
     "i1.h":"Open data","i1.p":"Built entirely on public satellite datasets — Sentinel-2, Sentinel-1, SRTM and Hansen Global Forest Change — so results are independent and reproducible.",
     "i2.h":"Precision","i2.p":"Combines optical, radar and terrain satellite data in a machine-learning model to detect forest change and simulate the impact of a cut.",
     "i3.h":"Privacy","i3.p":"Used anonymously. Land certificates are processed in memory only; owner names and IDs are never stored.",
-    "f.resources":"RESOURCES","f.methodology":"Methodology","f.datasources":"Data sources",
-    "f.support":"SUPPORT","f.contact":"Contact","f.guidelines":"Guidelines"
+    "f.legal":"LEGAL","f.privacy":"Privacy policy"
   },
   rw: {
     "nav.citizen":"Umuturage","nav.manager":"Umuyobozi","nav.login":"Injira",
@@ -242,8 +218,7 @@ const I18N = {
     "i1.h":"Amakuru afunguye","i1.p":"Yubatswe ku makuru rusange ya Sentinel-2, Sentinel-1, SRTM na Hansen Global Forest Change — bityo ibisubizo bigenga kandi bishobora kongera gukorwa.",
     "i2.h":"Ukuri","i2.p":"Ihuza amakuru y'amabara, radar n'ubutaka mu cyitegererezo cy'ubwenge bw'ubukorano kugira ngo imenye impinduka mu mashyamba kandi yerekane ingaruka zo gutema.",
     "i3.h":"Ibanga","i3.p":"Bikoreshwa mu ibanga. Impamyabutaka itunganyirizwa mu bwonko bwa mudasobwa gusa; amazina n'indangamuntu ntibibikwa.",
-    "f.resources":"IBIKORESHO","f.methodology":"Uburyo bwakoreshejwe","f.datasources":"Inkomoko y'amakuru",
-    "f.support":"UBUFASHA","f.contact":"Twandikire","f.guidelines":"Amabwiriza"
+    "f.legal":"AMATEGEKO","f.privacy":"Politiki y'ibanga"
   },
   fr: {
     "nav.citizen":"Citoyen","nav.manager":"Gestionnaire","nav.login":"Connexion",
@@ -264,8 +239,7 @@ const I18N = {
     "i1.h":"Données ouvertes","i1.p":"Construit entièrement sur des données satellitaires publiques — Sentinel-2, Sentinel-1, SRTM et Hansen Global Forest Change — pour des résultats indépendants et reproductibles.",
     "i2.h":"Précision","i2.p":"Combine des données satellitaires optiques, radar et de terrain dans un modèle d'apprentissage automatique pour détecter les changements forestiers et simuler l'impact d'une coupe.",
     "i3.h":"Confidentialité","i3.p":"Utilisé de façon anonyme. Les titres fonciers sont traités en mémoire uniquement ; les noms et identifiants ne sont jamais conservés.",
-    "f.resources":"RESSOURCES","f.methodology":"Méthodologie","f.datasources":"Sources de données",
-    "f.support":"ASSISTANCE","f.contact":"Contact","f.guidelines":"Directives"
+    "f.legal":"MENTIONS LÉGALES","f.privacy":"Politique de confidentialité"
   }
 };
 function setLang(lang){

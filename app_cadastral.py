@@ -588,6 +588,11 @@ def landing():
     return render_template("landing.html")
 
 
+@app.get("/privacy")
+def privacy():
+    return render_template("privacy.html")
+
+
 @app.get("/account")
 def citizen_account_page():
     """Dedicated citizen sign-up / log-in page (kept off the crowded sidebar)."""
@@ -976,6 +981,16 @@ else:
                 _con.execute("ALTER TABLE REQUESTS ADD COLUMN reason TEXT")
             except sqlite3.OperationalError:
                 pass  # the citizen's stated reason for cutting
+            # Optional site photo (a downscaled JPEG data URL) the citizen attaches,
+            # plus their short caption. Both help the manager judge the parcel.
+            try:
+                _con.execute("ALTER TABLE REQUESTS ADD COLUMN photo TEXT")
+            except sqlite3.OperationalError:
+                pass
+            try:
+                _con.execute("ALTER TABLE REQUESTS ADD COLUMN photo_note TEXT")
+            except sqlite3.OperationalError:
+                pass
     except sqlite3.Error as e:
         print(f"[boot]   could not create ANALYSIS_CACHE table: {e}")
 
@@ -1205,6 +1220,8 @@ def api_create_request():
             analysis_id: {type: integer, description: "ID from a prior /api/analyse", example: 1}
             district:    {type: string, description: "override the auto-detected district", example: "Rusizi"}
             reason:      {type: string, enum: [firewood, timber, farming, income], example: "firewood"}
+            photo:       {type: string, description: "optional site photo as a downscaled JPEG data URL (<=1.5 MB)"}
+            photo_note:  {type: string, description: "optional caption describing the photo (<=280 chars)"}
     responses:
       200: {description: "Request created; returns request_id, district, sector."}
       401: {description: "Not signed in as a citizen."}
@@ -1226,20 +1243,28 @@ def api_create_request():
     district = (data.get("district") or sec.get("district"))
     sector   = (data.get("sector") or sec.get("sector"))
     now = datetime.datetime.now().isoformat(timespec="seconds")
+    # Optional site photo the citizen attached. The browser already downscales it;
+    # we only keep a data-URL JPEG within a sane cap (~1.5 MB) and trim the caption.
+    photo = data.get("photo")
+    if not (isinstance(photo, str) and photo.startswith("data:image/") and len(photo) <= 1_500_000):
+        photo = None
+    photo_note = (data.get("photo_note") or "").strip()[:280] or None
     try:
         with sqlite3.connect(str(_DB_PATH), timeout=10) as con:
             cur = con.execute(
                 "INSERT INTO REQUESTS (created_at, citizen_name, citizen_phone, citizen_email, upi, "
                 "district, sector, sector_id, lat, lng, area_ha, risk_level, parcel_risk, "
-                "neighbourhood_risk, tree_cover_pct, deforestation_prob, data_source, analysis_id, reason) "
-                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                "neighbourhood_risk, tree_cover_pct, deforestation_prob, data_source, analysis_id, reason, "
+                "photo, photo_note) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (now, citizen.get("full_name"), citizen.get("phone"), citizen["email"],
                  (data.get("upi") or analysis.get("upi")), district, sector,
                  sec.get("sector_id"), lat, lng, analysis.get("parcel_area_ha"),
                  analysis.get("risk_level"), analysis.get("parcel_risk"),
                  analysis.get("neighbourhood_risk"), analysis.get("tree_cover_pct"),
                  analysis.get("deforestation_prob"), analysis.get("data_source"),
-                 str(data.get("analysis_id")), (data.get("reason") or None)),
+                 str(data.get("analysis_id")), (data.get("reason") or None),
+                 photo, photo_note),
             )
             rid = cur.lastrowid
     except sqlite3.Error as e:
@@ -1377,7 +1402,8 @@ def api_my_requests():
             con.row_factory = sqlite3.Row
             rows = [dict(r) for r in con.execute(
                 "SELECT request_id, created_at, sector, district, risk_level, parcel_risk, "
-                "neighbourhood_risk, tree_cover_pct, status, reviewed_at, review_note, reason "
+                "neighbourhood_risk, tree_cover_pct, status, reviewed_at, review_note, reason, "
+                "photo, photo_note "
                 "FROM REQUESTS WHERE LOWER(citizen_email) = LOWER(?) ORDER BY created_at DESC",
                 (citizen["email"],)).fetchall()]
     except sqlite3.Error as e:

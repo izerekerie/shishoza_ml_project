@@ -104,7 +104,6 @@
 <div class="flex items-center gap-2"><span class="material-symbols-outlined text-primary text-[20px]">inventory_2</span>
 <h3 class="font-label-md text-label-md font-bold uppercase tracking-wider text-on-surface-variant" data-i18n="inventory_title">Land Data Inventory</h3></div>
 <div class="grid grid-cols-1 gap-px bg-outline-variant/20 rounded-lg overflow-hidden border border-outline-variant/20" id="inventory">
-<div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline">UPI</span><span class="font-data-mono text-data-mono font-medium" id="v-upi">—</span></div>
 <div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline" data-i18n="lbl_surface">Surface Area</span><span class="font-data-mono text-data-mono font-medium" id="v-area">—</span></div>
 <div class="flex justify-between items-start p-3 bg-white"><span class="font-label-sm text-label-sm text-outline" data-i18n="lbl_location">Location</span><span class="font-data-mono text-data-mono text-right font-medium" id="v-loc">—</span></div>
 <div class="flex justify-between items-center p-3 bg-white"><span class="font-label-sm text-label-sm text-outline" data-i18n="lbl_latlng">Lat/Lng</span><span class="font-data-mono text-data-mono font-medium" id="v-latlng">—</span></div>
@@ -189,6 +188,10 @@
 <option value="farming" data-i18n="reason_fa">Farming</option>
 <option value="income" data-i18n="reason_in">Income</option>
 </select>
+<label class="block text-outline" style="font-size:11px" data-i18n="req_photo_lbl">Photo of the site (optional)</label>
+<input id="reqPhoto" type="file" accept="image/*" class="w-full text-label-md text-outline file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-label-md file:font-bold file:bg-primary/10 file:text-primary cursor-pointer">
+<label class="block text-outline" style="font-size:11px" data-i18n="req_photo_desc_lbl">Describe what the photo shows (optional)</label>
+<textarea id="reqPhotoNote" rows="2" maxlength="280" data-i18n-ph="req_photo_desc_ph" placeholder="e.g. The trees I plan to cut, near the road on the east side of the plot." class="w-full px-3 py-2 border border-outline-variant/50 rounded-lg text-label-md bg-white" style="resize:vertical"></textarea>
 <button id="reqSubmit" class="w-full text-on-primary py-3 rounded-lg font-label-md text-label-md font-bold hover:opacity-90 transition-all" style="background-color:#14532D;" data-i18n="req_send">Send for review</button>
 <div id="reqResult" class="space-y-1"></div>
 </div>
@@ -245,6 +248,8 @@ const STRINGS = {
     req_name_ph:'Your name (optional)', req_phone_ph:'Phone (optional)',
     req_district:'District — routes to that manager', req_pick:'Select district…',
     req_reason_lbl:'Reason for cutting', req_reason_pick:'Select a reason…',
+    req_photo_lbl:'Photo of the site (optional)', req_photo_desc_lbl:'Describe what the photo shows (optional)',
+    req_photo_desc_ph:'e.g. The trees I plan to cut, near the road on the east side of the plot.',
     req_send:'Send for review', req_err:'Could not send your request. Please try again.',
     auth_prompt:'Create a free account (or log in) to send this for review and track the decision.',
     auth_email_ph:'Email', auth_pass_ph:'Password (min 6 characters)',
@@ -253,7 +258,7 @@ const STRINGS = {
     auth_err:'Could not sign in. Check your details and try again.',
     req_as:'Requesting as', my_req_title:'My review requests', my_req_empty:'You have no requests yet.',
     st_pending:'Pending', st_approved:'Approved', st_rejected:'Flagged',
-    req_ok:(id,d)=>`Review #${id} sent to the ${d||'district'} forest manager. Keep this number to check the outcome.`,
+    req_ok:(id,d)=>`Sent to the ${d||'district'} forest manager (review #${id}). You'll get an email once they decide — and you can follow it any time under "My review requests" below.`,
     sim_same:(cb,ca,nb,na)=>`If you clear this area, your tree cover drops from ${cb}% to ${ca}%. The surrounding 500m area has ${na}% cleared land — the risk level stays the same.`,
     sim_worse:(cb,ca,nb,na)=>`If you clear this area, your tree cover drops from ${cb}% to ${ca}% and the risk increases. The 500m neighbourhood goes from ${nb}% to ${na}% cleared.`,
     sim_better:(cb,ca,nb,na)=>`After clearing, tree cover would be ${ca}% — the risk actually improves.`,
@@ -288,6 +293,8 @@ const STRINGS = {
     req_name_ph:'Amazina yawe (ku bushake)', req_phone_ph:'Telefone (ku bushake)',
     req_district:'Akarere — bijya kuri uwo muyobozi', req_pick:'Hitamo akarere…',
     req_reason_lbl:'Impamvu yo gutema', req_reason_pick:'Hitamo impamvu…',
+    req_photo_lbl:'Ifoto y\'aho biherereye (ku bushake)', req_photo_desc_lbl:'Sobanura ibigaragara ku ifoto (ku bushake)',
+    req_photo_desc_ph:'urugero: Ibiti nifuza gutema, hafi y\'umuhanda mu ruhande rw\'iburasirazuba.',
     req_send:'Ohereza isuzumwe', req_err:'Ntibyashobotse kohereza. Ongera ugerageze.',
     auth_prompt:'Fungura konti ku buntu (cyangwa winjire) kugira ngo wohereze isuzuma unakurikirane igisubizo.',
     auth_email_ph:'Imeyili', auth_pass_ph:'Ijambobanga (nibura inyuguti 6)',
@@ -296,7 +303,7 @@ const STRINGS = {
     auth_err:'Ntibyashobotse. Reba amakuru yawe wongere ugerageze.',
     req_as:'Urasaba nka', my_req_title:'Ibyifuzo byanjye by\'isuzuma', my_req_empty:'Nta byifuzo ufite.',
     st_pending:'Bitegereje', st_approved:'Byemejwe', st_rejected:'Byashyizweho ikimenyetso',
-    req_ok:(id,d)=>`Isuzuma #${id} ryoherejwe ku muyobozi wa ${d||'akarere'}. Bika iyi nomero kugira ngo urebe igisubizo.`,
+    req_ok:(id,d)=>`Ryoherejwe ku muyobozi w'amashyamba wa ${d||'akarere'} (isuzuma #${id}). Uzabona imeyili igihe bafashe icyemezo — ushobora no kurikirana buri gihe ahitwa "Ibyifuzo byanjye by'isuzuma" hepfo.`,
     sim_same:(cb,ca,nb,na)=>`Gukata aho, ibiti biri ${cb}% biramanuka kugera ${ca}%. Akarere ka 500m hafi yawe gifite ${na}% yahagaritswe — inzara iguma ingana.`,
     sim_worse:(cb,ca,nb,na)=>`Gukata aho, ibiti biramanuka ${cb}% → ${ca}%, kandi inzara iriyongera. Akarere ka 500m kijya ${nb}% → ${na}% yahagaritswe.`,
     sim_better:(cb,ca,nb,na)=>`Nyuma yo gukata, ibiti bizaba ${ca}% — inzara irageuka nziza.`,
@@ -331,6 +338,8 @@ const STRINGS = {
     req_name_ph:'Votre nom (facultatif)', req_phone_ph:'Téléphone (facultatif)',
     req_district:'District — dirige vers ce gestionnaire', req_pick:'Choisir un district…',
     req_reason_lbl:'Raison de la coupe', req_reason_pick:'Choisir une raison…',
+    req_photo_lbl:'Photo du site (facultatif)', req_photo_desc_lbl:'Décrivez ce que montre la photo (facultatif)',
+    req_photo_desc_ph:'ex. Les arbres que je compte couper, près de la route côté est de la parcelle.',
     req_send:'Envoyer pour examen', req_err:'Échec de l\'envoi. Veuillez réessayer.',
     auth_prompt:'Créez un compte gratuit (ou connectez-vous) pour envoyer cette demande et suivre la décision.',
     auth_email_ph:'E-mail', auth_pass_ph:'Mot de passe (6 caractères min)',
@@ -339,7 +348,7 @@ const STRINGS = {
     auth_err:'Échec de la connexion. Vérifiez vos informations et réessayez.',
     req_as:'Demande au nom de', my_req_title:'Mes demandes d\'examen', my_req_empty:'Vous n\'avez encore aucune demande.',
     st_pending:'En attente', st_approved:'Approuvée', st_rejected:'Signalée',
-    req_ok:(id,d)=>`Examen #${id} envoyé au gestionnaire forestier de ${d||'district'}. Gardez ce numéro pour le résultat.`,
+    req_ok:(id,d)=>`Envoyé au gestionnaire forestier de ${d||'district'} (examen #${id}). Vous recevrez un e-mail dès la décision — et vous pouvez le suivre à tout moment dans « Mes demandes d'examen » ci-dessous.`,
     sim_same:(cb,ca,nb,na)=>`Si vous déboisez, la couverture arborée passe de ${cb}% à ${ca}%. La zone de 500m autour a ${na}% de terres déboisées — le risque reste le même.`,
     sim_worse:(cb,ca,nb,na)=>`Si vous déboisez, la couverture passe de ${cb}% à ${ca}% et le risque augmente. Le voisinage 500m passe de ${nb}% à ${na}% déboisé.`,
     sim_better:(cb,ca,nb,na)=>`Après déforestation, la couverture serait de ${ca}% — le risque s\'améliore.`,
@@ -458,7 +467,6 @@ manSubmit.addEventListener('click', async () => {
 function render(d){
   resetAnalysis();   // clear any previous parcel's risk before showing the new one
   parcelMeta=d;
-  document.getElementById('v-upi').textContent = d.upi || '—';
   document.getElementById('v-area').textContent = d.surface_sqm ? `${d.surface_sqm} m²` : (d.extracted_area_m2 ? `${d.extracted_area_m2} m²` : '—');
   document.getElementById('v-loc').innerHTML = [d.village,d.sector,d.district].filter(Boolean).join(', ') || '—';
   document.getElementById('v-latlng').textContent = (d.lat&&d.lng) ? `${d.lat.toFixed(4)}, ${d.lng.toFixed(4)}` : '—';
@@ -471,7 +479,7 @@ function render(d){
   }
   if (d.lat && d.lng){
     if(marker) marker.remove(); if(circle500) circle500.remove(); drawnItems.clearLayers(); parcelPolygon=null;
-    marker=L.marker([d.lat,d.lng]).addTo(map).bindPopup(`<strong>${d.upi||'parcel'}</strong><br/>${d.sector||''}, ${d.district||''}`);
+    marker=L.marker([d.lat,d.lng]).addTo(map).bindPopup(`<strong>${[d.sector,d.district].filter(Boolean).join(', ')||'Your parcel'}</strong>`);
     circle500=L.circle([d.lat,d.lng],{radius:500,color:'#f59e0b',fillColor:'#f59e0b',fillOpacity:0.10,weight:4,dashArray:'8,5'}).addTo(map);
     circle500.bindTooltip('500m analysis area',{permanent:false,direction:'top',className:'text-xs'});
     if (d.polygon_wgs84 && d.polygon_wgs84.length>=4){
@@ -625,14 +633,41 @@ async function loadMyRequests(){
 
 document.getElementById('reqLogout').addEventListener('click', async ()=>{ await fetch('/api/citizen/logout',{method:'POST'}); refreshCitizen(); });
 
+// Downscale a chosen photo in the browser (max 1024px, JPEG q0.72) so the
+// upload stays small — a phone photo becomes ~100–300 KB before it is sent.
+function shrinkImage(file){
+  return new Promise((resolve,reject)=>{
+    if(!file){ resolve(null); return; }
+    const fr=new FileReader();
+    fr.onerror=reject;
+    fr.onload=()=>{
+      const img=new Image();
+      img.onerror=reject;
+      img.onload=()=>{
+        const max=1024, scale=Math.min(1, max/Math.max(img.width,img.height));
+        const c=document.createElement('canvas');
+        c.width=Math.round(img.width*scale); c.height=Math.round(img.height*scale);
+        c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+        resolve(c.toDataURL('image/jpeg',0.72));
+      };
+      img.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
 document.getElementById('reqSubmit').addEventListener('click', async ()=>{
   if(!lastAnalysis) return;
   const btn=document.getElementById('reqSubmit'), res=document.getElementById('reqResult');
   const district=document.getElementById('reqDistrict').value||lastAnalysis.district||'';
   const reason=document.getElementById('reqReason').value||'';
+  const photoNote=(document.getElementById('reqPhotoNote').value||'').trim();
   btn.disabled=true;
   try{
-    const r=await (await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id, district, reason})})).json();
+    let photo=null;
+    try{ photo=await shrinkImage(document.getElementById('reqPhoto').files[0]); }
+    catch(e){ photo=null; }  // a bad image just sends the request without one
+    const r=await (await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id, district, reason, photo, photo_note:photoNote})})).json();
     if(r.error){ res.innerHTML=`<div class="err">${r.error}</div>`; }
     else{ res.innerHTML=`<div style="color:#15803d;font-size:13px;font-weight:600;line-height:1.4">${t('req_ok')(r.request_id, r.district||district)}</div>`; loadMyRequests(); }
   }catch(e){ res.innerHTML=`<div class="err">${t('req_err')}</div>`; }

@@ -27,7 +27,7 @@
   <div class="bg-white rounded-xl border border-gray-200 overflow-x-auto">
     <table class="w-full text-sm">
       <thead class="bg-gray-50 text-left text-[11px] uppercase tracking-wide text-gray-500"><tr>
-        <th class="px-4 py-3 font-semibold">#</th><th class="px-4 py-3 font-semibold">Date</th><th class="px-4 py-3 font-semibold">Location</th><th class="px-4 py-3 font-semibold">Your parcel</th><th class="px-4 py-3 font-semibold">Neighbourhood</th><th class="px-4 py-3 font-semibold">Status</th><th class="px-4 py-3 font-semibold">Manager note</th>
+        <th class="px-4 py-3 font-semibold">#</th><th class="px-4 py-3 font-semibold">Date</th><th class="px-4 py-3 font-semibold">Location</th><th class="px-4 py-3 font-semibold">Photo</th><th class="px-4 py-3 font-semibold">Your parcel</th><th class="px-4 py-3 font-semibold">Neighbourhood</th><th class="px-4 py-3 font-semibold">Status</th><th class="px-4 py-3 font-semibold">Manager note</th>
       </tr></thead>
       <tbody id="tbody"></tbody>
     </table>
@@ -54,11 +54,12 @@ const SC = {pending:'#b45309', approved:'#15803d', rejected:'#b91c1c'};
       <td class="px-4 py-3 font-bold text-gray-700">${r.request_id}</td>
       <td class="px-4 py-3 text-xs text-gray-500">${(r.created_at||'').replace('T',' ')}</td>
       <td class="px-4 py-3 text-xs">${r.sector||'—'}${r.district ? ', ' + r.district : ''}</td>
+      <td class="px-4 py-3">${r.photo?`<a href="${r.photo}" target="_blank" rel="noopener" title="${(r.photo_note||'Open full size').replace(/"/g,'&quot;')}"><img src="${r.photo}" alt="Site photo" class="w-14 h-11 object-cover rounded border border-gray-200"></a>`:'<span class="text-xs text-gray-400">—</span>'}</td>
       <td class="px-4 py-3"><span class="text-xs font-bold" style="color:${RC[r.parcel_risk]||'#9ca3af'}">${r.parcel_risk||'—'}</span></td>
       <td class="px-4 py-3"><span class="text-xs font-bold" style="color:${RC[r.neighbourhood_risk]||'#9ca3af'}">${r.neighbourhood_risk||'—'}</span></td>
       <td class="px-4 py-3 text-xs font-bold" style="color:${SC[r.status]||'#6b7280'}">${SL[r.status]||r.status}</td>
       <td class="px-4 py-3 text-xs text-gray-500">${r.review_note||'—'}</td>
-    </tr>`).join('') : '<tr><td colspan="7" class="px-4 py-12 text-center text-gray-400">You have no review requests yet.</td></tr>';
+    </tr>`).join('') : '<tr><td colspan="8" class="px-4 py-12 text-center text-gray-400">You have no review requests yet.</td></tr>';
 })();
 </script>
 </body></html>

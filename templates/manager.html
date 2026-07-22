@@ -292,10 +292,12 @@ function reqCard(r){
     <div class="flex justify-between items-start gap-2">
       <div><div class="text-xs font-bold">#${r.request_id} · ${r.citizen_name||r.citizen_email||'—'}</div>
         <div class="text-[10px] text-on-surface-variant">${r.citizen_email||''}${r.citizen_phone?' · '+r.citizen_phone:''}</div>
-        <div class="text-[10px] text-on-surface-variant">${r.sector||'—'} · ${r.upi||'no UPI'}</div></div>
+        <div class="text-[10px] text-on-surface-variant">${r.sector||'—'}${r.reason?' · '+r.reason:''}</div></div>
       <span class="text-[9px] px-1.5 py-0.5 rounded-full text-white font-bold shrink-0" style="background:${_rc(r.parcel_risk)}">${r.parcel_risk||'—'}</span>
     </div>
     <div class="text-[10px] text-on-surface-variant mt-1">Neighbourhood ${r.neighbourhood_risk||'—'} · Trees ${r.tree_cover_pct!=null?Math.round(r.tree_cover_pct)+'%':'—'}</div>
+    ${r.photo?`<a href="${r.photo}" target="_blank" rel="noopener" title="Open the citizen's photo full size"><img src="${r.photo}" alt="Site photo" class="mt-2 w-full h-24 object-cover rounded border border-outline-variant/40"></a>`:''}
+    ${r.photo_note?`<div class="text-[10px] text-on-surface-variant mt-1 italic">"${r.photo_note}"</div>`:''}
     <div class="flex gap-1.5 mt-2">
       <button data-focus="${r.request_id}" class="text-[10px] px-2 py-1 rounded border border-outline-variant/40 hover:bg-surface-container">Map</button>
       <button data-id="${r.request_id}" data-decide="approved" class="flex-1 text-[10px] px-2 py-1 rounded text-white font-bold" style="background:#16a34a">Approve</button>
