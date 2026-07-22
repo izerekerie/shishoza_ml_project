@@ -44,6 +44,27 @@
   .custom-scrollbar::-webkit-scrollbar-thumb { background:#e1e3e2; border-radius:10px; }
   #map { position:absolute; inset:0; z-index:0; }
   .leaflet-top.leaflet-left { top:70px; }
+  /* Mobile: the dashboard is a desktop-first fixed/absolute layout. On small
+     screens, stack it — nav on top, then the scope header, the map, and the
+     data panels — and let the page scroll normally. Desktop is unchanged. */
+  @media (max-width: 767px) {
+    body { display:block !important; height:auto !important; overflow:visible !important; }
+    aside { position:static !important; width:100% !important; height:auto !important;
+            box-shadow:none !important; border-right:none !important;
+            border-bottom:1px solid #E5E7EB; }
+    aside nav { flex-direction:row !important; flex-wrap:wrap !important; margin-bottom:0.75rem !important; }
+    aside .mb-auto, aside .mt-8, aside .mt-auto { margin-top:0.75rem !important; margin-bottom:0.75rem !important; }
+    aside > div:last-child { display:none; }   /* hide the footer credit to save height */
+    main { margin-left:0 !important; display:flex !important; flex-direction:column !important;
+           height:auto !important; overflow:visible !important; }
+    main > header { position:relative !important; order:-1; height:auto !important;
+                    padding-top:0.5rem; padding-bottom:0.5rem; }
+    #map { position:relative !important; inset:auto !important; height:55vh !important; order:0; }
+    #mgrPanels { position:static !important; width:100% !important; height:auto !important;
+                 order:1; padding-top:1rem !important; overflow:visible !important;
+                 pointer-events:auto !important; }
+    .leaflet-top.leaflet-left { top:10px !important; }
+  }
 </style>
 </head>
 <body class="flex h-screen overflow-hidden text-on-surface">
@@ -96,7 +117,7 @@
 </header>
 
 <!-- Right data panels -->
-<div class="absolute right-0 top-0 h-full w-[400px] flex flex-col gap-gutter p-gutter overflow-y-auto custom-scrollbar pointer-events-none pt-20 z-10">
+<div id="mgrPanels" class="absolute right-0 top-0 h-full w-[400px] flex flex-col gap-gutter p-gutter overflow-y-auto custom-scrollbar pointer-events-none pt-20 z-10">
 <!-- Risk summary -->
 <section class="glass-card p-5 rounded-lg pointer-events-auto">
 <header class="flex justify-between items-center mb-4">
@@ -190,6 +211,10 @@ map.fitBounds(RW_BOUNDS);
 // Recalculate size once the flex/absolute layout settles, else Leaflet shows the world.
 setTimeout(() => map.invalidateSize(), 250);
 window.addEventListener('load', () => map.invalidateSize());
+// Keep the map sized to its box when the phone rotates or the stacked mobile
+// layout reflows.
+window.addEventListener('resize', () => map.invalidateSize());
+window.addEventListener('orientationchange', () => setTimeout(() => map.invalidateSize(), 300));
 document.getElementById('zoomIn').addEventListener('click', () => map.zoomIn());
 document.getElementById('zoomOut').addEventListener('click', () => map.zoomOut());
 

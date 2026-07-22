@@ -44,13 +44,13 @@
   .err { color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; padding:8px 10px; border-radius:6px; font-size:13px; }
 </style>
 </head>
-<body class="bg-background text-on-surface overflow-hidden h-screen flex flex-col" style="background-color:#f8fafc;">
+<body class="bg-background text-on-surface min-h-screen md:h-screen md:overflow-hidden flex flex-col" style="background-color:#f8fafc;">
 <!-- Top nav -->
-<header class="bg-white border-b border-gray-200 flex items-center justify-between px-6 h-14 w-full shrink-0 z-50">
-<div class="flex items-center gap-6">
+<header class="bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 h-14 w-full shrink-0 z-50">
+<div class="flex items-center gap-3 md:gap-6">
 <a href="/" class="text-xl font-extrabold tracking-tight hover:opacity-70 transition-opacity" style="color:#14532D">Shishoza</a>
-<nav class="hidden md:flex items-center gap-5 text-sm">
-<a href="/" class="font-medium text-gray-500 hover:text-gray-900 transition-colors">Home</a>
+<nav class="flex items-center gap-3 md:gap-5 text-xs md:text-sm whitespace-nowrap">
+<a href="/" class="hidden sm:block font-medium text-gray-500 hover:text-gray-900 transition-colors">Home</a>
 <a href="/citizen" class="font-semibold border-b-2 pb-0.5" style="color:#14532D;border-color:#14532D">Citizen</a>
 <a href="/my-reviews" class="font-medium text-gray-500 hover:text-gray-900 transition-colors">My Reviews</a>
 </nav>
@@ -63,9 +63,9 @@
 </div>
 </header>
 
-<main class="flex-1 flex overflow-hidden">
+<main class="flex-1 flex flex-col md:flex-row md:overflow-hidden">
 <!-- Citizen portal panel -->
-<section class="w-panel-width h-full bg-surface overflow-y-auto border-r border-outline-variant shrink-0 z-40">
+<section class="w-full md:w-panel-width md:h-full bg-surface md:overflow-y-auto border-b md:border-b-0 md:border-r border-outline-variant shrink-0 z-40">
 <div class="p-container-margin space-y-6">
 <header>
 <h2 class="font-title-lg text-title-lg text-primary" data-i18n="citizen_portal">Citizen Portal</h2>
@@ -225,7 +225,7 @@
 </section>
 
 <!-- Map viewport (real Leaflet) -->
-<section class="flex-1 relative bg-surface-dim">
+<section class="relative bg-surface-dim h-[60vh] min-h-[320px] md:h-auto md:flex-1">
 <div id="map"></div>
 </section>
 </main>
@@ -432,6 +432,10 @@ map.fitBounds(RW_BOUNDS);
 function fixMapSize(){ map.invalidateSize(); if (!parcelPolygon && !marker) map.fitBounds(RW_BOUNDS); }
 setTimeout(fixMapSize, 250);
 window.addEventListener('load', fixMapSize);
+// Keep the map filling its box when the phone rotates or the panel height shifts
+// (mobile stacks the panel above the map), without resetting the user's view.
+window.addEventListener('resize', () => map.invalidateSize());
+window.addEventListener('orientationchange', () => setTimeout(fixMapSize, 300));
 
 window.type = '';
 const drawnItems = new L.FeatureGroup().addTo(map);
