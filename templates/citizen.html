@@ -79,9 +79,27 @@
 <label class="border border-dashed border-outline-variant rounded-xl p-8 text-center cursor-pointer hover:bg-surface-container-low transition-all group bg-white flex flex-col items-center" for="file">
 <input class="hidden" id="file" type="file" accept=".pdf,.png,.jpg,.jpeg"/>
 <div class="w-12 h-12 rounded-full bg-primary/5 flex items-center justify-center mb-3"><span class="material-symbols-outlined text-primary text-2xl">upload_file</span></div>
-<p class="font-label-md text-label-md font-medium text-on-surface" data-i18n="upload_label">Upload Land Title</p>
-<p class="font-label-sm text-label-sm text-outline mt-1" data-i18n="upload_sub">PDF, PNG, or JPG · crop out your name first</p>
+<p class="font-label-md text-label-md font-medium text-on-surface" data-i18n="upload_label">Upload the cadastral-plan page</p>
+<p class="font-label-sm text-label-sm text-outline mt-1" data-i18n="upload_sub">A photo or screenshot of the page showing your land's shape. PDF, PNG or JPG · crop out your name first.</p>
 </label>
+<!-- Sample of the page to upload, so citizens know exactly what to look for -->
+<div class="rounded-xl border border-outline-variant/40 bg-surface-container-low p-3">
+<p class="font-label-sm text-label-sm text-outline mb-2 flex items-center gap-1"><span class="material-symbols-outlined text-[16px] text-primary">image</span><span data-i18n="ex_caption">Example — upload a page like this</span></p>
+<svg viewBox="0 0 320 150" class="w-full h-auto rounded-lg border border-outline-variant/30 bg-white" role="img" aria-label="Example of a cadastral plan page">
+  <text x="12" y="17" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#374151">EXTRACT OF CADASTRAL PLAN</text>
+  <rect x="8" y="26" width="304" height="116" fill="none" stroke="#9ca3af" stroke-width="1.5"/>
+  <text x="150" y="24" font-family="monospace" font-size="7" fill="#9ca3af" text-anchor="middle">527180</text>
+  <text x="150" y="139" font-family="monospace" font-size="7" fill="#9ca3af" text-anchor="middle">527180</text>
+  <polygon points="58,52 252,44 260,104 72,122" fill="#14532D" fill-opacity="0.06" stroke="#1f2937" stroke-width="3" stroke-linejoin="round"/>
+  <text x="156" y="90" font-family="Inter,sans-serif" font-size="12" font-weight="600" fill="#6b7280" text-anchor="middle">7914</text>
+  <g transform="translate(286,44)">
+    <polygon points="0,-9 5,0 0,9 -5,0" fill="#6b7280"/>
+    <text x="0" y="-11" font-family="Inter,sans-serif" font-size="7" font-weight="700" fill="#374151" text-anchor="middle">N</text>
+  </g>
+  <rect x="16" y="128" width="34" height="5" fill="#374151"/>
+  <text x="54" y="133" font-family="monospace" font-size="7" fill="#6b7280">Scale 1:212</text>
+</svg>
+</div>
 <p class="font-label-sm text-label-sm text-on-surface-variant" id="status"></p>
 <button id="go" disabled class="w-full bg-primary text-on-primary py-3.5 rounded-xl font-label-md text-label-md font-bold hover:opacity-90 active:scale-[0.98] transition-all shadow-sm disabled:opacity-40 disabled:cursor-not-allowed" style="background-color:#14532D;" data-i18n="extract_btn">Extract Location</button>
 <details class="group">
@@ -219,8 +237,9 @@
 const STRINGS = {
   en: {
     citizen_portal:'Citizen Portal', citizen_sub:'Land management & risk monitoring',
-    identify:'Identify Your Land', upload_label:'Upload Land Title',
-    upload_sub:'PDF, PNG, or JPG · crop out your name first',
+    identify:'Identify Your Land', upload_label:'Upload the cadastral-plan page',
+    upload_sub:"A photo or screenshot of the page showing your land's shape. PDF, PNG or JPG · crop out your name first.",
+    ex_caption:'Example — upload a page like this',
     extract_btn:'Extract Location', manual_entry:'Manual coordinate entry',
     lbl_easting:'Easting', lbl_northing:'Northing', lbl_area:'Surface area m² (optional)',
     manual_submit:'Use these coordinates', inventory_title:'Land Data Inventory',
@@ -265,8 +284,9 @@ const STRINGS = {
   },
   rw: {
     citizen_portal:'Umunyamuryango', citizen_sub:'Gucunga ubutaka no gukurikirana inzara',
-    identify:'Menya Ubutaka Bwawe', upload_label:'Shyiraho Impapuro z\'Ubutaka',
-    upload_sub:'PDF, PNG, cyangwa JPG · kura izina ryawe mbere',
+    identify:'Menya Ubutaka Bwawe', upload_label:'Ohereza urupapuro rw\'ishusho y\'ubutaka',
+    upload_sub:'Ifoto cyangwa screenshot y\'urupapuro rugaragaza uko ubutaka bwawe bumeze (cadastral plan). PDF, PNG cyangwa JPG · banza ukure izina ryawe.',
+    ex_caption:'Urugero — ohereza urupapuro rusa n\'iyi shusho',
     extract_btn:'Shakisha Aho Ubutaka Buherereye', manual_entry:'Injiza intego ku maboko',
     lbl_easting:'Ubuso bw\'Ubumanuko', lbl_northing:'Ubuso bw\'Amajyaruguru', lbl_area:'Ubuso mu m² (bisabwa)',
     manual_submit:'Koresha izi ntego', inventory_title:'Amakuru y\'Ubutaka',
@@ -310,8 +330,9 @@ const STRINGS = {
   },
   fr: {
     citizen_portal:'Portail Citoyen', citizen_sub:'Gestion foncière & suivi des risques',
-    identify:'Identifiez votre Terrain', upload_label:'Télécharger le Titre Foncier',
-    upload_sub:'PDF, PNG ou JPG · masquez votre nom d\'abord',
+    identify:'Identifiez votre Terrain', upload_label:'Téléversez la page du plan cadastral',
+    upload_sub:'Une photo ou capture d\'écran de la page montrant la forme de votre terrain. PDF, PNG ou JPG · masquez d\'abord votre nom.',
+    ex_caption:'Exemple — téléversez une page comme celle-ci',
     extract_btn:'Extraire la localisation', manual_entry:'Saisie manuelle des coordonnées',
     lbl_easting:'Coordonnée Est', lbl_northing:'Coordonnée Nord', lbl_area:'Surface m² (facultatif)',
     manual_submit:'Utiliser ces coordonnées', inventory_title:'Données du Terrain',
