@@ -131,9 +131,9 @@
         <option value="forest_manager">Forest manager</option>
         <option value="admin">Admin</option>
       </select>
-      <label for="formScope" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">District scope (forest managers only)</label>
+      <label for="formScope" id="scopeLabel" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">District scope (forest managers only)</label>
       <select id="formScope" class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm">
-        <option value="">— none —</option>
+        <option value="" id="scopeNoneOpt">— select a district —</option>
       </select>
       <label for="formOrg" class="block text-xs font-semibold text-on-surface-variant mt-2 mb-1">Organisation</label>
       <input id="formOrg" type="text" placeholder="e.g. Rwanda Forestry Authority" class="w-full px-3 py-2 rounded-lg border border-outline-variant/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary"/>
@@ -214,6 +214,28 @@ function renderTable() {
 document.getElementById('searchInp').addEventListener('input', renderTable);
 document.getElementById('roleFilter').addEventListener('change', renderTable);
 
+// Keep the district-scope field in step with the chosen role. Admins are always
+// national (no scope), so the field is locked; managers must pick one district.
+function syncScope() {
+  const role = document.getElementById('formRole').value;
+  const scope = document.getElementById('formScope');
+  const noneOpt = document.getElementById('scopeNoneOpt');
+  const label = document.getElementById('scopeLabel');
+  if (role === 'admin') {
+    scope.value = '';
+    scope.disabled = true;
+    scope.classList.add('opacity-60', 'cursor-not-allowed');
+    noneOpt.textContent = '— national (all districts) —';
+    label.textContent = 'District scope — admins cover all districts';
+  } else {
+    scope.disabled = false;
+    scope.classList.remove('opacity-60', 'cursor-not-allowed');
+    noneOpt.textContent = '— select a district —';
+    label.textContent = 'District scope (required for forest managers)';
+  }
+}
+document.getElementById('formRole').addEventListener('change', syncScope);
+
 const modal = document.getElementById('modal');
 function openModal(user) {
   document.getElementById('formErr').style.display = 'none';
@@ -246,6 +268,7 @@ function openModal(user) {
     document.getElementById('pwdLabel').style.display = 'block';
     document.getElementById('formPwd').style.display = 'block';
   }
+  syncScope();
   modal.classList.add('open');
 }
 function closeModal() { modal.classList.remove('open'); }
@@ -292,6 +315,12 @@ document.getElementById('userForm').addEventListener('submit', async (e) => {
   };
   const err = document.getElementById('formErr');
   err.style.display = 'none';
+  if (body.role === 'forest_manager' && !body.district_scope) {
+    err.textContent = 'Pick a district for this forest manager — a manager must be scoped to one district.';
+    err.style.display = 'block';
+    document.getElementById('formScope').focus();
+    return;
+  }
   try {
     let r;
     if (id) {
