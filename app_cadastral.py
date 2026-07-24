@@ -991,6 +991,17 @@ else:
                 _con.execute("ALTER TABLE REQUESTS ADD COLUMN photo_note TEXT")
             except sqlite3.OperationalError:
                 pass
+            # Restore the demo users/citizens/reviews after an ephemeral rebuild
+            # (Hugging Face wipes the disk on each deploy). INSERT OR IGNORE means
+            # it only fills gaps — anything created since is left untouched.
+            # Refresh the snapshot with scripts/make_demo_seed.py.
+            _seed = _DB_PATH.parent / "seed_demo_data.sql"
+            if _seed.exists():
+                try:
+                    _con.executescript(_seed.read_text())
+                    print(f"[boot]   applied demo seed: {_seed.name}")
+                except sqlite3.Error as e:
+                    print(f"[boot]   demo seed skipped: {e}")
     except sqlite3.Error as e:
         print(f"[boot]   could not create ANALYSIS_CACHE table: {e}")
 

@@ -77,6 +77,8 @@ RUN mkdir -p models \
 # image is ready-to-run. seed_alternatives.sql creates the DB + ALTERNATIVES
 # table; seed_users.py then adds the demo accounts. Without this the app boots
 # with no alternatives AND no shared ANALYSIS_CACHE (multi-worker fix needs it).
+# The citizens + reviews snapshot (seed_demo_data.sql) is restored by the app on
+# boot, once it has created the REQUESTS/CITIZENS tables, so it survives rebuilds.
 RUN python -c "import sqlite3; con=sqlite3.connect('data/database/treesight.db'); con.executescript(open('data/database/seed_alternatives.sql').read()); con.close()" \
  && python scripts/seed_users.py
 

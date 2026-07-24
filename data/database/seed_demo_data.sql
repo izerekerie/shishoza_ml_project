@@ -1,0 +1,19 @@
+-- seed_demo_data.sql — restores demo users, citizens and reviews after each
+-- Hugging Face rebuild (the free disk is ephemeral). Idempotent: INSERT OR
+-- IGNORE leaves anything already present untouched. Regenerate with
+-- scripts/make_demo_seed.py after you add accounts you want to keep.
+
+-- USERS (7 rows)
+INSERT OR IGNORE INTO USERS (user_id, email, password_hash, full_name, role, organisation, district_scope, language, created_at, last_login, is_active) VALUES (1, 'admin@treesight.rw', '$2b$10$m3sBARJSvgnBIZkD0vhYXOGGPJK5lAddjpXipVC90YyjL9rciXF6i', 'TreeSight Admin', 'admin', 'TreeSight Project', NULL, 'en', '2026-06-09 12:23:42', '2026-07-22 12:13:24', 1);
+INSERT OR IGNORE INTO USERS (user_id, email, password_hash, full_name, role, organisation, district_scope, language, created_at, last_login, is_active) VALUES (2, 'manager.nyamasheke@treesight.rw', '$2b$10$dQ9NuCJTA/yp.zzJldoFuO24ezyhpkCaOinZwE4XDvt8Yk8UY1x2u', 'Nyamasheke Forest Manager', 'forest_manager', 'Rwanda Forestry Authority', 'Nyamasheke', 'rw', '2026-06-09 12:23:42', '2026-07-10 07:16:51', 1);
+INSERT OR IGNORE INTO USERS (user_id, email, password_hash, full_name, role, organisation, district_scope, language, created_at, last_login, is_active) VALUES (3, 'manager.rusizi@treesight.rw', '$2b$10$CDpwpPneNTVmEbgcurpe8..fXLJHZtU8LHwe8bB7JASglSjMmN1mu', 'Rusizi Forest Manager', 'forest_manager', 'Rwanda Forestry Authority', 'Rusizi', 'rw', '2026-06-09 12:23:42', '2026-07-15 10:21:51', 1);
+INSERT OR IGNORE INTO USERS (user_id, email, password_hash, full_name, role, organisation, district_scope, language, created_at, last_login, is_active) VALUES (4, 'manager.nyaruguru@treesight.rw', '$2b$10$RxkWmUWREbaDQZ0.8lDbje9f29rwn/Z5GQCVNBkH6TsCysZ3nogem', 'Nyaruguru Forest Manager', 'forest_manager', 'Rwanda Forestry Authority', 'Nyaruguru', 'rw', '2026-06-09 12:23:42', '2026-06-09 12:26:00', 1);
+INSERT OR IGNORE INTO USERS (user_id, email, password_hash, full_name, role, organisation, district_scope, language, created_at, last_login, is_active) VALUES (6, 'test.nyabihu@treesight.rw', '$2b$10$1lY3hEPrPlwWFnUykjOFt.XvqkJjx5kSABT2wfcuioH1LDYqsdqaK', 'Test Nyabihu Manager', 'forest_manager', 'Rwanda Forestry Authority', 'Nyabihu', 'fr', '2026-06-10 12:32:36', NULL, 0);
+INSERT OR IGNORE INTO USERS (user_id, email, password_hash, full_name, role, organisation, district_scope, language, created_at, last_login, is_active) VALUES (8, 'gakenke@treesight.rw', '$2b$10$fMmZdVISBsk/3j3BXw6OjOzovrm/0H0jYj2ByMGCcjElF8rm2EWB2', 'Kerie Izere', 'forest_manager', NULL, 'Gakenke', 'en', '2026-06-12 16:40:55', '2026-07-14 13:21:30', 1);
+INSERT OR IGNORE INTO USERS (user_id, email, password_hash, full_name, role, organisation, district_scope, language, created_at, last_login, is_active) VALUES (9, 'kicukiro@treesight', '$2b$10$CrL2S6S1xzYKmoXJqwLb6uq0uuJg2l.aaUuNHyS0KlYCWMO9SQRu.', 'kicukicro manager', 'forest_manager', NULL, 'Kicukiro', 'en', '2026-07-14 15:04:13', '2026-07-19 16:39:36', 1);
+
+-- CITIZENS (1 rows)
+INSERT OR IGNORE INTO CITIZENS (citizen_id, email, password_hash, full_name, phone, created_at, last_login) VALUES (14, 'k.izereuwon@alustudent.com', '$2b$12$006snbkMb3XvQIUGSQETd.mgOOHETDfcDMFDIhTbdYLl.ZH2y6jQ2', NULL, NULL, '2026-07-15T12:38:58', '2026-07-19T19:23:07');
+
+-- REQUESTS (1 rows)
+INSERT OR IGNORE INTO REQUESTS (request_id, created_at, citizen_name, citizen_phone, upi, district, sector, sector_id, lat, lng, area_ha, risk_level, parcel_risk, neighbourhood_risk, tree_cover_pct, deforestation_prob, data_source, analysis_id, status, reviewed_by, reviewed_at, review_note, citizen_email, reason, photo, photo_note) VALUES (22, '2026-07-15T15:26:42', NULL, NULL, NULL, 'Kicukiro', 'Gatenga', '1302', -2.01209, 30.069628, 0.1179546704399067, 'HIGH', 'HIGH', 'HIGH', 68.9, 0.653, 'nearest_sample', '2666404', 'rejected', 'kicukiro@treesight', '2026-07-19T19:11:58', 'deforstation in high', 'k.izereuwon@alustudent.com', 'firewood', NULL, NULL);
