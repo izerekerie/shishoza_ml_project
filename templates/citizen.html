@@ -42,30 +42,32 @@
   .map-overlay-shadow { box-shadow:0 4px 12px rgba(15,23,42,0.12); }
   #map { position:absolute; inset:0; z-index:0; }
   .err { color:#b91c1c; background:#fef2f2; border:1px solid #fecaca; padding:8px 10px; border-radius:6px; font-size:13px; }
+  /* Never allow a sideways scroll on phones. */
+  @media (max-width:767px){ html,body{ overflow-x:hidden; max-width:100%; } }
 </style>
 </head>
-<body class="bg-background text-on-surface min-h-screen md:h-screen md:overflow-hidden flex flex-col" style="background-color:#f8fafc;">
+<body class="bg-background text-on-surface min-h-screen md:h-screen md:overflow-hidden md:flex md:flex-col" style="background-color:#f8fafc;">
 <!-- Top nav -->
-<header class="bg-white border-b border-gray-200 flex items-center justify-between px-4 md:px-6 h-14 w-full shrink-0 z-50">
-<div class="flex items-center gap-3 md:gap-6">
-<a href="/" class="text-xl font-extrabold tracking-tight hover:opacity-70 transition-opacity" style="color:#14532D">Shishoza</a>
-<nav class="flex items-center gap-3 md:gap-5 text-xs md:text-sm whitespace-nowrap">
+<header class="bg-white border-b border-gray-200 flex items-center justify-between gap-2 px-4 md:px-6 h-14 w-full shrink-0 z-50">
+<div class="flex items-center gap-2 md:gap-6 min-w-0">
+<a href="/" class="text-lg md:text-xl font-extrabold tracking-tight hover:opacity-70 transition-opacity shrink-0" style="color:#14532D">Shishoza</a>
+<nav class="flex items-center gap-2.5 md:gap-5 text-xs md:text-sm whitespace-nowrap">
 <a href="/" class="hidden sm:block font-medium text-gray-500 hover:text-gray-900 transition-colors">Home</a>
 <a href="/citizen" class="font-semibold border-b-2 pb-0.5" style="color:#14532D;border-color:#14532D">Citizen</a>
 <a href="/my-reviews" class="font-medium text-gray-500 hover:text-gray-900 transition-colors">My Reviews</a>
 </nav>
 </div>
 <!-- Language selector -->
-<div class="flex items-center gap-0.5 bg-surface-container border border-outline-variant/40 rounded-lg p-0.5">
+<div class="flex items-center gap-0.5 bg-surface-container border border-outline-variant/40 rounded-lg p-0.5 shrink-0">
   <button onclick="setLang('en')" id="btn-lang-en" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all bg-primary text-on-primary">EN</button>
   <button onclick="setLang('rw')" id="btn-lang-rw" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">RW</button>
   <button onclick="setLang('fr')" id="btn-lang-fr" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">FR</button>
 </div>
 </header>
 
-<main class="flex-1 flex flex-col md:flex-row md:overflow-hidden">
+<main class="block md:flex md:flex-1 md:flex-row md:overflow-hidden">
 <!-- Citizen portal panel -->
-<section class="w-full md:w-panel-width md:h-full bg-surface md:overflow-y-auto border-b md:border-b-0 md:border-r border-outline-variant shrink-0 z-40">
+<section class="w-full md:w-panel-width md:h-full bg-surface md:overflow-y-auto border-b md:border-b-0 md:border-r border-outline-variant md:shrink-0 z-40">
 <div class="p-container-margin space-y-6">
 <header>
 <h2 class="font-title-lg text-title-lg text-primary" data-i18n="citizen_portal">Citizen Portal</h2>
