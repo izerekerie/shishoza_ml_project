@@ -53,6 +53,10 @@
       <div class="relative"><span class="material-symbols-outlined ico">lock</span><input id="password" type="password" placeholder="Password (min 6 characters)" class="fld"></div>
       <div class="relative signup-only"><span class="material-symbols-outlined ico">person</span><input id="fullName" type="text" placeholder="Your name (optional)" class="fld"></div>
       <div class="relative signup-only"><span class="material-symbols-outlined ico">call</span><input id="phone" type="tel" placeholder="Phone (optional)" class="fld"></div>
+      <label class="signup-only flex items-start gap-2 text-xs text-gray-600 leading-relaxed pt-1">
+        <input id="agreeTerms" type="checkbox" class="mt-0.5 accent-[#14532D]">
+        <span>I agree to the <a href="/privacy" target="_blank" class="font-semibold text-[#14532D] underline">Privacy Policy &amp; Terms of Use</a>. My personal data is stored only when I create an account or submit a parcel for review — anonymous lookups store nothing.</span>
+      </label>
       <button id="submitBtn" class="w-full py-3 rounded-xl text-sm font-bold text-white hover:opacity-90 active:scale-[.99] transition shadow-sm" style="background:#14532D">Create account</button>
       <div id="result"></div>
     </div>
@@ -76,13 +80,17 @@ function setMode(m){
     ? "Sign up to send a parcel for a review and track the manager's decision."
     : 'Log in to request a review and see your past requests.';
   $('submitBtn').textContent = signup ? 'Create account' : 'Log in';
-  document.querySelectorAll('.signup-only').forEach(el => el.style.display = signup ? 'block' : 'none');
+  document.querySelectorAll('.signup-only').forEach(el => el.style.display = signup ? '' : 'none');
   $('result').innerHTML = '';
 }
 $('tabSignup').addEventListener('click', () => setMode('signup'));
 $('tabLogin').addEventListener('click', () => setMode('login'));
 
 $('submitBtn').addEventListener('click', async () => {
+  if (mode === 'signup' && !$('agreeTerms').checked) {
+    $('result').innerHTML = '<div class="err">Please agree to the Privacy Policy &amp; Terms of Use to create an account.</div>';
+    return;
+  }
   const body = { email: $('email').value.trim(), password: $('password').value };
   if (mode === 'signup') { body.full_name = $('fullName').value.trim(); body.phone = $('phone').value.trim(); }
   $('submitBtn').disabled = true;
