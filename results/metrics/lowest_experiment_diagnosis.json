@@ -1,0 +1,52 @@
+{
+  "f1_optical_only_A": 0.7477,
+  "f1_all_features_D": 0.8293,
+  "test_pixels": 4664,
+  "A_total_errors": 1183,
+  "D_rescued_from_A": 642,
+  "rescue_rate_of_A_errors_pct": 54.3,
+  "rescued_were_missed_clearings_FN": 351,
+  "rescued_were_false_alarms_FP": 291,
+  "radar_terrain_value_of_rescued_vs_all": {
+    "VH_VV_ratio": {
+      "all_test_median": 1.697,
+      "rescued_median": 1.676,
+      "shift": -0.021
+    },
+    "VH_test": {
+      "all_test_median": -15.211,
+      "rescued_median": -15.163,
+      "shift": 0.048
+    },
+    "VH_train": {
+      "all_test_median": -15.231,
+      "rescued_median": -15.182,
+      "shift": 0.049
+    },
+    "VV_test": {
+      "all_test_median": -8.957,
+      "rescued_median": -9.084,
+      "shift": -0.127
+    },
+    "VV_train": {
+      "all_test_median": -8.972,
+      "rescued_median": -9.069,
+      "shift": -0.097
+    },
+    "aspect": {
+      "all_test_median": 187.128,
+      "rescued_median": 177.731,
+      "shift": -9.397
+    },
+    "elevation": {
+      "all_test_median": 1850.0,
+      "rescued_median": 1796.0,
+      "shift": -54.0
+    },
+    "slope": {
+      "all_test_median": 15.401,
+      "rescued_median": 15.818,
+      "shift": 0.417
+    }
+  }
+}
