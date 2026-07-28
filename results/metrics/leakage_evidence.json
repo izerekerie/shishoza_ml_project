@@ -1,0 +1,15 @@
+{
+  "random_split": {
+    "median_m": 211.8,
+    "pct_within_100m": 33.8,
+    "pct_within_1km": 93.9
+  },
+  "spatial_blocks": {
+    "median_m": 14626.5,
+    "pct_within_100m": 0.0,
+    "pct_within_1km": 1.4
+  },
+  "rf_random_cv_f1": 0.836,
+  "rf_spatial_cv_f1": 0.7524,
+  "f1_drop": 0.0836
+}

@@ -42,10 +42,23 @@ The system combines:
 
 **Headline result**: the best model (all 17 features) scores **F1 = 0.83 under
 5-fold cross-validation** and **F1 ≈ 0.75 under spatial cross-validation** — the
-more conservative, geographically honest figure to quote. Both beat the published
-global baseline (Ygorra et al. 2024, F1 = 0.71). Recall stays usable (~0.77 rising
+more conservative, geographically honest figure to quote. Both sit in the same
+range as published fine-scale detection work (Ygorra et al. 2024, F1 = 0.71) and
+clear the F1 > 0.71 target set in the proposal; this is a comparison against a
+published figure, not a like-for-like benchmark, since that study covers a
+different region, label set and class balance. Recall stays usable (~0.77 rising
 to ~0.87) down to the 0.09–0.18 ha smallholder patch size where global models
 typically degrade.
+
+**Where this sits in the literature.** Fine-scale detection is not an open
+problem in research — Ygorra et al. (2024) demonstrate a near-real-time radar
+CuSum method with a minimum mapping unit of 0.03 ha, finer than the 0.09 ha
+(one 30 m pixel) floor of this work. The gap this project addresses is not
+detection resolution but **delivery**: the alert systems actually deployed
+(RADD, GLAD, DETER, JJ-FAST) remain at 0.1–6.25 ha, and every one of these
+systems — research and operational alike — emits regional alerts for expert
+analysts. None deliver parcel-level risk to the landowner, before the cut,
+inside a permit workflow. That is the contribution here.
 
 The system answers four research questions:
 
@@ -373,14 +386,17 @@ python app_cadastral.py
 
 This section maps each **specific objective** from the project proposal to what
 was actually delivered, with honest notes where results deviate. The proposal set
-three specific objectives, evaluated against the published baseline of **F1 > 0.71**
-(Ygorra et al. 2024, the best international result for small-scale deforestation).
+three specific objectives, evaluated against a target of **F1 > 0.71**, taken from
+the figure Ygorra et al. (2024) report for small-scale deforestation detection.
+The target is a reference point drawn from the literature, not a head-to-head
+benchmark — that study uses a different region, label set and class balance, so
+the two F1 values are not measured on common ground.
 
 | # | Proposal objective | Outcome | Evidence |
 |---|---|---|---|
 | **O1** | Review the literature (2019–26) and collect a balanced, labelled GEE dataset (Sentinel-2 + Sentinel-1 + SRTM + Hansen), province-stratified across all 5 provinces for 2020–2024, with the Nyungwe buffer as the validation case study. | **Met.** A national, province-stratified sample of ~23,300 labelled pixels with the 17-feature schema was exported from Earth Engine; the Nyungwe buffer is retained as the validation zone. | `notebooks/01_GEE_Export_National.js`, `data/processed/`, `results/eda/` |
 | **O2** | Train a Random Forest comparing **4 feature combinations** and integrate the best model into one responsive, Dockerised web app showing deforestation to managers and letting citizens locate their parcel and see tree-loss-since-2020, 500 m neighbourhood recovery, and a HIGH/MEDIUM/LOW risk class *before* a permit. | **Met, with one platform deviation.** Four feature sets (A–D) were compared; the best is **D (all 17 features)**. The Flask app delivers Citizen / Manager / Admin personas, per-parcel risk, the 500 m neighbourhood analysis, and a cut simulation. Deployed Dockerised — on **Hugging Face Spaces, not Render** (free 16 GB tier holds the model; see §5). | `notebooks/03_Train_Model.ipynb`, `models/rf_D*.pkl`, `app_cadastral.py` |
-| **O3** | Evaluate whether the system closes the gap: model **F1 > 0.71**, and the app delivers satellite tree-cover + risk to citizens at their location. | **Met on accuracy; partially met on external validation.** Best model **F1 = 0.83 (5-fold CV) / 0.75 (spatial CV)** — both clear 0.71. The app delivers the information end-to-end. Cross-district out-of-sample validation (RQ4) is in progress on a ten-parcel citizen-collected sample. | `results/metrics/`, `RQ_FINDINGS_DRAFT.md` |
+| **O3** | Evaluate whether the system closes the gap: model **F1 > 0.71**, and the app delivers satellite tree-cover + risk to citizens at their location. | **Met on accuracy; partially met on external validation.** Best model **F1 = 0.83 (5-fold CV) / 0.75 (spatial CV)** — both clear the 0.71 target. The app delivers the information end-to-end. Cross-district out-of-sample validation (RQ4) is in progress on a ten-parcel citizen-collected sample. | `results/metrics/`, `RQ_FINDINGS_DRAFT.md` |
 
 ### How the headline result was achieved
 
@@ -404,8 +420,14 @@ research questions decompose *why* it works:
 gives F1 of about 0.79 to 0.83; a spatial cross-validation, which trains and tests
 on geographically separate blocks, gives about 0.75. The spatial figure is the more
 conservative and defensible measure of real-world generalization, and is the one
-quoted throughout. It still exceeds the 0.71 baseline, though by a narrower margin
+quoted throughout. It still clears the 0.71 target, though by a narrower margin
 than a random split implies.
+
+**The 0.71 reference is not a controlled comparison.** F1 values from different
+studies are not directly comparable: Ygorra et al. (2024) evaluate on a different
+region, label set and class balance, and this project's own figures are measured
+on a deliberately balanced ~51 % positive sample. The 0.71 figure is best read as
+a target drawn from the literature, not as evidence of outperforming that work.
 
 **Live-scoring accuracy is estimated rather than independently measured.** The live
 map and parcel lookup run the model on current 2025–2026 Sentinel imagery and return
