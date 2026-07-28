@@ -57,11 +57,20 @@
 <a href="/my-reviews" class="font-medium text-gray-500 hover:text-gray-900 transition-colors">My Reviews</a>
 </nav>
 </div>
+<div class="flex items-center gap-2 md:gap-3 shrink-0">
 <!-- Language selector -->
 <div class="flex items-center gap-0.5 bg-surface-container border border-outline-variant/40 rounded-lg p-0.5 shrink-0">
   <button onclick="setLang('en')" id="btn-lang-en" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all bg-primary text-on-primary">EN</button>
   <button onclick="setLang('rw')" id="btn-lang-rw" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">RW</button>
   <button onclick="setLang('fr')" id="btn-lang-fr" class="px-2.5 py-1 text-xs font-bold rounded-md transition-all text-on-surface-variant hover:bg-primary/10">FR</button>
+</div>
+<!-- Account: signed-in email + logout, or a log-in link. Hidden until
+     /api/citizen/me answers, so a signed-out visitor never sees a flash. -->
+<div id="hdrAccount" class="hidden items-center gap-2 text-xs whitespace-nowrap">
+  <span id="hdrEmail" class="hidden sm:inline font-semibold text-on-surface max-w-[9rem] truncate"></span>
+  <a id="hdrLogout" href="#" class="font-semibold text-red-600 hover:underline" data-i18n="auth_logout">log out</a>
+</div>
+<a id="hdrLogin" href="/account?mode=login" class="hidden text-xs font-semibold whitespace-nowrap hover:underline" style="color:#14532D" data-i18n="auth_login">Log in</a>
 </div>
 </header>
 
@@ -134,22 +143,29 @@
 <div id="riskPanel" class="hidden p-5 rounded-xl border space-y-4" style="border-left:4px solid #DC2626; background-color:rgba(220,38,38,0.05);">
 <div class="flex justify-between items-center">
 <div class="flex items-center gap-2"><span class="material-symbols-outlined text-[20px]" id="riskIconEl" style="color:#DC2626">analytics</span>
-<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline">Risk Analysis</h3></div>
-<span class="px-2.5 py-0.5 text-on-primary font-label-sm text-label-sm font-bold rounded-full" id="riskBadge" style="background:#DC2626;">—</span>
+<h3 class="font-label-sm text-label-sm font-bold uppercase tracking-widest text-outline" data-i18n="risk_title">Deforestation risk</h3></div>
+<span class="px-2.5 py-0.5 text-on-primary font-label-sm text-label-sm font-bold rounded-full whitespace-nowrap shrink-0" id="riskBadge" style="background:#DC2626;">—</span>
 </div>
+<p class="text-outline" style="font-size:11px;line-height:1.4;margin-top:-6px" data-i18n="risk_sub">Deforestation means trees being cut down or lost. This is how likely that is here in the coming years, read from satellite images.</p>
 <!-- Two risks side by side: parcel vs surrounding environment -->
-<div class="grid grid-cols-2 gap-3">
-<div class="p-3 bg-white rounded-xl border border-outline-variant/30 text-center"><p class="font-label-sm text-label-sm text-outline mb-1.5" data-i18n="parcel_risk_lbl">Your parcel</p><span class="inline-block px-2.5 py-0.5 text-on-primary font-label-sm text-label-sm font-bold rounded-full" id="parcelRisk" style="background:#6b7280;">—</span></div>
-<div class="p-3 bg-white rounded-xl border border-outline-variant/30 text-center"><p class="font-label-sm text-label-sm text-outline mb-1.5" data-i18n="nbr_risk_lbl">Neighbourhood (500m)</p><span class="inline-block px-2.5 py-0.5 text-on-primary font-label-sm text-label-sm font-bold rounded-full" id="nbrRisk" style="background:#6b7280;">—</span></div>
+<!-- flex column + a fixed-height label row so both badges sit on the same line
+     however long the two labels wrap -->
+<div class="grid grid-cols-2 gap-3 items-stretch">
+<div class="p-3 bg-white rounded-xl border border-outline-variant/30 text-center flex flex-col h-full"><p class="font-label-sm text-label-sm text-outline mb-1.5 flex items-center justify-center" style="min-height:2.4em" data-i18n="parcel_risk_lbl">On your land</p><span class="self-center max-w-full px-2.5 py-1 text-on-primary font-label-sm text-label-sm font-bold rounded-lg text-center leading-tight break-words" id="parcelRisk" style="background:#6b7280;">—</span><p class="text-outline mt-1.5" style="font-size:10px;line-height:1.3" data-i18n="parcel_risk_help">Your own plot only</p></div>
+<div class="p-3 bg-white rounded-xl border border-outline-variant/30 text-center flex flex-col h-full"><p class="font-label-sm text-label-sm text-outline mb-1.5 flex items-center justify-center" style="min-height:2.4em" data-i18n="nbr_risk_lbl">Around your land</p><span class="self-center max-w-full px-2.5 py-1 text-on-primary font-label-sm text-label-sm font-bold rounded-lg text-center leading-tight break-words" id="nbrRisk" style="background:#6b7280;">—</span><p class="text-outline mt-1.5" style="font-size:10px;line-height:1.3" data-i18n="nbr_risk_help">Land within 500 m — about a 5-minute walk in any direction</p></div>
 </div>
 <p id="riskVerdict" class="leading-relaxed px-1" style="font-size:13px;"></p>
 <div class="p-4 bg-white rounded-xl border border-outline-variant/30">
-<div class="flex justify-between items-end mb-2"><p class="font-label-sm text-label-sm text-outline" data-i18n="defo_prob">Chance of tree loss</p><p class="font-headline-md text-headline-md font-bold tabular-nums" id="defProb" style="color:#DC2626">—</p></div>
+<div class="flex justify-between items-end mb-2"><p class="font-label-sm text-label-sm text-outline" data-i18n="defo_prob">Chance of deforestation here</p><p class="font-headline-md text-headline-md font-bold tabular-nums" id="defProb" style="color:#DC2626">—</p></div>
 <div class="w-full bg-outline-variant/20 h-1.5 rounded-full overflow-hidden"><div class="h-full" id="defProbBar" style="width:0%;background:#DC2626"></div></div>
+<p class="text-outline mt-2" style="font-size:10px;line-height:1.35" id="defProbHelp"></p>
 </div>
-<div class="grid grid-cols-2 gap-3">
-<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1" data-i18n="tree_cover">Trees on your land</p><p class="font-title-lg text-title-lg text-primary tabular-nums font-bold" id="treeCover">—</p><p class="text-outline mt-1" style="font-size:10px;line-height:1.3" data-i18n="tree_cover_help">Share of your land shaded by tree canopy, seen from satellite</p></div>
-<div class="p-3 bg-white rounded-xl border border-outline-variant/30"><p class="font-label-sm text-label-sm text-outline mb-1" data-i18n="tree_health">Tree health 2020→today</p><p class="font-title-lg text-title-lg tabular-nums font-bold" id="ndviTrend">—</p><p class="font-label-sm text-label-sm text-outline mt-0.5" id="ndviDir" style="font-size:11px;"></p></div>
+<!-- One card. The raw 2020-vs-today index numbers were satellite jargon that
+     said nothing to a landowner — the direction alone is the useful part. -->
+<div class="p-4 bg-white rounded-xl border border-outline-variant/30">
+<div class="flex justify-between items-end"><p class="font-label-sm text-label-sm text-outline" data-i18n="tree_cover">Trees on your land today</p><p class="font-headline-md text-headline-md text-primary tabular-nums font-bold" id="treeCover">—</p></div>
+<p class="font-label-sm text-label-sm mt-1" id="ndviDir" style="font-size:11px;"></p>
+<p class="text-outline mt-1.5" style="font-size:10px;line-height:1.35" data-i18n="tree_cover_help">Share of your land shaded by tree canopy, seen from satellite</p>
 </div>
 <p class="font-label-sm text-label-sm text-outline" id="confNote"></p>
 <p id="disclaimerEl" class="hidden"></p>
@@ -246,17 +262,28 @@ const STRINGS = {
     lbl_easting:'Easting', lbl_northing:'Northing', lbl_area:'Surface area m² (optional)',
     manual_submit:'Use these coordinates', inventory_title:'Land Data Inventory',
     lbl_surface:'Surface Area', lbl_location:'Location', lbl_latlng:'Lat / Lng',
-    defo_prob:'Chance of tree loss', tree_cover:'Trees on your land', tree_health:'Tree cover 2020→today',
+    defo_prob:'Chance of deforestation here', tree_cover:'Trees on your land today',
     tree_cover_help:'Share of your land shaded by tree canopy, seen from satellite',
-    parcel_risk_lbl:'Your parcel', nbr_risk_lbl:'Neighbourhood (500m)',
+    defo_prob_help:'This is an estimate, not a certainty. It describes the area, not a decision about your own trees.',
+    odds_one_in:(n)=>`About 1 chance in ${n} that this area loses tree cover in the coming years.`,
+    odds_even:'Close to a 50-50 chance that this area loses tree cover in the coming years.',
+    odds_likely:'More likely than not that this area loses tree cover in the coming years.',
+    risk_title:'Deforestation risk',
+    risk_sub:'Deforestation means trees being cut down or lost. This is how likely that is here in the coming years, read from satellite images.',
+    parcel_risk_lbl:'On your land', nbr_risk_lbl:'Around your land',
+    parcel_risk_help:'Your own plot only', nbr_risk_help:'Land within 500 m — about a 5-minute walk in any direction',
+    risk_low:'Low', risk_medium:'Medium', risk_high:'High',
+    risk_low_full:'LOW RISK', risk_medium_full:'MEDIUM RISK', risk_high_full:'HIGH RISK',
     verdict_concern:'Trees are being cleared in your area too — cutting here adds to a wider problem.',
     verdict_local:'Your land has tree cover worth protecting, but the surrounding area is stable — this is mainly a personal choice, not a sign of wider clearing.',
-    verdict_low:'Your land has little tree cover that a cut would remove.',
-    ndvi_up:'Forest recovering', ndvi_down:'Forest declining', ndvi_flat:'Forest stable',
-    conf_label:'Data accuracy',
-    conf_high:'Good — results are reliable for this area',
-    conf_medium:'Moderate — results are fairly reliable',
-    conf_low:'Limited — use results with caution',
+    verdict_low:'Tree loss looks unlikely here, and the land around you is stable. Cutting is mainly your own decision — you still need the usual permission.',
+    ndvi_up:'↑ More tree cover than in recent years', ndvi_down:'↓ Less tree cover than in recent years', ndvi_flat:'→ About the same as in recent years',
+    conf_label:'How much to trust this',
+    conf_high:'Reliable — we have good satellite data for this area',
+    conf_medium:'Fairly reliable — treat it as a guide',
+    conf_low:'Less reliable — we have little data here, so use it with care',
+    src_live:'Read directly from satellite images of your parcel (2025–26).',
+    src_sample:'Based on the closest area we monitor, not your exact plot.',
     disclaimer:'These results describe the area around your land — not your exact plot. Based on satellite data (2020–2024), not a live reading.',
     sim_title:'Simulate a Cut', target_area:'Area to clear', run_sim:'Run Simulation',
     risk_after:'Impact if you cut', cover_after:'Trees left after cutting',
@@ -293,16 +320,28 @@ const STRINGS = {
     lbl_easting:'Ubuso bw\'Ubumanuko', lbl_northing:'Ubuso bw\'Amajyaruguru', lbl_area:'Ubuso mu m² (bisabwa)',
     manual_submit:'Koresha izi ntego', inventory_title:'Amakuru y\'Ubutaka',
     lbl_surface:'Ubuso bw\'Ubutaka', lbl_location:'Aho biherereye', lbl_latlng:'Lat / Lng',
-    defo_prob:'Amahirwe yo kubura ibiti', tree_cover:'Ibiti biri ku butaka bwawe', tree_health:'Ubuzima bw\'ibiti 2020→ubu',
+    defo_prob:'Uko gutema amashyamba bishoboka hano', tree_cover:'Ibiti biri ku butaka bwawe ubu',
     tree_cover_help:'Igice cy\'ubutaka bwawe gitwikiriwe n\'ibiti, kigaragara kuri satelite',
+    defo_prob_help:'Ni ikigereranyo, si icyemezo. Kivuga ku karere, si icyemezo ku biti byawe bwite.',
+    odds_one_in:(n)=>`Nka rimwe muri ${n}: uko bishoboka ko aka karere gatakaza ibiti mu myaka iri imbere.`,
+    odds_even:'Hafi 50-50: uko bishoboka ko aka karere gatakaza ibiti mu myaka iri imbere.',
+    odds_likely:'Birashoboka cyane ko aka karere gatakaza ibiti mu myaka iri imbere.',
+    risk_title:'Ibyago byo gutema amashyamba',
+    risk_sub:'Gutema amashyamba ni ugukuraho cyangwa kubura kw\'ibiti. Aha twerekana uko ibyo bishoboka hano mu myaka iri imbere, dukurikije amafoto ya satelite.',
+    parcel_risk_lbl:'Ku butaka bwawe', nbr_risk_lbl:'Hafi y\'ubutaka bwawe',
+    parcel_risk_help:'Parcelle yawe gusa', nbr_risk_help:'Ubutaka buri mu ntera ya metero 500 — nka iminota 5 ugenda n\'amaguru',
+    risk_low:'IKIGERO KIRI HASI', risk_medium:'BIRI MU RUGERO', risk_high:'IKIGERO KIRI HEJURU',
+    risk_low_full:'IBYAGO BIKE', risk_medium_full:'IBYAGO BIRINGANIYE', risk_high_full:'IBYAGO BYINSHI',
     verdict_concern:'Hari n\'ibindi biti biri gutemwa mu karere kawe — gukata aha byongera ikibazo.',
     verdict_local:'Ubutaka bwawe bufite ibiti bikwiye kurindwa, ariko akarere gakikije karahamye — iki ni icyemezo cyawe bwite, si ikimenyetso cyo gutema kwinshi.',
-    verdict_low:'Ubutaka bwawe bufite ibiti bike byakurwaho no gukata.',
-    ndvi_up:'Ishyamba rireba', ndvi_down:'Ishyamba rigabanuka', ndvi_flat:'Ishyamba ntirigenda ryaragera',
-    conf_label:'Ubukanwe bw\'amakuru',
-    conf_high:'Buhagije — ibisubizo ni ukuri kuri aka karere',
-    conf_medium:'Bihagije — ibisubizo ni ukuri mu buryo bwinshi',
-    conf_low:'Bukeya — fata ibisubizo witewe',
+    verdict_low:'Kubura kw\'ibiti hano ntibisa n\'ibishoboka, kandi ahakikije harahamye. Gukata ni icyemezo cyawe bwite — ariko ukeneye uruhushya nk\'uko bisanzwe.',
+    ndvi_up:'↑ Ibiti byiyongereye mu myaka ishize', ndvi_down:'↓ Ibiti byagabanutse mu myaka ishize', ndvi_flat:'→ Bimeze nk\'uko byari bimeze mu myaka ishize',
+    conf_label:'Ukwizerwa kw\'ibi bisubizo',
+    conf_high:'Byizewe — dufite amakuru ya satelite ahagije kuri aka karere',
+    conf_medium:'Byizewe ku rugero — bifate nk\'icyerekezo',
+    conf_low:'Ntibyizewe cyane — dufite amakuru make hano, bikoreshe witonze',
+    src_live:'Byavuye mu mafoto ya satelite y\'ubutaka bwawe (2025–26).',
+    src_sample:'Bishingiye ku karere ka hafi dukurikirana, si parcelle yawe nyayo.',
     disclaimer:'Ibisubizo biri aha bisobanura akarere kandi k\'ubutaka bwawe — si parcelle nyayo. Bivuye kuri satelite (2020–2024), si isoma ry\'igihe.',
     sim_title:'Gerageza Gukata', target_area:'Ubuso bw\'ugukata', run_sim:'Kora Gerageza',
     risk_after:'Ingaruka yo gukata', cover_after:'Ibiti bisigara nyuma yo gukata',
@@ -339,16 +378,28 @@ const STRINGS = {
     lbl_easting:'Coordonnée Est', lbl_northing:'Coordonnée Nord', lbl_area:'Surface m² (facultatif)',
     manual_submit:'Utiliser ces coordonnées', inventory_title:'Données du Terrain',
     lbl_surface:'Surface du terrain', lbl_location:'Localisation', lbl_latlng:'Lat / Lng',
-    defo_prob:'Risque de perte d\'arbres', tree_cover:'Arbres sur votre terrain', tree_health:'Santé des arbres 2020→auj.',
+    defo_prob:'Probabilité de déforestation ici', tree_cover:'Arbres sur votre terrain aujourd\'hui',
     tree_cover_help:'Part de votre terrain couverte par la canopée, vue par satellite',
+    defo_prob_help:'C\'est une estimation, pas une certitude. Elle décrit la zone, pas une décision sur vos propres arbres.',
+    odds_one_in:(n)=>`Environ 1 chance sur ${n} que cette zone perde des arbres dans les prochaines années.`,
+    odds_even:'Environ une chance sur deux que cette zone perde des arbres dans les prochaines années.',
+    odds_likely:'Plus probable qu\'improbable que cette zone perde des arbres dans les prochaines années.',
+    risk_title:'Risque de déforestation',
+    risk_sub:'La déforestation, c\'est la coupe ou la disparition des arbres. Voici la probabilité que cela arrive ici dans les prochaines années, d\'après les images satellites.',
+    parcel_risk_lbl:'Sur votre terrain', nbr_risk_lbl:'Autour de votre terrain',
+    parcel_risk_help:'Votre parcelle uniquement', nbr_risk_help:'Les terres à moins de 500 m — environ 5 minutes de marche',
+    risk_low:'Faible', risk_medium:'Moyen', risk_high:'Élevé',
+    risk_low_full:'RISQUE FAIBLE', risk_medium_full:'RISQUE MOYEN', risk_high_full:'RISQUE ÉLEVÉ',
     verdict_concern:'Des arbres sont aussi abattus dans votre zone — couper ici aggrave un problème plus large.',
     verdict_local:'Votre terrain a une couverture arborée à protéger, mais la zone environnante est stable — c\'est surtout un choix personnel, pas un signe de déboisement plus large.',
-    verdict_low:'Votre terrain a peu de couverture arborée qu\'une coupe supprimerait.',
-    ndvi_up:'Forêt en récupération', ndvi_down:'Forêt en déclin', ndvi_flat:'Forêt stable',
-    conf_label:'Fiabilité des données',
-    conf_high:'Bonne — les résultats sont fiables pour cette zone',
-    conf_medium:'Modérée — les résultats sont assez fiables',
-    conf_low:'Limitée — utilisez les résultats avec précaution',
+    verdict_low:'La perte d\'arbres semble peu probable ici, et la zone autour est stable. Couper relève surtout de votre choix — mais l\'autorisation habituelle reste nécessaire.',
+    ndvi_up:'↑ Plus d\'arbres que ces dernières années', ndvi_down:'↓ Moins d\'arbres que ces dernières années', ndvi_flat:'→ À peu près comme ces dernières années',
+    conf_label:'Confiance à accorder',
+    conf_high:'Fiable — nous avons de bonnes données satellites pour cette zone',
+    conf_medium:'Assez fiable — à prendre comme une indication',
+    conf_low:'Peu fiable — nous avons peu de données ici, à utiliser avec prudence',
+    src_live:'Lu directement sur les images satellites de votre parcelle (2025–26).',
+    src_sample:'Basé sur la zone surveillée la plus proche, pas exactement votre parcelle.',
     disclaimer:'Ces résultats décrivent la zone autour de votre terrain — pas exactement votre parcelle. Basé sur des données satellites (2020–2024), pas une lecture en direct.',
     sim_title:'Simuler une Coupe', target_area:'Surface à déboiser', run_sim:'Lancer la Simulation',
     risk_after:'Impact si vous coupez', cover_after:'Arbres restants après la coupe',
@@ -398,23 +449,42 @@ function setLang(code){
   if(lastAnalysis){
     document.getElementById('confNote').textContent=confNoteText(lastAnalysis);
     renderVerdict(lastAnalysis);
+    // these carry translated words, not just numbers — re-render them too
+    document.getElementById('riskBadge').textContent=riskWord(lastAnalysis.risk_level,true);
+    setSubBadge('parcelRisk', lastAnalysis.parcel_risk);
+    setSubBadge('nbrRisk', lastAnalysis.neighbourhood_risk);
+    document.getElementById('defProbHelp').textContent=`${oddsText(lastAnalysis.deforestation_prob)} ${t('defo_prob_help')}`;
+    renderTrend(lastAnalysis);
     // disclaimer kept in dissertation, not shown in UI
   }
   document.documentElement.lang=code;
 }
 
+// The raw HIGH/MEDIUM/LOW level is model wording, not citizen wording — always
+// show the plain sentence that says what that level means for the reader.
 function confNoteText(r){
   const map={HIGH:t('conf_high'),MEDIUM:t('conf_medium'),LOW:t('conf_low')};
-  const src = r.data_source === 'live_gee'
-    ? 'Live satellite (this parcel, 2025–26) · '
-    : 'Nearest monitored sample · ';
-  return `${src}${t('conf_label')}: ${r.confidence} — ${map[r.confidence]||r.confidence_note}`;
+  const src = r.data_source === 'live_gee' ? t('src_live') : t('src_sample');
+  return `${t('conf_label')}: ${map[r.confidence]||r.confidence_note} · ${src}`;
+}
+
+// "10.7%" means little on its own — "about 1 chance in 9" is what people read.
+function oddsText(prob){
+  const pct = prob*100;
+  if (pct > 60) return t('odds_likely');
+  if (pct >= 40) return t('odds_even');
+  if (pct < 1)  return t('odds_one_in')(100);
+  return t('odds_one_in')(Math.round(1/prob));
 }
 // ────────────────────────────────────────────────────────────────────────────
 
 const RISK_COLOUR = { HIGH:'#dc2626', MEDIUM:'#ea580c', LOW:'#16a34a' };
 function rc(r){ return RISK_COLOUR[r] || '#6b7280'; }
-function setSubBadge(id, level){ const el=document.getElementById(id); if(!el) return; el.textContent = level || '—'; el.style.background = rc(level); }
+function riskWord(level, full){
+  if(!level) return '—';
+  return t('risk_'+String(level).toLowerCase()+(full?'_full':'')) || level;
+}
+function setSubBadge(id, level){ const el=document.getElementById(id); if(!el) return; el.textContent = riskWord(level); el.style.background = rc(level); }
 
 const fileEl = document.getElementById('file');
 const go = document.getElementById('go');
@@ -574,6 +644,18 @@ function renderVerdict(r){
   vEl.textContent=t(key); vEl.style.color=col;
 }
 
+// Direction of travel only — the raw NDVI numbers meant nothing to a landowner.
+// A one-point move is noise in the satellite index, so anything under 2 points
+// reads as "about the same": calling 56%→55% a decline alarms people over a
+// change we cannot actually measure.
+function renderTrend(r){
+  const dir = document.getElementById('ndviDir'); if(!dir) return;
+  const delta = (r.ndvi_current - r.ndvi_2020) * 100;
+  if (delta >= 2) { dir.textContent = t('ndvi_up'); dir.style.color='#15803d'; }
+  else if (delta <= -2) { dir.textContent = t('ndvi_down'); dir.style.color='#b91c1c'; }
+  else { dir.textContent = t('ndvi_flat'); dir.style.color='#6b7280'; }
+}
+
 function renderRisk(r){
   lastAnalysis=r;
   const c=rc(r.risk_level);
@@ -581,15 +663,14 @@ function renderRisk(r){
   panel.classList.remove('hidden');
   panel.style.borderLeftColor=c; panel.style.backgroundColor=c+'0d';
   document.getElementById('riskIconEl').style.color=c;
-  const badge=document.getElementById('riskBadge'); badge.textContent=r.risk_level+' RISK'; badge.style.background=c;
+  const badge=document.getElementById('riskBadge'); badge.textContent=riskWord(r.risk_level,true); badge.style.background=c;
   setSubBadge('parcelRisk', r.parcel_risk);
   setSubBadge('nbrRisk', r.neighbourhood_risk);
   renderVerdict(r);
   const dp=document.getElementById('defProb'); dp.textContent=(r.deforestation_prob*100).toFixed(1)+'%'; dp.style.color=c;
   const bar=document.getElementById('defProbBar'); bar.style.width=(r.deforestation_prob*100).toFixed(1)+'%'; bar.style.background=c;
+  document.getElementById('defProbHelp').textContent=`${oddsText(r.deforestation_prob)} ${t('defo_prob_help')}`;
   document.getElementById('treeCover').textContent=r.tree_cover_pct.toFixed(0)+'%';
-  document.getElementById('ndviTrend').textContent=`${(r.ndvi_2020*100).toFixed(0)}% → ${(r.ndvi_current*100).toFixed(0)}%`;
-  document.getElementById('confNote').textContent=`Confidence: ${r.confidence} — ${r.confidence_note}`;
   // circle stays amber regardless of risk — risk colour blended with parcel and satellite
   if(parcelPolygon) parcelPolygon.setStyle({color:c,fillColor:c});
   // simulation
@@ -600,11 +681,7 @@ function renderRisk(r){
   // confidence note — plain language
   document.getElementById('confNote').textContent = confNoteText(r);
   // disclaimer kept in dissertation, not shown in UI
-  // NDVI direction hint
-  const dir = document.getElementById('ndviDir');
-  if (r.ndvi_current > r.ndvi_2020) { dir.textContent = '↑ ' + t('ndvi_up'); dir.style.color='#15803d'; }
-  else if (r.ndvi_current < r.ndvi_2020) { dir.textContent = '↓ ' + t('ndvi_down'); dir.style.color='#b91c1c'; }
-  else { dir.textContent = '→ ' + t('ndvi_flat'); dir.style.color='#6b7280'; }
+  renderTrend(r);
   // alternatives — always show so citizen can explore options at any risk level
   document.getElementById('altPanel').classList.remove('hidden');
   // cutting-permission request panel — pre-fill the detected district
@@ -637,8 +714,20 @@ async function refreshCitizen(){
   if(a) a.classList.toggle('hidden', authed);
   if(f) f.classList.toggle('hidden', !authed);
   if(authed){ const e=document.getElementById('reqAsEmail'); if(e) e.textContent=_citizen.email; }
+  // header account block — logout has to be reachable without scrolling to the
+  // request panel, and without running an analysis first
+  const hdrA=document.getElementById('hdrAccount'), hdrL=document.getElementById('hdrLogin');
+  if(hdrA){ hdrA.classList.toggle('hidden', !authed); hdrA.classList.toggle('flex', authed); }
+  if(hdrL) hdrL.classList.toggle('hidden', authed);
+  if(authed){ const he=document.getElementById('hdrEmail'); if(he) he.textContent=_citizen.email; }
   loadMyRequests();
 }
+
+async function citizenLogout(){
+  try{ await fetch('/api/citizen/logout',{method:'POST'}); }catch(e){}
+  refreshCitizen();
+}
+document.getElementById('hdrLogout').addEventListener('click', e=>{ e.preventDefault(); citizenLogout(); });
 
 const ST_COLOUR={pending:'#b45309',approved:'#15803d',rejected:'#b91c1c'};
 async function loadMyRequests(){
@@ -658,7 +747,7 @@ async function loadMyRequests(){
     </div>`).join('') : `<p class="text-outline" style="font-size:12px">${t('my_req_empty')}</p>`;
 }
 
-document.getElementById('reqLogout').addEventListener('click', async ()=>{ await fetch('/api/citizen/logout',{method:'POST'}); refreshCitizen(); });
+document.getElementById('reqLogout').addEventListener('click', ()=>citizenLogout());
 
 // Downscale a chosen photo in the browser (max 1024px, JPEG q0.72) so the
 // upload stays small — a phone photo becomes ~100–300 KB before it is sent.
@@ -730,8 +819,8 @@ document.getElementById('simulateBtn').addEventListener('click', async () => {
     simResult.innerHTML = `
       <p class="font-label-sm text-label-sm text-outline text-center mb-1" data-i18n="risk_after">${t('risk_after')}</p>
       <div class="grid grid-cols-2 gap-4 mt-1">
-        ${cell(t('parcel_risk_lbl'), s.after.parcel_risk, rc(s.after.parcel_risk))}
-        ${cell(t('nbr_risk_lbl'), s.after.neighbourhood_risk, rc(s.after.neighbourhood_risk))}
+        ${cell(t('parcel_risk_lbl'), riskWord(s.after.parcel_risk), rc(s.after.parcel_risk))}
+        ${cell(t('nbr_risk_lbl'), riskWord(s.after.neighbourhood_risk), rc(s.after.neighbourhood_risk))}
       </div>
       <div class="mt-3">${cell(t('cover_after'), ca+'%', '#374151')}</div>
       <p class="font-label-sm text-label-sm mt-3 leading-relaxed" style="color:${chg>0?'#b91c1c':chg<0?'#15803d':'#374151'}">${plainSentence}</p>`;
