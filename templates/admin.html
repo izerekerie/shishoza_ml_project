@@ -114,6 +114,25 @@
       </table>
     </div>
   </section>
+
+  <!-- Citizen accounts. Separate table from USERS, so they need their own
+       listing — until now an admin could not see a citizen at all. -->
+  <section class="bg-white rounded-2xl border border-[#E5E7EB] p-6 mt-6" style="box-shadow:0 4px 12px rgba(0,0,0,0.03);">
+    <div class="flex gap-3 items-center flex-wrap mb-1">
+      <h3 class="text-lg font-bold text-primary">Citizen accounts</h3>
+      <span class="text-xs font-bold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full" id="statCitizens">—</span>
+      <input type="text" id="citSearch" placeholder="Search email, name, or phone…" class="flex-1 min-w-[220px] px-4 py-2.5 rounded-lg border border-outline-variant/60 text-sm focus:outline-none focus:ring-2 focus:ring-primary"/>
+    </div>
+    <p class="text-sm text-on-surface-variant mb-4">People who signed up on the citizen portal. Deleting an account keeps the reviews they already sent, so managers' decisions stay on record.</p>
+    <div class="overflow-x-auto">
+      <table id="citizensTable">
+        <thead><tr>
+          <th>ID</th><th>Email</th><th>Name</th><th>Phone</th><th>Signed up</th><th>Last login</th><th>Reviews sent</th><th style="text-align:right">Actions</th>
+        </tr></thead>
+        <tbody id="citizensBody"></tbody>
+      </table>
+    </div>
+  </section>
 </main>
 
 <!-- Add/Edit modal -->
@@ -173,6 +192,7 @@ async function refresh() {
   const r = await fetch('/api/users').then(r => r.json());
   USERS = r.users || [];
   renderStats(); renderTable();
+  refreshCitizens();
 }
 
 function renderStats() {
@@ -213,6 +233,69 @@ function renderTable() {
 
 document.getElementById('searchInp').addEventListener('input', renderTable);
 document.getElementById('roleFilter').addEventListener('change', renderTable);
+
+// ── Citizen accounts ──────────────────────────────────────────────────────
+// Names and phones here are typed by the citizens themselves, so escape them
+// before they land in admin markup.
+let CITIZENS = [];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const shortDate = s => s ? esc(String(s).slice(0, 10)) : '<em style="color:#9ca3af">never</em>';
+
+async function refreshCitizens() {
+  try { CITIZENS = (await (await fetch('/api/citizens')).json()).citizens || []; }
+  catch (e) { CITIZENS = []; }
+  document.getElementById('statCitizens').textContent = `${CITIZENS.length} account${CITIZENS.length === 1 ? '' : 's'}`;
+  renderCitizens();
+}
+
+function renderCitizens() {
+  const q = document.getElementById('citSearch').value.toLowerCase();
+  const tbody = document.getElementById('citizensBody');
+  const rows = CITIZENS.filter(c =>
+    !q || ((c.email || '') + ' ' + (c.full_name || '') + ' ' + (c.phone || '')).toLowerCase().includes(q));
+  if (!rows.length) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;color:#9ca3af;padding:24px">${CITIZENS.length ? 'No citizen matches that search.' : 'No citizen accounts yet.'}</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = rows.map(c => `
+    <tr>
+      <td>${c.citizen_id}</td>
+      <td class="email">${esc(c.email)}</td>
+      <td>${c.full_name ? esc(c.full_name) : '<em style="color:#9ca3af">—</em>'}</td>
+      <td>${c.phone ? esc(c.phone) : '<em style="color:#9ca3af">—</em>'}</td>
+      <td>${shortDate(c.created_at)}</td>
+      <td>${shortDate(c.last_login)}</td>
+      <td>${c.request_count}</td>
+      <td style="text-align:right"><button data-action="del-citizen" data-id="${c.citizen_id}" style="background:none;border:none;color:#dc2626;font-weight:600;font-size:13px;cursor:pointer">Delete</button></td>
+    </tr>`).join('');
+}
+
+document.getElementById('citSearch').addEventListener('input', renderCitizens);
+
+document.getElementById('citizensBody').addEventListener('click', async (e) => {
+  const btn = e.target.closest('button[data-action="del-citizen"]'); if (!btn) return;
+  const c = CITIZENS.find(x => x.citizen_id === parseInt(btn.getAttribute('data-id'), 10));
+  if (!c) return;
+  // Hard delete with no undo — make the admin type the address, the same guard
+  // a destructive action deserves anywhere else.
+  const kept = c.request_count
+    ? ` Their ${c.request_count} review request${c.request_count === 1 ? '' : 's'} will be kept.`
+    : '';
+  const typed = await askText({
+    title: 'Delete citizen account',
+    desc: `This permanently removes ${c.email}.${kept} Type the email address to confirm.`,
+    placeholder: c.email, confirmLabel: 'Delete', confirmColor: '#dc2626',
+    errText: 'Type the email address to confirm.'
+  });
+  if (!typed) return;
+  if (typed.trim().toLowerCase() !== (c.email || '').toLowerCase()) {
+    alert('That does not match the account email — nothing was deleted.');
+    return;
+  }
+  const d = await (await fetch(`/api/citizens/${c.citizen_id}`, { method: 'DELETE' })).json();
+  if (d.ok) refreshCitizens(); else alert('Error: ' + (d.error || 'unknown'));
+});
 
 // Keep the district-scope field in step with the chosen role. Admins are always
 // national (no scope), so the field is locked; managers must pick one district.

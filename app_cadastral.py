@@ -12,6 +12,7 @@ import csv
 import datetime
 import json
 import os
+import secrets
 import smtplib
 import sqlite3
 import tempfile
@@ -549,8 +550,17 @@ def login_required(fn):
 
 app = Flask(__name__)
 # Secret key for signing the login session cookie. Fixed dev value for the
-# capstone demo; set SHISHOZA_SECRET in the environment for any real deployment.
-app.secret_key = os.environ.get("SHISHOZA_SECRET", "shishoza-dev-secret-change-me")
+# Session-signing key. The fallback is a fresh random key per process, never a
+# literal committed here: a default in the repo would let anyone forge a session
+# cookie — including an admin one — on any deployment that forgot to set
+# SHISHOZA_SECRET. The cost of the fallback is that a restart logs everyone out,
+# which is the right way for a missing secret to fail.
+_secret = os.environ.get("SHISHOZA_SECRET")
+if not _secret:
+    _secret = secrets.token_hex(32)
+    print("[warn] SHISHOZA_SECRET not set — using a random key for this process; "
+          "sessions will not survive a restart", flush=True)
+app.secret_key = _secret
 # Allow up to 16 MB uploads (covers any phone photo + PDF)
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024
 
@@ -818,6 +828,58 @@ def api_users_delete(user_id):
             return jsonify({"error": f"user {user_id} not found"}), 404
         con.commit()
     return jsonify({"ok": True})
+
+
+@app.get("/api/citizens")
+@login_required
+def api_citizens():
+    """List citizen accounts with how many reviews each has sent — admin only.
+
+    Citizens live in their own table, so they never appeared in /api/users and
+    an admin had no way to see or remove one.
+    """
+    err = _require_admin()
+    if err is not None:
+        return err
+    with _users_conn() as con:
+        rows = con.execute(
+            "SELECT c.citizen_id, c.email, c.full_name, c.phone, "
+            "       c.created_at, c.last_login, "
+            "       (SELECT COUNT(*) FROM REQUESTS r "
+            "         WHERE r.citizen_email = c.email) AS request_count "
+            "  FROM CITIZENS c ORDER BY c.citizen_id"
+        ).fetchall()
+    return jsonify({"citizens": [dict(r) for r in rows]})
+
+
+@app.delete("/api/citizens/<int:citizen_id>")
+@login_required
+def api_citizens_delete(citizen_id):
+    """Delete a citizen account — admin only.
+
+    The account row goes; the person's REQUESTS rows stay. REQUESTS carries its
+    own citizen_name/citizen_phone captured at submission time, so a manager's
+    review record is still readable after the account is removed. Unlike USERS
+    there is no is_active column to soft-delete against, and a citizen asking to
+    be removed should actually be removed.
+    """
+    err = _require_admin()
+    if err is not None:
+        return err
+    with _users_conn() as con:
+        row = con.execute(
+            "SELECT email FROM CITIZENS WHERE citizen_id = ?", (citizen_id,)
+        ).fetchone()
+        if row is None:
+            return jsonify({"error": f"citizen {citizen_id} not found"}), 404
+        kept = con.execute(
+            "SELECT COUNT(*) AS n FROM REQUESTS WHERE citizen_email = ?",
+            (row["email"],)
+        ).fetchone()["n"]
+        con.execute("DELETE FROM CITIZENS WHERE citizen_id = ?", (citizen_id,))
+        con.commit()
+    return jsonify({"ok": True, "deleted_email": row["email"],
+                    "requests_kept": kept})
 
 
 @app.get("/manager")
