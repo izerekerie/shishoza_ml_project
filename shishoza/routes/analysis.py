@@ -574,7 +574,7 @@ def ussd_gateway():
     if not steps or steps == [""]:
         # First interaction — welcome screen
         return _ussd("CON",
-            "TreeSight / Umurinzi\n"
+            "Shishoza\n"
             "Deforestation risk checker\n"
             "--------------------------------\n"
             "Enter your UPI number:\n"
@@ -603,7 +603,7 @@ def ussd_gateway():
     if result is None:
         return _ussd("END",
             f"UPI {upi} has not been analysed yet.\n\n"
-            "Visit the TreeSight web app to\n"
+            "Visit the Shishoza web app to\n"
             "analyse your parcel first, then\n"
             "dial again for the USSD summary.")
 
@@ -622,7 +622,7 @@ def ussd_gateway():
         f"Tree cover: {cover:.0f}%\n"
         f"Forest: {trend}\n"
         f"({risk_rw})\n\n"
-        "Full report: visit TreeSight web app")
+        "Full report: visit Shishoza web app")
 
 
 def _ussd(action, message):
