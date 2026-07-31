@@ -27,6 +27,10 @@ _ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(_ROOT))
 
 import app_cadastral                                   # noqa: E402
+from shishoza import email_notify                       # noqa: E402
+from shishoza import model as shishoza_model            # noqa: E402
+from shishoza.config import DB_PATH                     # noqa: E402
+from shishoza.routes import analysis as analysis_routes  # noqa: E402
 from extract_cadastral import utm_to_wgs84, parse_text  # noqa: E402
 
 
@@ -45,7 +49,7 @@ def _classify(**overrides):
         data_source="unit_test",
     )
     kwargs.update(overrides)
-    return app_cadastral._classify_and_build(**kwargs)
+    return shishoza_model.classify_and_build(**kwargs)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -87,7 +91,7 @@ class TestRiskClassifier:
         assert result["deforestation_prob"] == 0.123   # rounded to 3 dp
 
     def test_subrisks_split_parcel_from_neighbourhood(self):
-        parcel, neighbourhood = app_cadastral._subrisks(
+        parcel, neighbourhood = shishoza_model._subrisks(
             prob=0.80, tree_cover_pct=25.0, deforested_pct_500m=60.0)
         assert parcel == "HIGH"
         assert neighbourhood == "HIGH"
@@ -161,7 +165,10 @@ class TestCertificateParsing:
 def client(monkeypatch_module):
     # Force the deterministic local-model path so tests never depend on a live
     # Earth Engine connection (the endpoint falls back to this in production too).
-    monkeypatch_module.setattr(app_cadastral, "_ensure_ee", lambda: False)
+    # Patch the name where the route module looks it up: analysis.py did
+    # `from ..model import ensure_ee`, so patching shishoza.model would not
+    # reach the already-bound reference.
+    monkeypatch_module.setattr(analysis_routes, "ensure_ee", lambda: False)
     app_cadastral.app.config.update(TESTING=True)
     return app_cadastral.app.test_client()
 
@@ -234,7 +241,7 @@ TEST_CITIZEN_EMAIL = "pytest_review@treesight.test"
 def _cleanup_review(request_ids=(), citizen_email=None):
     """Remove any rows a workflow test created, so the real database stays clean."""
     try:
-        with sqlite3.connect(str(app_cadastral._DB_PATH), timeout=10) as con:
+        with sqlite3.connect(str(DB_PATH), timeout=10) as con:
             for rid in request_ids:
                 if rid is not None:
                     con.execute("DELETE FROM REQUESTS WHERE request_id = ?", (rid,))
@@ -260,7 +267,10 @@ class TestReviewWorkflow:
         # database is what ties their actions together.
         # Neutralise email so the approval step never sends a real message
         # through the configured SMTP account during testing.
-        monkeypatch.setattr(app_cadastral, "_send_email", lambda *a, **k: None)
+        # notify_decision() resolves _send_email from its own module globals at
+        # call time, so patching it here silences the send without touching the
+        # reviews route.
+        monkeypatch.setattr(email_notify, "_send_email", lambda *a, **k: None)
         citizen = app_cadastral.app.test_client()
         manager = app_cadastral.app.test_client()
         _cleanup_review(citizen_email=TEST_CITIZEN_EMAIL)   # start from a clean slate

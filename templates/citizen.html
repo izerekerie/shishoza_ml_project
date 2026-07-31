@@ -524,7 +524,7 @@ map.on(L.Draw.Event.CREATED, e => {
   if (sqm) e.layer.bindPopup(`Drawn area: <strong>${Math.round(sqm).toLocaleString()} m²</strong>`).openPopup();
 });
 
-let marker=null, circle500=null, parcelPolygon=null, parcelMeta=null, lastAnalysis=null;
+let marker=null, circle500=null, parcelPolygon=null, parcelMeta=null, lastAnalysis=null, lastSim=null;
 function computeAreaM2(ll){ return (L.GeometryUtil && L.GeometryUtil.geodesicArea) ? L.GeometryUtil.geodesicArea(ll) : null; }
 
 // ── Upload ──
@@ -597,7 +597,7 @@ function render(d){
 
 // ── Reset + loading states (so a new upload never shows the previous parcel) ──
 function resetAnalysis(){
-  lastAnalysis=null;
+  lastAnalysis=null; lastSim=null;
   ['riskPanel','simPanel','altPanel'].forEach(id=>{ const el=document.getElementById(id); if(el) el.classList.add('hidden'); });
   const sr=document.getElementById('simResult'); if(sr) sr.innerHTML='';
   const ac=document.getElementById('altCards'); if(ac) ac.innerHTML='';
@@ -783,7 +783,9 @@ document.getElementById('reqSubmit').addEventListener('click', async ()=>{
     let photo=null;
     try{ photo=await shrinkImage(document.getElementById('reqPhoto').files[0]); }
     catch(e){ photo=null; }  // a bad image just sends the request without one
-    const r=await (await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id, district, reason, photo, photo_note:photoNote})})).json();
+    const r=await (await fetch('/api/requests',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id, district, reason, photo, photo_note:photoNote,
+      intended_cut_ha:lastSim?.cut_area_ha, after_parcel_risk:lastSim?.after_parcel_risk,
+      after_neighbourhood_risk:lastSim?.after_neighbourhood_risk, after_tree_cover_pct:lastSim?.after_tree_cover_pct})})).json();
     if(r.error){ res.innerHTML=`<div class="err">${r.error}</div>`; }
     else{ res.innerHTML=`<div style="color:#15803d;font-size:13px;font-weight:600;line-height:1.4">${t('req_ok')(r.request_id, r.district||district)}</div>`; loadMyRequests(); }
   }catch(e){ res.innerHTML=`<div class="err">${t('req_err')}</div>`; }
@@ -810,6 +812,10 @@ document.getElementById('simulateBtn').addEventListener('click', async () => {
   try {
     const s = await (await fetch('/api/simulate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({analysis_id:lastAnalysis.analysis_id,cut_area_ha:cut})})).json();
     if (s.error){ simResult.innerHTML=`<div class="err">${s.error}</div>`; return; }
+    // Remember the intended cut so it travels with a review request to the manager.
+    lastSim = { cut_area_ha: cut, after_parcel_risk: s.after.parcel_risk,
+                after_neighbourhood_risk: s.after.neighbourhood_risk,
+                after_tree_cover_pct: s.after.tree_cover_pct };
     const cb = s.before.tree_cover_pct.toFixed(0), ca = s.after.tree_cover_pct.toFixed(0);
     const nb = s.before.neighbourhood_500m_deforested_pct.toFixed(0), na = s.after.neighbourhood_500m_deforested_pct.toFixed(0);
     const chg = s.delta.risk_level_change;

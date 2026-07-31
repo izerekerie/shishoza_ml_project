@@ -57,6 +57,7 @@ ENV MALLOC_ARENA_MAX=2 \
 
 # Copy the application — only what the runtime actually needs
 COPY app_cadastral.py .
+COPY shishoza/ shishoza/
 COPY templates/ templates/
 COPY scripts/ scripts/
 COPY data/ data/
