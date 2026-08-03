@@ -165,9 +165,8 @@ class TestCertificateParsing:
 def client(monkeypatch_module):
     # Force the deterministic local-model path so tests never depend on a live
     # Earth Engine connection (the endpoint falls back to this in production too).
-    # Patch the name where the route module looks it up: analysis.py did
-    # `from ..model import ensure_ee`, so patching shishoza.model would not
-    # reach the already-bound reference.
+    # Patch the name where the route module looks it up: analysis.py binds
+    # `ensure_ee` at import, so patching shishoza.model would not reach it.
     monkeypatch_module.setattr(analysis_routes, "ensure_ee", lambda: False)
     app_cadastral.app.config.update(TESTING=True)
     return app_cadastral.app.test_client()

@@ -1,12 +1,9 @@
 """Shishoza — application entry point.
 
-This file stays at the repository root and exposes `app`, so nothing about
-deployment changes: gunicorn still runs it as `app_cadastral:app` and Flask's
-default template/static folders (`templates/`, `static/`) resolve exactly as
-before.
+Exposes `app` at the repository root: gunicorn serves it as `app_cadastral:app`,
+and Flask resolves `templates/` and `static/` relative to this file.
 
-The code that used to live here in one ~2,000-line module now lives in the
-`shishoza/` package, split by responsibility:
+Responsibilities are split across the `shishoza/` package:
 
     shishoza/config.py        constants, env, paths, shared thread pool
     shishoza/db.py            SQLite connections, schema, analysis cache

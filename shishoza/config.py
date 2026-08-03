@@ -1,8 +1,8 @@
 """Configuration, constants and shared resources for Shishoza.
 
 This is the base module: it imports nothing else from the package, so every
-other module can import it without any circular-import risk. It reproduces the
-constants and the `.env` loader that lived at the top of `app_cadastral.py`.
+other module can import it without any circular-import risk. It owns the
+constants, the resolved paths and the `.env` loader.
 """
 
 from __future__ import annotations
@@ -12,9 +12,9 @@ import secrets
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
-# Project root = the repository directory (one level up from this package), so
-# the model / data / template paths resolve exactly as they did when everything
-# lived in app_cadastral.py at the root.
+# Project root = the repository directory, one level up from this package. Every
+# model / data / template path is resolved against it, so the app runs the same
+# whatever directory it is launched from.
 ROOT = Path(__file__).resolve().parent.parent
 
 

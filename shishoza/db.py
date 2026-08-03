@@ -27,7 +27,7 @@ def users_conn():
 
 def init_schema():
     """Create the runtime tables if they don't exist. Safe to call at import;
-    idempotent. Mirrors the boot block that lived in app_cadastral.py."""
+    idempotent, so a restart against an existing database is a no-op."""
     if not DB_PATH.exists():
         print(f"[boot]   {DB_PATH} not found — alternatives + analysis cache disabled")
         return
@@ -120,5 +120,5 @@ def recall_analysis(aid):
     return result
 
 
-# Create the schema on import, exactly as the monolith did at boot.
+# Create the schema on import, so no route has to check whether it exists first.
 init_schema()

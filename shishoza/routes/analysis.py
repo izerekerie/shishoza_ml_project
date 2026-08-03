@@ -20,8 +20,9 @@ from ..model import (analyse_parcel, analyse_parcel_live, ensure_ee, _subrisks,
                      sector_for_point, _SECTORS)
 from ..monitoring import log_prediction
 
-# The cadastral extractor lives in scripts/, imported the same way the monolith
-# did (path insert + top-level module import).
+# The cadastral extractor lives in scripts/ rather than in this package, because
+# it also runs standalone on the command line. Put scripts/ on the path so it
+# imports as a top-level module either way.
 sys.path.insert(0, str(ROOT / "scripts"))
 from extract_cadastral import extract  # type: ignore  # noqa: E402
 
