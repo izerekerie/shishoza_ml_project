@@ -185,6 +185,7 @@ scripts/add_engineering_slides.py
 scripts/baseline_comparison.py
 scripts/baseline_ladder.py
 scripts/make_ndvi_cut_figure.py
+scripts/make_ocr_diagram.py
 scripts/make_pipeline_diagram.py
 scripts/make_split_map.py
 scripts/md_to_docx.py
@@ -192,3 +193,4 @@ scripts/paired_model_test.py
 scripts/rf_tuning_table.py
 scripts/tune_xgb_spatial.py
 results/metrics/ndvi_cut_simulation.png
+results/metrics/ocr_flow_diagram.png

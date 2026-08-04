@@ -200,7 +200,15 @@ Then open **http://localhost:5050**.
 ### Folder structure (each folder has ONE purpose)
 
 ```
-shishoza/
+shishoza_ml_project/
+├── shishoza/         Application package
+│   ├── config.py     Constants, env vars, paths, shared thread pool
+│   ├── db.py         SQLite connections, schema, analysis cache
+│   ├── model.py      Model load, 17 features, risk rules, Earth Engine
+│   ├── auth.py       Password checks, sessions, login_required
+│   ├── email_notify.py  Citizen decision emails
+│   ├── monitoring.py    Prediction / drift logging
+│   └── routes/       Flask blueprints: pages, analysis, accounts, reviews
 ├── data/
 │   ├── raw/          GEE exports (training_data.csv) + sample cadastral PDFs
 │   ├── processed/    Cleaned training data
@@ -216,7 +224,7 @@ shishoza/
 │   ├── metrics/                    F1, confusion matrix, audit JSON
 │   ├── patch_size_analysis/        RQ2 figure + CSV
 │   └── application/                Precomputed sector_risk.json
-├── app_cadastral.py               Flask web app entry point
+├── app_cadastral.py               Entry point: builds the app, registers blueprints
 ├── Dockerfile                      Production container (Hugging Face Docker Space)
 ├── railway.json                    Legacy Railway config (unused — superseded by HF Spaces)
 ├── render.yaml                     Render blueprint (alternative platform)
