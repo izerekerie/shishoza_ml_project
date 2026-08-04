@@ -594,14 +594,19 @@ is a **73-line entry point** that builds the Flask app and registers four bluepr
 | [`shishoza/routes/accounts.py`](shishoza/routes/accounts.py) | 367 | Manager and citizen sign-in, signup, admin account management |
 | [`shishoza/routes/reviews.py`](shishoza/routes/reviews.py) | 245 | Citizen review requests and the manager decision queue |
 
-The split is what makes the answer to the panel's question checkable. The risk rules
-live in exactly one place, `classify_and_build` in
-[`shishoza/model.py`](shishoza/model.py), and both analysis paths, the live Earth
-Engine query and the nearest-training-sample fallback, call that one function with the
-same four inputs rather than each holding its own copy. They differ in where the
-numbers come from, never in how those numbers are read. Every result records which
-path produced it and which rule fired, so any classification can be traced to its
-cause.
+The split is what makes the answer to the panel's question checkable. Both analysis
+paths, the live Earth Engine query and the nearest-training-sample fallback, call one
+shared function, `classify_and_build` in [`shishoza/model.py`](shishoza/model.py),
+with the same four inputs rather than each holding its own copy of the rules. They
+differ in where the numbers come from, never in how those numbers are read. Every
+result records which path produced it and which rule fired, so any classification can
+be traced to its cause.
+
+One known exception: the cut simulator in
+[`shishoza/routes/analysis.py`](shishoza/routes/analysis.py) re-applies the same three
+rules to its projected values rather than calling `classify_and_build`. The thresholds
+match, so behaviour is correct today, but the rules are written out twice and could
+drift. Folding the simulator into the shared function is the next cleanup.
 
 ### 6. Diagram clarity
 
