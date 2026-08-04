@@ -279,13 +279,52 @@ Muted text           #6b7280
 
 ### 4.2 Architecture diagrams
 
-Architecture diagrams documented in Chapter 3 of the dissertation. Shishoza is
-a software-only system, so the "circuit diagram" requirement is met by the
-system data-flow and entity-relationship diagrams below.
+Architecture diagrams documented in Chapter 3 of the report. Shishoza is a
+software-only system, so the "circuit diagram" requirement is met by the system
+data-flow and entity-relationship diagrams below.
 
-<img width="842" height="1251" alt="System architecture" src="https://github.com/user-attachments/assets/eef68975-f8ec-45e5-8deb-1a6f39c9d093" />
+Every diagram below is committed to this repository at full resolution, so it can
+be opened and zoomed rather than read from a page render. Click any image for the
+source file.
 
-<img width="1465" height="1629" alt="Data flow and ERD" src="https://github.com/user-attachments/assets/91b4fbc2-1813-47af-9c55-cb0158dbf707" />
+| Diagram | Report figure | Full-resolution file |
+|---|---|---|
+| System architecture | Figure 3.1 | [`results/diagrams/architecture.png`](results/diagrams/architecture.png) — 2973 × 1239 |
+| Class diagram | Figure 3.3 | [`results/diagrams/class_diagram.png`](results/diagrams/class_diagram.png) — 2820 × 1375 |
+| Entity relationship diagram | Figure 3.5 | [`results/diagrams/erd.png`](results/diagrams/erd.png) — 2820 × 1358 |
+| Data pipeline | — | [`results/metrics/pipeline_diagram.png`](results/metrics/pipeline_diagram.png) |
+
+**System architecture** — left: offline training pipeline; right: online serving
+pipeline with three endpoints and six processing services.
+
+![System architecture](results/diagrams/architecture.png)
+
+**Class diagram** — eight classes, each with its UML stereotype.
+
+![Class diagram](results/diagrams/class_diagram.png)
+
+**Entity relationship diagram** — six tables in crow's-foot notation.
+
+![Entity relationship diagram](results/diagrams/erd.png)
+
+### 4.2.1 Result figures used in the report
+
+Chapter 5 figures are committed here too, so each number in the report can be
+traced to the figure that produced it.
+
+| Report figure | File |
+|---|---|
+| 5.1 Dataset composition | [`results/metrics/nat_chart1_dataset.png`](results/metrics/nat_chart1_dataset.png) |
+| 5.2 F1 by feature configuration (RQ1) | [`results/metrics/nat_chart2_rq1_experiments.png`](results/metrics/nat_chart2_rq1_experiments.png) |
+| 5.3 Feature importance | [`results/metrics/nat_chart3_feature_importance.png`](results/metrics/nat_chart3_feature_importance.png) |
+| 5.4 Decision weight by data source | [`results/metrics/nat_chart4_importance_by_source.png`](results/metrics/nat_chart4_importance_by_source.png) |
+| 5.5 Algorithm comparison | [`results/experiments/model_family_comparison.png`](results/experiments/model_family_comparison.png) |
+| 5.6 Random vs spatial cross-validation | [`results/metrics/nat_chart5_spatial_cv.png`](results/metrics/nat_chart5_spatial_cv.png) |
+| 5.7 Leave-one-province-out | [`results/metrics/nat_chart6_province_lopo.png`](results/metrics/nat_chart6_province_lopo.png) |
+| 5.8 Confusion matrix | [`results/metrics/nat_chart7_confusion_matrix.png`](results/metrics/nat_chart7_confusion_matrix.png) |
+| 5.9 Precision–recall curve | [`results/metrics/nat_chart8_pr_curve.png`](results/metrics/nat_chart8_pr_curve.png) |
+| 5.10 Recall by clearing patch size (RQ2) | [`results/metrics/nat_chart9_rq2_patchsize.png`](results/metrics/nat_chart9_rq2_patchsize.png) |
+| 5.12 Model risk vs Hansen loss | [`results/metrics/nat_chart10_hansen_validation.png`](results/metrics/nat_chart10_hansen_validation.png) |
 
 ### 4.3 App interface
 
@@ -475,6 +514,76 @@ across all five provinces so the model learns Rwanda's full landscape) while
 deforestation zone. The whole system is aimed squarely at the documented gap: making
 **sub-hectare, pre-permit** deforestation risk visible to citizens and managers, which
 no existing Rwandan tool offers before a clearing decision is made.
+
+---
+
+## 7 · Defence panel feedback and how it was addressed
+
+The panel reviewed the report and raised five areas. Each is listed below with the
+change made and where to find it. Section numbers refer to the revised report.
+
+### 1. Distinguish the machine learning model from the rule-based part
+
+**Section 4.3.6 (new).** The Random Forest is the only component that learns, and it
+produces one output: a probability between 0 and 1 that the parcel resembles the
+cleared parcels it was trained on. It does not produce a risk level. The HIGH, MEDIUM
+and LOW tiers come from three fixed rules (Table 4.7) that take that probability
+together with tree cover, the share of the 500 m neighbourhood scored as cleared, and
+the neighbourhood mean NDVI.
+
+The report also states that the four thresholds were set by judgement rather than
+fitted to data, so the accuracy figures in Chapter 5 describe the probability and not
+the risk labels built on it.
+
+In code: the probability comes from [`shishoza/model.py`](shishoza/model.py); the
+rules are the `classify_and_build` function in the same file.
+
+### 2. Justify the selected features and the prediction process
+
+**Section 3.9.3 and Table 3.10 (new).** All 17 predictors are listed with their
+source and why each should carry information about clearing. **Section 3.9.1** covers
+the data sources, the sampling method, and why labels were taken from Hansen rather
+than derived from NDVI, which would have made the exercise circular. **Section
+3.9.2** covers preprocessing.
+
+In code: `FEATURE_COLS` in [`shishoza/config.py`](shishoza/config.py); feature
+construction in `_ee_build_feature_image` in
+[`shishoza/model.py`](shishoza/model.py).
+
+### 3. Predictive modelling and feature engineering
+
+**Section 3.9.4 (new)** justifies Random Forest against the conditions of this
+problem rather than by convention, reports the grid search that set the
+hyperparameters, and records that the choice was checked against XGBoost and LightGBM
+with no measurable difference under spatial cross-validation. **Section 2.4.1 (new)**
+compares the four approaches found in the literature and explains why the others did
+not fit this case.
+
+### 4. Model evaluation and validation
+
+**Section 5.2.1 (new)** defines recall, precision, F1, ROC-AUC and accuracy and ties
+each to the objective it serves, including why accuracy is reported but not relied
+on. It also explains why spatial block cross-validation is treated as authoritative
+where it disagrees with the random split.
+
+**Section 4.3.7 (new)** states that the cut simulation is not validated, lists the
+three assumptions that remain untested, and explains why the cleared-ground reference
+of 0.20 NDVI was chosen over the training-set median. Recommendation 4 in Section 6.3
+gives the protocol to test it.
+
+### 5. Implementation: are the model-based and rule-based parts synchronised?
+
+Both analysis paths, the live Earth Engine query and the nearest-training-sample
+fallback, call the same `classify_and_build` function with the same four inputs
+rather than each holding its own copy of the rules. They differ in where the numbers
+come from, never in how those numbers are read. Every result records which path
+produced it and which rule fired, so any classification can be traced to its cause.
+
+### 6. Diagram clarity
+
+Every diagram in the report is committed to this repository at full resolution and
+indexed in §4.2 above, so it can be opened and zoomed rather than read from a page
+render.
 
 ---
 
