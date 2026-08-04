@@ -573,11 +573,35 @@ gives the protocol to test it.
 
 ### 5. Implementation: are the model-based and rule-based parts synchronised?
 
-Both analysis paths, the live Earth Engine query and the nearest-training-sample
-fallback, call the same `classify_and_build` function with the same four inputs
-rather than each holding its own copy of the rules. They differ in where the numbers
-come from, never in how those numbers are read. Every result records which path
-produced it and which rule fired, so any classification can be traced to its cause.
+At the defence the whole application was one file, `app_cadastral.py`, at **1,991
+lines**. Model loading, database access, authentication, risk rules and every HTTP
+route sat together, which is what made it hard to see where the learned part ended
+and the rule-based part began.
+
+It is now split into a package with one module per responsibility. `app_cadastral.py`
+is a **73-line entry point** that builds the Flask app and registers four blueprints.
+
+| Module | Lines | Responsibility |
+|---|---|---|
+| [`shishoza/config.py`](shishoza/config.py) | 102 | Constants, env vars, paths, the 17 feature names, shared thread pool |
+| [`shishoza/model.py`](shishoza/model.py) | 304 | Model loading, feature construction, Earth Engine, **and the risk rules** |
+| [`shishoza/db.py`](shishoza/db.py) | 124 | SQLite connections, schema, analysis cache |
+| [`shishoza/auth.py`](shishoza/auth.py) | 94 | Password checks, sessions, `login_required` |
+| [`shishoza/email_notify.py`](shishoza/email_notify.py) | 70 | Citizen decision emails |
+| [`shishoza/monitoring.py`](shishoza/monitoring.py) | 53 | Prediction and drift logging |
+| [`shishoza/routes/pages.py`](shishoza/routes/pages.py) | 64 | The 9 rendered pages: landing, citizen, manager, admin, reviews |
+| [`shishoza/routes/analysis.py`](shishoza/routes/analysis.py) | 631 | `/api/analyse`, `/api/simulate`, sector risk, cadastral extraction, USSD |
+| [`shishoza/routes/accounts.py`](shishoza/routes/accounts.py) | 367 | Manager and citizen sign-in, signup, admin account management |
+| [`shishoza/routes/reviews.py`](shishoza/routes/reviews.py) | 245 | Citizen review requests and the manager decision queue |
+
+The split is what makes the answer to the panel's question checkable. The risk rules
+live in exactly one place, `classify_and_build` in
+[`shishoza/model.py`](shishoza/model.py), and both analysis paths, the live Earth
+Engine query and the nearest-training-sample fallback, call that one function with the
+same four inputs rather than each holding its own copy. They differ in where the
+numbers come from, never in how those numbers are read. Every result records which
+path produced it and which rule fired, so any classification can be traced to its
+cause.
 
 ### 6. Diagram clarity
 
