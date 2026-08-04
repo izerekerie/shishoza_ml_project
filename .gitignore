@@ -14,7 +14,6 @@ venv/
 env/
 # local secrets (SMTP etc.); .env.example stays committed
 .env
-.vscode/
 .claude/
 .idea/
 *.swp
@@ -194,3 +193,6 @@ scripts/rf_tuning_table.py
 scripts/tune_xgb_spatial.py
 results/metrics/ndvi_cut_simulation.png
 results/metrics/ocr_flow_diagram.png
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
